@@ -69,7 +69,11 @@ module.exports = class SimplePluginsManager {
 						for (var i = 0; i < plugins.length; ++i) {
 
 							try {
-								that.addByPath(path.join(that.directory, plugins[i]));
+
+								if (fs.fileExists(path.join(that.directory, plugins[i], 'package.json'))) {
+									that.addByPath(path.join(that.directory, plugins[i]));
+								}
+								
 							}
 							catch(e) {
 								err = (e.message) ? e.message : e;
@@ -174,7 +178,14 @@ module.exports = class SimplePluginsManager {
 						else {
 
 							try {
-								resolve(that.addByPath(pluginPath));
+
+								if (fs.fileExists(path.join(pluginPath, 'package.json'))) {
+									resolve(that.addByPath(pluginPath));
+								}
+								else {
+									reject("'" + path.join(pluginPath, 'package.json') + "' does not exist.");
+								}
+								
 							}
 							catch(e) {
 								reject(e);
