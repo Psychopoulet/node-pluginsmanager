@@ -1,0 +1,28 @@
+{
+  "name": "simplepluginsmanager",
+  "version": "1.0.0",
+  "description": "A plugins manager's object",
+  "main": "main.js",
+  "scripts": {
+    "start": "node main.js",
+    "test": "node tests/tests.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/Psychopoulet/simplepluginsmanager"
+  },
+  "keywords": [
+    "plugin", "manage"
+  ],
+  "author": "Sébastien VIDAL",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Psychopoulet/simplepluginsmanager/issues"
+  },
+  "dependencies": {
+    "simplefs": "^1.1.0",
+    "simpleplugin": "^1.0.0"
+  },
+  "devDependencies": {},
+  "homepage": "https://github.com/Psychopoulet/simplepluginsmanager#readme"
+}

@@ -1,0 +1,11 @@
+{
+  "name": "TestPlugin",
+  "version": "0.0.1",
+  "description": "A test for simpleplugin",
+  "main": "TestPlugin.js",
+  "author": "Sébastien VIDAL",
+  "license": "ISC",
+  "widget": "widget.html",
+  "templates" : [ "template.html" ],
+  "javascripts" :[ "javascript.js"]
+}
