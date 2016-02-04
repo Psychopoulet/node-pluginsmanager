@@ -37,7 +37,7 @@ try {
 
 		oPluginsManager.load().then(function() {
 
-			console.log("must be == [ 'TestPlugin', 'TestPlugin2' ] :");
+			console.log("must be == [ 'TestPlugin' ] :");
 			console.log(oPluginsManager.getPluginsNames());
 
 			console.log("----------------");
