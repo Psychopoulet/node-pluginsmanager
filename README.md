@@ -1,5 +1,5 @@
 # simplepluginsmanager
-A plugins manager, using simpleplugin
+A plugins manager's object, using simpleplugin
 
 
 ## Installation

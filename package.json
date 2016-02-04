@@ -1,7 +1,7 @@
 {
   "name": "simplepluginsmanager",
   "version": "1.0.0",
-  "description": "A plugins manager's object",
+  "description": "A plugins manager's object, using simpleplugin",
   "main": "main.js",
   "scripts": {
     "start": "node main.js",
