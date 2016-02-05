@@ -7,132 +7,125 @@ const 	fs = require('simplefs'),
 		path = require('path'),
 		spawn = require('child_process').spawn;
 
-// private
-
-function _deleteFolderRecursive(path) {
-
-	if(fs.existsSync(path) ) {
-
-		fs.readdirSync(path).forEach(function(file,index) {
-
-			var curPath = path + "/" + file;
-
-			if(fs.dirExists(curPath)) {
-				_deleteFolderRecursive(curPath);
-			}
-			else {
-				fs.unlinkSync(curPath);
-			}
-
-		});
-
-		fs.rmdirSync(path);
-
-	}
-
-}
-
 // module
 
-module.exports = class SimplePluginsManager {
+module.exports = class SimplePluginsManager extends require('events').EventEmitter {
 
-	constructor () {
+	constructor (directory) {
 
-		this.directory = '';
+		super();
+
+		this.directory = (directory) ? directory : '';
 		this.plugins = [];
 
 	}
 
-	load () {
+	loadAll (data) {
 
 		var that = this;
 
 		return new Promise(function(resolve, reject) {
 
-			if ('' == that.directory) {
-				reject(that.constructor.name + "/load : 'directory' is not defined.");
-			}
-			else if (!fs.dirExists(that.directory)) {
-				reject(that.constructor.name + "/load : '" + that.directory + "' does not exist.");
-			}
-			else {
+			try {
 
-				fs.readdir(that.directory, function (err, plugins) {
+				if ('' == that.directory) {
+					reject(that.constructor.name + "/loadAll : 'directory' is not defined.");
+				}
+				else if (!fs.dirExists(that.directory)) {
+					reject(that.constructor.name + "/loadAll : '" + that.directory + "' does not exist.");
+				}
+				else {
 
-					if (err) {
-						reject((err.message) ? err.message : err);
-					}
-					else {
-
-						err = null;
-
-						for (var i = 0; i < plugins.length; ++i) {
-
-							try {
-
-								if (fs.fileExists(path.join(that.directory, plugins[i], 'package.json'))) {
-									that.addByPath(path.join(that.directory, plugins[i]));
-								}
-								
-							}
-							catch(e) {
-								err = (e.message) ? e.message : e;
-								break;
-							}
-
-						}
+					fs.readdir(that.directory, function (err, plugins) {
 
 						if (err) {
-							reject(err);
+							reject((err.message) ? err.message : err);
 						}
 						else {
+
+							plugins.forEach(function(plugin) {
+
+								that.loadOne(path.join(that.directory, plugin), data)
+								.then(function(plugin) {
+									that.emit('load', plugin);
+								})
+								.catch(function(msg) {
+									that.emit('error', msg);
+								});
+
+							});
+
 							resolve();
+
 						}
 
-					}
+					});
 
-				});
+				}
 
+			}
+			catch(e) {
+				reject(that.constructor.name + "/loadAll : " + ((e.message) ? e.message : e));
 			}
 
 		});
 
 	}
 
-	addByPath (pluginPath) {
+	loadOne (pluginPath, data) {
 
-		var _Plugin, oPlugin;
+		var that = this;
 
-		try {
+		return new Promise(function(resolve, reject) {
 
-			_Plugin = require(pluginPath);
-			oPlugin = new _Plugin();
+			try {
 
-			if ('function' !== typeof oPlugin.run) {
-				throw "Plugin '" + oPlugin.name + "' has no 'run' method.";
-			}
-			else {
+				if (!fs.fileExists(path.join(pluginPath, 'package.json'))) {
+					reject(that.constructor.name + "/loadOne : missing '" + path.join(pluginPath, 'package.json') + "' file.");
+				}
+				else {
 
-				for (var j = 0; j < this.plugins.length; ++j) {
+					var _Plugin = require(pluginPath);
 
-					if (oPlugin.name == this.plugins[j].name) {
-						throw "Plugin's name '" + oPlugin.name + "' is already used.";
+					if ('function'!== typeof _Plugin) {
+						reject(that.constructor.name + "/loadOne : '" + pluginPath + "' is not a valid plugin.");
+					}
+					else {
+
+						var oPlugin = new _Plugin();
+
+						if (!oPlugin.directory) {
+							oPlugin.directory = pluginPath;
+						}
+						if (!oPlugin.name) {
+							oPlugin.name = path.basename(pluginPath);
+						}
+
+						that.plugins.push(oPlugin);
+
+						if ('function' !== typeof oPlugin.run) {
+							reject(that.constructor.name + "/loadOne : Plugin '" + oPlugin.name + "' has no 'run' method.");
+						}
+						else if ('function' !== typeof oPlugin.free) {
+							reject(that.constructor.name + "/loadOne : Plugin '" + oPlugin.name + "' has no 'free' method.");
+						}
+						else {
+
+							oPlugin.run(data);
+							resolve(oPlugin);
+
+						}
+
 					}
 
 				}
 
-				oPlugin.run();
-				this.plugins.push(oPlugin);
-				
+			}
+			catch(e) {
+				reject(that.constructor.name + "/loadOne : " + ((e.message) ? e.message : e));
 			}
 
-		}
-		catch(e) {
-			_deleteFolderRecursive(pluginPath);
-			throw this.constructor.name + "/addByPath : " + ((e.message) ? e.message : e);
-		}
-
-		return oPlugin;
+		});
 
 	}
 
@@ -149,52 +142,53 @@ module.exports = class SimplePluginsManager {
 				if (-1 == url.indexOf('github')) {
 					reject(that.constructor.name + "/addByGithub : '" + url + "' is not a valid github url.");
 				}
+				else if (-1 == url.indexOf('https')) {
+					reject(that.constructor.name + "/addByGithub : '" + url + "' is not a valid https url.");
+				}
 				else {
 
 					tabUrl = url.split('/');
 
 					pluginPath = path.join(that.directory, tabUrl[tabUrl.length - 1]);
 
-					oSpawn = spawn(
-						'git', [
-							'-c', 'diff.mnemonicprefix=false', '-c', 'core.quotepath=false', 'clone', '--recursive',
-							url, pluginPath
-						]
-					);
+					if (fs.dirExists(pluginPath)) {
+						reject(that.constructor.name + "/addByGithub : '" + pluginPath + "' aldready exists.");
+					}
+					else {
 
-					oSpawn.stdout.on('data', function(data) {
-						sResult += data;
-					});
+						oSpawn = spawn(
+							'git', [
+								'-c', 'diff.mnemonicprefix=false', '-c', 'core.quotepath=false', 'clone', '--recursive',
+								url, pluginPath
+							]
+						);
 
-					oSpawn.stderr.on('data', function(err) {
-						sResult += err;
-					});
+						oSpawn.stdout.on('data', function(data) {
+							sResult += data;
+						});
 
-					oSpawn.on('close', function (code) {
+						oSpawn.stderr.on('data', function(err) {
+							sResult += err;
+						});
 
-						if (code) {
-							reject(that.constructor.name + "/addByGithub : " + sResult);
-						}
-						else {
+						oSpawn.on('close', function (code) {
 
-							try {
-
-								if (fs.fileExists(path.join(pluginPath, 'package.json'))) {
-									resolve(that.addByPath(pluginPath));
-								}
-								else {
-									reject("'" + path.join(pluginPath, 'package.json') + "' does not exist.");
-								}
-								
+							if (code) {
+								reject(that.constructor.name + "/addByGithub : " + sResult);
 							}
-							catch(e) {
-								reject(e);
+							else {
+
+								that.loadOne(pluginPath).then(function(plugin) {
+									that.emit('add', plugin);
+									resolve(plugin);
+								}).catch(reject);
+
 							}
 							
-						}
-						
-					});
+						});
 					
+					}
+
 				}
 
 			}
@@ -220,18 +214,43 @@ module.exports = class SimplePluginsManager {
 
 	remove (key) {
 
-		if (!this.plugins[key]) {
-			throw this.constructor.name + "/remove : there is no '" + key + "' plugins' key.";
-		}
-		else {
+		var that = this;
+
+		return new Promise(function(resolve, reject) {
 
 			try {
-				this.plugins[key].free();
-				this.plugins.splice(key, 1);
-			}
-			catch(e) { }
 
-		}
+				if (!that.plugins[key]) {
+					reject(that.constructor.name + "/remove : there is no '" + key + "' plugins' key.");
+				}
+				else {
+
+					var sName = that.plugins[key].name, sDirectory = that.plugins[key].directory;
+
+					if ('function' === typeof that.plugins[key].free) {
+						that.plugins[key].free();
+					}
+
+					that.plugins.splice(key, 1);
+
+					if (!fs.rmdirp(sDirectory)) {
+						reject(that.constructor.name + "/remove : impossible to remove '" + sDirectory + "' directory.");
+					}
+					else {
+
+						that.emit('remove', sName);
+						resolve(sName);
+
+					}
+
+				}
+
+			}
+			catch(e) {
+				reject(that.constructor.name + "/remove : " + ((e.message) ? e.message : e));
+			}
+
+		});
 
 	}
 

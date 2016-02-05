@@ -14,8 +14,8 @@ module.exports = class TestPlugin extends require('simpleplugin') {
 
 	}
 
-	run () {
-		console.log('run TestPlugin');
+	run (data) {
+		console.log("run TestPlugin with '" + data + "' data");
 	}
 
 	free () {

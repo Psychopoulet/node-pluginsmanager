@@ -22,22 +22,43 @@ $ npm install simplepluginsmanager
 
 const SimplePluginsManager = require('simplepluginsmanager');
 
-var oPluginsManager = new SimplePluginsManager();
+var oPluginsManager = new SimplePluginsManager(path.join(__dirname, 'plugins'));
 
-oPluginsManager.load().then(function() {
+oPluginsManager
+
+		.on('error', function(msg) {
+			console.log(msg);
+		})
+		.on('add', function(pluginPath) {
+			console.log("--- [event] '" + pluginPath + "' added ---");
+		})
+		.on('remove', function(pluginName) {
+			console.log("--- [event] '" + pluginName + "' removed ---");
+		})
+		.on('load', function(plugin) {
+			console.log("--- [event] '" + plugin.name + "' loaded ---");
+		})
+
+.loadAll(<optional data to pass to the 'run' plugins methods>).then(function() {
 
 	console.log('all plugins loaded');
 	console.log(oPluginsManager.getPluginsNames());
 
 	oPluginsManager.addByGithub('https://github.com/<account>/<plugin>')
 	.then(function(plugin) {
-		console.log(plugin.name + ' loaded');
+		console.log(plugin.name + ' added & loaded');
 	})
 	.catch(function(err) {
 		console.log(err);
 	});
 
-	oPluginsManager.remove(5);
+	oPluginsManager.remove(5)
+	.then(function(pluginName) {
+		console.log(pluginName + ' removed');
+	})
+	.catch(function(err) {
+		console.log(err);
+	});
 
 })
 .catch(function(err) {
