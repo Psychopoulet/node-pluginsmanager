@@ -3,7 +3,7 @@
 
 // module
 
-module.exports = class TestPlugin extends require('simpleplugin') {
+module.exports = class TestGoodPlugin extends require('simpleplugin') {
 
 	constructor () {
 
@@ -15,13 +15,13 @@ module.exports = class TestPlugin extends require('simpleplugin') {
 	}
 
 	run (data) {
-		console.log("run TestPlugin with '" + data + "' data");
+		console.log("run TestGoodPlugin with '" + data + "' data");
 	}
 
 	free () {
 
 		super.free();
-		console.log('free TestPlugin');
+		console.log('free TestGoodPlugin');
 
 	}
 
