@@ -21,8 +21,10 @@ $ npm install simplepluginsmanager
 "use strict";
 
 const SimplePluginsManager = require('simplepluginsmanager');
+const path = require('path');
 
-var oPluginsManager = new SimplePluginsManager(path.join(__dirname, 'plugins'));
+var oPluginsManager = new SimplePluginsManager(path.join(__dirname, 'plugins')); // param optional : automaticly set to this value if not given...
+oPluginsManager.directory = path.join(__dirname, 'plugins'); // ... or changed like this
 
 oPluginsManager
 
@@ -52,7 +54,7 @@ oPluginsManager
 		console.log(err);
 	});
 
-	oPluginsManager.remove(5)
+	oPluginsManager.removeByDirectory(path.join(oPluginsManager.directory, <plugin>))
 	.then(function(pluginName) {
 		console.log(pluginName + ' removed');
 	})
