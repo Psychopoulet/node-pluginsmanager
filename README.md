@@ -46,7 +46,7 @@ oPluginsManager
 	console.log('all plugins loaded');
 	console.log(oPluginsManager.getPluginsNames());
 
-	oPluginsManager.addByGithub('https://github.com/<account>/<plugin>')
+	oPluginsManager.addByGithub('https://github.com/<account>/<plugin>', <optional data to pass to the 'run' plugins methods>)
 	.then(function(plugin) {
 		console.log(plugin.name + ' added & loaded');
 	})

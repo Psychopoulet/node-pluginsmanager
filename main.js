@@ -138,7 +138,7 @@ module.exports = class SimplePluginsManager extends require('events').EventEmitt
 
 	}
 
-	addByGithub (url) {
+	addByGithub (url, data) {
 
 		var that = this;
 
@@ -187,7 +187,7 @@ module.exports = class SimplePluginsManager extends require('events').EventEmitt
 							}
 							else {
 
-								that.loadOne(pluginPath).then(function(plugin) {
+								that.loadOne(pluginPath, data).then(function(plugin) {
 									that.emit('add', plugin);
 									resolve(plugin);
 								}).catch(reject);
