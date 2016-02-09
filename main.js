@@ -16,7 +16,7 @@ module.exports = class SimplePluginsManager extends require('events').EventEmitt
 
 		super();
 
-		this.directory = (directory) ? directory : '';
+		this.directory = (directory) ? directory : path.join(__dirname, 'plugins');
 		this.plugins = [];
 
 	}
@@ -221,7 +221,7 @@ module.exports = class SimplePluginsManager extends require('events').EventEmitt
 
 	}
 
-	remove (key) {
+	removeByKey (key) {
 
 		var that = this;
 
@@ -230,7 +230,7 @@ module.exports = class SimplePluginsManager extends require('events').EventEmitt
 			try {
 
 				if (!that.plugins[key]) {
-					reject(that.constructor.name + "/remove : there is no '" + key + "' plugins' key.");
+					reject(that.constructor.name + "/removeByKey : there is no '" + key + "' plugins' key.");
 				}
 				else {
 
@@ -243,7 +243,7 @@ module.exports = class SimplePluginsManager extends require('events').EventEmitt
 					that.plugins.splice(key, 1);
 
 					if (!fs.rmdirp(sDirectory)) {
-						reject(that.constructor.name + "/remove : impossible to remove '" + sDirectory + "' directory.");
+						reject(that.constructor.name + "/removeByKey : impossible to remove '" + sDirectory + "' directory.");
 					}
 					else {
 
@@ -256,7 +256,49 @@ module.exports = class SimplePluginsManager extends require('events').EventEmitt
 
 			}
 			catch(e) {
-				reject(that.constructor.name + "/remove : " + ((e.message) ? e.message : e));
+				reject(that.constructor.name + "/removeByKey : " + ((e.message) ? e.message : e));
+			}
+
+		});
+
+	}
+
+	removeByDirectory (dir) {
+
+		var that = this;
+
+		return new Promise(function(resolve, reject) {
+
+			try {
+
+				if (!fs.dirExists(dir)) {
+					reject(that.constructor.name + "/removeByDirectory : there is no '" + dir + "' plugins' directory.");
+				}
+				else {
+
+					var key = 0;
+
+					for (var i = 0; i < that.plugins.length; ++i) {
+
+						if (that.plugins[i].directory === dir) {
+							key = i;
+							break;
+						}
+
+					}
+
+					if (0 >= key) {
+						reject(that.constructor.name + "/removeByDirectory : impossible to remove '" + dir + "' directory.");
+					}
+					else {
+						that.removeByKey(key).then(resolve).catch(reject);
+					}
+
+				}
+
+			}
+			catch(e) {
+				reject(that.constructor.name + "/removeByDirectory : " + ((e.message) ? e.message : e));
 			}
 
 		});

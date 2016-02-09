@@ -85,7 +85,7 @@ try {
 
 					if (3 == oPluginsManager.plugins.length) {
 
-						oPluginsManager.remove(2).then(function () {
+						oPluginsManager.removeByDirectory(path.join(oPluginsManager.directory, 'simplefs')).then(function () {
 
 							console.log("must be == [ 'TestEmptyPlugin', 'TestGoodPlugin' ] :");
 							console.log(oPluginsManager.getPluginsNames());
