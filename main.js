@@ -5,7 +5,8 @@
 	
 const 	fs = require('simplefs'),
 		path = require('path'),
-		spawn = require('child_process').spawn;
+		spawn = require('child_process').spawn,
+		SimplePugin = require('simpleplugin');
 
 // module
 
@@ -78,9 +79,16 @@ module.exports = class SimplePluginsManager extends require('events').EventEmitt
 
 		return new Promise(function(resolve, reject) {
 
+			var oPlugin;
+
 			try {
 
+				oPlugin = new SimplePugin();
+				oPlugin.directory = pluginPath;
+				oPlugin.name = path.basename(pluginPath);
+
 				if (!fs.fileExists(path.join(pluginPath, 'package.json'))) {
+					that.plugins.push(oPlugin);
 					reject(that.constructor.name + "/loadOne : missing '" + path.join(pluginPath, 'package.json') + "' file.");
 				}
 				else {
@@ -88,11 +96,12 @@ module.exports = class SimplePluginsManager extends require('events').EventEmitt
 					var _Plugin = require(pluginPath);
 
 					if ('function'!== typeof _Plugin) {
+						that.plugins.push(oPlugin);
 						reject(that.constructor.name + "/loadOne : '" + pluginPath + "' is not a valid plugin.");
 					}
 					else {
 
-						var oPlugin = new _Plugin();
+						oPlugin = new _Plugin();
 
 						if (!oPlugin.directory) {
 							oPlugin.directory = pluginPath;
@@ -122,7 +131,7 @@ module.exports = class SimplePluginsManager extends require('events').EventEmitt
 
 			}
 			catch(e) {
-				reject(that.constructor.name + "/loadOne : " + ((e.message) ? e.message : e));
+				reject(that.constructor.name + "/loadOne : Plugin '" + pluginPath + "' -> " + ((e.message) ? e.message : e));
 			}
 
 		});
