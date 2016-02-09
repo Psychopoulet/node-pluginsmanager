@@ -1,8 +1,8 @@
 {
-  "name": "TestPlugin",
+  "name": "TestGoodPlugin",
   "version": "0.0.1",
   "description": "A test for simpleplugin",
-  "main": "TestPlugin.js",
+  "main": "TestGoodPlugin.js",
   "author": "Sébastien VIDAL",
   "license": "ISC",
   "widget": "widget.html",

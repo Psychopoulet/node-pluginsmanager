@@ -17,16 +17,16 @@ try {
 	oPluginsManager
 
 		.on('error', function(msg) {
-			console.log(msg);
+			console.log("--- [event/error] '" + msg + "' ---");
 		})
 		.on('add', function(pluginPath) {
-			console.log("--- [event] '" + pluginPath + "' added ---");
+			console.log("--- [event/add] '" + pluginPath + "' added ---");
 		})
 		.on('remove', function(pluginName) {
-			console.log("--- [event] '" + pluginName + "' removed ---");
+			console.log("--- [event/remove] '" + pluginName + "' removed ---");
 		})
 		.on('load', function(plugin) {
-			console.log("--- [event] '" + plugin.name + "' loaded ---");
+			console.log("--- [event/load] '" + plugin.name + "' loaded ---");
 		})
 
 	.loadAll().then(function() {
@@ -61,11 +61,11 @@ try {
 			console.log("----------------");
 			console.log("test SimplePluginsManager");
 			console.log("----------------");
-			console.log("must be == 'run TestPlugin with 'test' data' :");
+			console.log("must be == 'run TestGoodPlugin with 'test' data' :");
 
 			oPluginsManager.loadAll('test').then(function() {
 
-				console.log("must be == [ 'TestPlugin' ] :");
+				console.log("must be == [ 'TestEmptyPlugin', 'TestGoodPlugin' ] :");
 				console.log(oPluginsManager.getPluginsNames());
 
 				console.log("must be == 'SimplePluginsManager/loadOne : '<path>' is not a valid plugin.' :");
@@ -78,11 +78,31 @@ try {
 
 				}).catch(function(msg) {
 
-					if (fs.rmdirp(path.join(oPluginsManager.directory, 'simplefs'))) {
-						console.log(msg);
-					}
-					else {
-						console.log('impossible to delete ' + path.join(oPluginsManager.directory, 'simplefs'));
+					console.log(msg);
+
+					console.log("must be == [ 'TestEmptyPlugin', 'TestGoodPlugin', 'simplefs' ] :");
+					console.log(oPluginsManager.getPluginsNames());
+
+					if (3 == oPluginsManager.plugins.length) {
+
+						oPluginsManager.remove(2).then(function () {
+
+							console.log("must be == [ 'TestEmptyPlugin', 'TestGoodPlugin' ] :");
+							console.log(oPluginsManager.getPluginsNames());
+
+							console.log("----------------");
+							console.log("");
+
+						})
+						.catch(function(msg) {
+
+							console.log(msg);
+
+							console.log("----------------");
+							console.log("");
+
+						});
+
 					}
 
 				});
