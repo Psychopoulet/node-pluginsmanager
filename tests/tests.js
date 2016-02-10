@@ -12,7 +12,7 @@ try {
 	console.log("----------------");
 	console.log("test error");
 	console.log("----------------");
-	console.log("must be == 'SimplePluginsManager/loadAll : 'directory' is not defined.' :");
+	console.log("must be == 'SimplePluginsManager/loadAll : '<path>' does not exist.' :");
 
 	oPluginsManager
 
