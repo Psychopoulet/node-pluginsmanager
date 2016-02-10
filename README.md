@@ -31,14 +31,14 @@ oPluginsManager
 		.on('error', function(msg) {
 			console.log(msg);
 		})
-		.on('add', function(pluginPath) {
-			console.log("--- [event] '" + pluginPath + "' added ---");
+		.on('add', function(plugin) {
+			console.log("--- [event] '" + plugin.name + "' (v" + plugin.version + ") added ---");
 		})
 		.on('remove', function(pluginName) {
 			console.log("--- [event] '" + pluginName + "' removed ---");
 		})
 		.on('load', function(plugin) {
-			console.log("--- [event] '" + plugin.name + "' loaded ---");
+			console.log("--- [event] '" + plugin.name + "' (v" + plugin.version + ") loaded ---");
 		})
 
 .loadAll(<optional data to pass to the 'run' plugins methods>).then(function() {

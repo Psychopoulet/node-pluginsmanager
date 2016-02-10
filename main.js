@@ -221,7 +221,7 @@ module.exports = class SimplePluginsManager extends require('events').EventEmitt
 
 	}
 
-	removeByKey (key) {
+	removeByKey (key, data) {
 
 		var that = this;
 
@@ -237,7 +237,7 @@ module.exports = class SimplePluginsManager extends require('events').EventEmitt
 					var sName = that.plugins[key].name, sDirectory = that.plugins[key].directory;
 
 					if ('function' === typeof that.plugins[key].free) {
-						that.plugins[key].free();
+						that.plugins[key].free(data);
 					}
 
 					that.plugins.splice(key, 1);
@@ -263,7 +263,7 @@ module.exports = class SimplePluginsManager extends require('events').EventEmitt
 
 	}
 
-	removeByDirectory (dir) {
+	removeByDirectory (dir, data) {
 
 		var that = this;
 
@@ -291,7 +291,7 @@ module.exports = class SimplePluginsManager extends require('events').EventEmitt
 						reject(that.constructor.name + "/removeByDirectory : impossible to remove '" + dir + "' directory.");
 					}
 					else {
-						that.removeByKey(key).then(resolve).catch(reject);
+						that.removeByKey(key, data).then(resolve).catch(reject);
 					}
 
 				}
