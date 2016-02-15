@@ -144,7 +144,7 @@ module.exports = class SimplePluginsManager extends require('events').EventEmitt
 
 		return new Promise(function(resolve, reject) {
 
-			var tabUrl, pluginPath, oSpawn, sResult;
+			var tabUrl, pluginPath, oSpawn, sResult = '';
 
 			try {
 
@@ -153,6 +153,9 @@ module.exports = class SimplePluginsManager extends require('events').EventEmitt
 				}
 				else if (-1 == url.indexOf('https')) {
 					reject(that.constructor.name + "/addByGithub : '" + url + "' is not a valid https url.");
+				}
+				else if (-1 >= process.env.PATH.indexOf('Git') && -1 >= process.env.PATH.indexOf('git')) {
+					reject(that.constructor.name + "/addByGithub : 'git' is probably not registered in your PATH.");
 				}
 				else {
 
@@ -177,10 +180,14 @@ module.exports = class SimplePluginsManager extends require('events').EventEmitt
 						});
 
 						oSpawn.stderr.on('data', function(err) {
-							sResult += err;
+							sResult += ((err.message) ? err.message : err);
 						});
 
-						oSpawn.on('close', function (code) {
+						oSpawn.on('error', function(err) {
+							sResult += ((err.message) ? err.message : err);
+						})
+
+						.on('close', function (code) {
 
 							if (code) {
 								reject(that.constructor.name + "/addByGithub : " + sResult);
