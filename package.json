@@ -1,6 +1,6 @@
 {
   "name": "simplepluginsmanager",
-  "version": "1.2.3",
+  "version": "1.2.4",
   "description": "A plugins manager's object, using simpleplugin",
   "main": "main.js",
   "scripts": {
