@@ -170,7 +170,7 @@ module.exports = class SimplePluginsManager extends require('events').EventEmitt
 
 						oSpawn = spawn(
 							'git', [
-								'-c', 'diff.mnemonicprefix=false', '-c', 'core.quotepath=false', 'clone', '--recursive',
+								'-c', 'core.quotepath=false', 'clone', '--recursive', '--depth=1',
 								url, pluginPath
 							]
 						);
