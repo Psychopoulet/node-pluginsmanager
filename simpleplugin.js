@@ -19,6 +19,7 @@ module.exports = class SimplePlugin {
 		this.version = '';
 		this.author = '';
 		this.license = '';
+		this.github = '';
 
 		this.widget = '';
 
@@ -60,6 +61,9 @@ module.exports = class SimplePlugin {
 				}
 				if (data.license) {
 					this.license = data.license;
+				}
+				if (data.github) {
+					this.github = data.github;
 				}
 
 				if (data.widget) {
