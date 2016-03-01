@@ -1,9 +1,7 @@
 
 "use strict";
 
-// module
-
-module.exports = class TestGoodPlugin extends require('simpleplugin') {
+module.exports = class TestGoodPlugin extends require('../../../main.js').SimplePlugin {
 
 	constructor () {
 

@@ -6,7 +6,7 @@
 const 	fs = require('simplefs'),
 		path = require('path'),
 		spawn = require('child_process').spawn,
-		SimplePugin = require('simpleplugin');
+		SimplePlugin = require(path.join(__dirname, 'simpleplugin.js'));
 
 // module
 
@@ -18,6 +18,59 @@ module.exports = class SimplePluginsManager extends require('events').EventEmitt
 
 		this.directory = (directory) ? directory : path.join(__dirname, 'plugins');
 		this.plugins = [];
+
+	}
+
+	static get SimplePlugin() { return SimplePlugin; }
+
+	executeGIT(params) {
+
+		var that = this;
+
+		return new Promise(function(resolve, reject) {
+
+			var oSpawn, sResult = '';
+
+			try {
+
+				if (-1 >= process.env.PATH.indexOf('Git') && -1 >= process.env.PATH.indexOf('git')) {
+					reject(that.constructor.name + "/executeGIT : 'git' is probably not registered in your PATH.");
+				}
+				else {
+
+					oSpawn = spawn('git', params);
+
+					oSpawn.stdout.on('data', function(data) {
+						sResult += data;
+					});
+
+					oSpawn.stderr.on('data', function(err) {
+						sResult += ((err.message) ? err.message : err);
+					});
+
+					oSpawn.on('error', function(err) {
+						sResult += ((err.message) ? err.message : err);
+					})
+
+					.on('close', function (code) {
+
+						if (code) {
+							reject(that.constructor.name + "/executeGIT : " + sResult);
+						}
+						else {
+							resolve();
+						}
+						
+					});
+					
+				}
+
+			}
+			catch(e) {
+				reject(that.constructor.name + "/executeGIT : " + ((e.message) ? e.message : e));
+			}
+
+		});
 
 	}
 
@@ -83,7 +136,7 @@ module.exports = class SimplePluginsManager extends require('events').EventEmitt
 
 			try {
 
-				oPlugin = new SimplePugin();
+				oPlugin = new SimplePlugin();
 				oPlugin.directory = pluginPath;
 				oPlugin.name = path.basename(pluginPath);
 
@@ -120,7 +173,7 @@ module.exports = class SimplePluginsManager extends require('events').EventEmitt
 						}
 						else {
 
-							oPlugin.run(data);
+							oPlugin.run((data) ? data : null);
 							resolve(oPlugin);
 
 						}
@@ -154,13 +207,9 @@ module.exports = class SimplePluginsManager extends require('events').EventEmitt
 				else if (-1 == url.indexOf('https')) {
 					reject(that.constructor.name + "/addByGithub : '" + url + "' is not a valid https url.");
 				}
-				else if (-1 >= process.env.PATH.indexOf('Git') && -1 >= process.env.PATH.indexOf('git')) {
-					reject(that.constructor.name + "/addByGithub : 'git' is probably not registered in your PATH.");
-				}
 				else {
 
 					tabUrl = url.split('/');
-
 					pluginPath = path.join(that.directory, tabUrl[tabUrl.length - 1]);
 
 					if (fs.dirExists(pluginPath)) {
@@ -168,41 +217,18 @@ module.exports = class SimplePluginsManager extends require('events').EventEmitt
 					}
 					else {
 
-						oSpawn = spawn(
-							'git', [
-								'-c', 'core.quotepath=false', 'clone', '--recursive', '--depth=1',
-								url, pluginPath
-							]
-						);
+						that.executeGIT([
+							'-c', 'core.quotepath=false', 'clone', '--recursive', '--depth=1',
+							url, pluginPath
+						]).then(function() {
 
-						oSpawn.stdout.on('data', function(data) {
-							sResult += data;
-						});
+							that.loadOne(pluginPath, data).then(function(plugin) {
+								that.emit('add', plugin);
+								resolve(plugin);
+							}).catch(reject);
 
-						oSpawn.stderr.on('data', function(err) {
-							sResult += ((err.message) ? err.message : err);
-						});
+						}).catch(reject);
 
-						oSpawn.on('error', function(err) {
-							sResult += ((err.message) ? err.message : err);
-						})
-
-						.on('close', function (code) {
-
-							if (code) {
-								reject(that.constructor.name + "/addByGithub : " + sResult);
-							}
-							else {
-
-								that.loadOne(pluginPath, data).then(function(plugin) {
-									that.emit('add', plugin);
-									resolve(plugin);
-								}).catch(reject);
-
-							}
-							
-						});
-					
 					}
 
 				}
@@ -228,6 +254,63 @@ module.exports = class SimplePluginsManager extends require('events').EventEmitt
 
 	}
 
+	updateByDirectory (dir, data) {
+
+		var that = this;
+
+		return new Promise(function(resolve, reject) {
+
+			try {
+
+				if (!fs.dirExists(dir)) {
+					reject(that.constructor.name + "/updateByDirectory : there is no '" + dir + "' plugins' directory.");
+				}
+				else {
+
+					var key = -1;
+
+					for (var i = 0; i < that.plugins.length; ++i) {
+
+						if (that.plugins[i].directory === dir) {
+							key = i;
+							break;
+						}
+
+					}
+
+					if (0 > key) {
+						reject(that.constructor.name + "/updateByDirectory : impossible to find '" + dir + "' directory.");
+					}
+					else {
+
+						if ('function' === typeof that.plugins[key].free) {
+							that.plugins[key].free((data) ? data : null, false);
+						}
+
+						that.plugins.splice(key, 1);
+
+						that.executeGIT([ '-c', dir, 'pull' ]).then(function() {
+
+							that.loadOne(dir, data).then(function(plugin) {
+								that.emit('update', plugin);
+								resolve(plugin);
+							}).catch(reject);
+
+						}).catch(reject);
+
+					}
+
+				}
+
+			}
+			catch(e) {
+				reject(that.constructor.name + "/updateByDirectory : " + ((e.message) ? e.message : e));
+			}
+
+		});
+
+	}
+
 	removeByKey (key, data) {
 
 		var that = this;
@@ -244,7 +327,7 @@ module.exports = class SimplePluginsManager extends require('events').EventEmitt
 					var sName = that.plugins[key].name, sDirectory = that.plugins[key].directory;
 
 					if ('function' === typeof that.plugins[key].free) {
-						that.plugins[key].free(data);
+						that.plugins[key].free((data) ? data : null, true);
 					}
 
 					that.plugins.splice(key, 1);
@@ -283,10 +366,10 @@ module.exports = class SimplePluginsManager extends require('events').EventEmitt
 				}
 				else {
 
-					var key = 0;
+					var key = -1;
 
 					for (var i = 0; i < that.plugins.length; ++i) {
-
+						
 						if (that.plugins[i].directory === dir) {
 							key = i;
 							break;
@@ -294,8 +377,8 @@ module.exports = class SimplePluginsManager extends require('events').EventEmitt
 
 					}
 
-					if (0 >= key) {
-						reject(that.constructor.name + "/removeByDirectory : impossible to remove '" + dir + "' directory.");
+					if (0 > key) {
+						reject(that.constructor.name + "/removeByDirectory : impossible to find '" + dir + "' directory.");
 					}
 					else {
 						that.removeByKey(key, data).then(resolve).catch(reject);
