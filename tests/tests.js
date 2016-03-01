@@ -10,7 +10,7 @@ try {
 	var oPluginsManager = new SimplePluginsManager();
 
 	console.log("----------------");
-	console.log("test error");
+	console.log("test errors");
 	console.log("----------------");
 	console.log("must be == 'SimplePluginsManager/loadAll : '<path>' does not exist.' :");
 
@@ -19,14 +19,17 @@ try {
 		.on('error', function(msg) {
 			console.log("--- [event/error] '" + msg + "' ---");
 		})
-		.on('add', function(pluginPath) {
-			console.log("--- [event/add] '" + pluginPath + "' added ---");
+		.on('add', function(plugin) {
+        	console.log("--- [event/add] '" + plugin.name + "' (v" + plugin.version + ") added ---");
+		})
+		.on('update', function(plugin) {
+			console.log("--- [event/update] '" + plugin.name + "' (v" + plugin.version + ") updated ---");
 		})
 		.on('remove', function(pluginName) {
 			console.log("--- [event/remove] '" + pluginName + "' removed ---");
 		})
 		.on('load', function(plugin) {
-			console.log("--- [event/load] '" + plugin.name + "' loaded ---");
+			console.log("--- [event/load] '" + plugin.name + "' (v" + plugin.version + ") loaded ---");
 		})
 
 	.loadAll().then(function() {
@@ -41,76 +44,136 @@ try {
 
 		console.log(err);
 
-		console.log("must be == 'SimplePluginsManager/addByGithub : '' is not a valid github url.' :");
-		oPluginsManager.addByGithub('').then(function() {
+		oPluginsManager.directory = path.join(__dirname, 'plugins');
 
-			console.log('added');
+		var sEmptyPlugin = path.join(oPluginsManager.directory, 'TestEmptyPlugin');
 
-			console.log("----------------");
-			console.log("");
+		fs.mkdirp(sEmptyPlugin);
 
-		}).catch(function(msg) {
+		console.log("must be == 'SimplePluginsManager/loadOne : missing '<path>package.json' file.' :");
+		oPluginsManager.loadOne(sEmptyPlugin).then(function() {
+			console.log('loaded');
+		})
+		.catch(function(err) {
 
-			console.log(msg);
+			console.log(err);
 
-			console.log("----------------");
-			console.log("");
+			oPluginsManager.removeByDirectory(sEmptyPlugin).then(function () {
 
-			oPluginsManager.directory = path.join(__dirname, 'plugins');
+				console.log("must be == 'SimplePluginsManager/addByGithub : '' is not a valid github url.' :");
+				oPluginsManager.addByGithub('').then(function() {
 
-			console.log("----------------");
-			console.log("test SimplePluginsManager");
-			console.log("----------------");
-			console.log("must be == 'run TestGoodPlugin with 'test' data' :");
-
-			oPluginsManager.loadAll('test').then(function() {
-
-				console.log("must be == [ 'TestEmptyPlugin', 'TestGoodPlugin' ] :");
-				console.log(oPluginsManager.getPluginsNames());
-
-				console.log("must be == 'SimplePluginsManager/loadOne : '<path>' is not a valid plugin.' :");
-				oPluginsManager.addByGithub('https://github.com/Psychopoulet/simplefs').then(function() {
-					
 					console.log('added');
 
 					console.log("----------------");
 					console.log("");
 
-				}).catch(function(msg) {
+				}).catch(function(err) {
 
-					console.log(msg);
+					console.log(err);
 
-					console.log("must be == [ 'TestEmptyPlugin', 'TestGoodPlugin', 'simplefs' ] :");
-					console.log(oPluginsManager.getPluginsNames());
+					console.log("must be == 'SimplePluginsManager/loadOne : '<path>' has no 'run' method.' :");
+					oPluginsManager.addByGithub('https://github.com/Psychopoulet/simplecontainer').then(function() {
+						
+						console.log('simplecontainer added');
 
-					if (3 == oPluginsManager.plugins.length) {
+						console.log("----------------");
+						console.log("");
 
-						oPluginsManager.removeByDirectory(path.join(oPluginsManager.directory, 'simplefs')).then(function () {
+					}).catch(function(err) {
 
-							console.log("must be == [ 'TestEmptyPlugin', 'TestGoodPlugin' ] :");
-							console.log(oPluginsManager.getPluginsNames());
+						console.log(err);
 
-							console.log("----------------");
-							console.log("");
+						oPluginsManager.removeByDirectory(path.join(oPluginsManager.directory, 'simplecontainer')).then(function () {
+
+							console.log("must be == 'SimplePluginsManager/loadOne : missing '<path>package.json' file.' :");
+							oPluginsManager.addByGithub('https://github.com/Psychopoulet/angular-bootstrap-popup').then(function() {
+								
+								console.log('angular-bootstrap-popup added');
+
+								console.log("----------------");
+								console.log("");
+
+							}).catch(function(err) {
+
+								console.log(err);
+
+								oPluginsManager.removeByDirectory(path.join(oPluginsManager.directory, 'angular-bootstrap-popup')).then(function () {
+
+									console.log("must be == 'SimplePluginsManager/loadOne : '<path>' is not a valid plugin.' :");
+									oPluginsManager.addByGithub('https://github.com/Psychopoulet/simplefs').then(function() {
+										
+										console.log('simplefs added');
+
+										console.log("----------------");
+										console.log("");
+
+									}).catch(function(err) {
+
+										console.log(err);
+
+										oPluginsManager.updateByDirectory(path.join(oPluginsManager.directory, 'simplefs')).then(function (plugin) {
+
+											console.log("'" + plugin.name +  "' updated");
+
+											console.log("----------------");
+											console.log("");
+
+										})
+										.catch(function(err) {
+											
+											oPluginsManager.removeByDirectory(path.join(oPluginsManager.directory, 'simplefs')).then(function () {
+
+												console.log("must be == [] :");
+												console.log(oPluginsManager.plugins);
+
+												console.log("----------------");
+												console.log("");
+
+											})
+											.catch(function(err) {
+
+												console.log(err);
+
+												console.log("----------------");
+												console.log("");
+
+											});
+
+										});
+
+									});
+
+								})
+								.catch(function(err) {
+
+									console.log(err);
+
+									console.log("----------------");
+									console.log("");
+
+								});
+
+							});
 
 						})
-						.catch(function(msg) {
+						.catch(function(err) {
 
-							console.log(msg);
+							console.log(err);
 
 							console.log("----------------");
 							console.log("");
 
 						});
 
-					}
+					});
 
 				});
 
 			})
 			.catch(function(err) {
 
-				console.log('plugins load failed : ' + err);
+				console.log(err);
 
 				console.log("----------------");
 				console.log("");
