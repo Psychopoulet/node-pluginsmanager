@@ -28,20 +28,22 @@ module.exports = class SimplePlugin {
 
 	}
 
+	// read
+
 	loadDataFromPackageFile () {
 
 		if ('' == this.directory) {
-			throw this.constructor.name + "/loadDataFromPackageFile : 'directory' is not defined.";
+			throw "SimplePlugin/loadDataFromPackageFile : 'directory' is not defined.";
 		}
 		else if (!fs.dirExists(this.directory)) {
-			throw this.constructor.name + "/loadDataFromPackageFile : '" + this.directory + "' does not exist.";
+			throw "SimplePlugin/loadDataFromPackageFile : '" + this.directory + "' does not exist.";
 		}
 		else {
 
 			var file = path.join(this.directory, 'package.json');
 
 			if (!fs.fileExists(file)) {
-				throw this.constructor.name + "/loadDataFromPackageFile : '" + file + "' does not exist.";
+				throw "SimplePlugin/loadDataFromPackageFile : '" + file + "' does not exist.";
 			}
 			else {
 
@@ -112,13 +114,20 @@ module.exports = class SimplePlugin {
 
 	}
 
-	run () { }
+	// load
 
-	free () {
+	load () { }
+	unload () {
 		
 		delete this.templates;
 		delete this.javascripts;
 
 	}
+
+	// write
+
+	install () { }
+	update () { }
+	uninstall () { }
 
 }

@@ -3,24 +3,31 @@
 
 module.exports = class TestGoodPlugin extends require('../../../main.js').SimplePlugin {
 
-	constructor () {
+	// load
 
-		super();
+	load (data) {
+		console.log("load TestGoodPlugin with '" + data + "' data");
+	}
 
-		this.directory = __dirname;
-		this.loadDataFromPackageFile();
+	unload (data) {
+
+		super.unload();
+		console.log("unload TestGoodPlugin with '" + data + "' data");
 
 	}
 
-	run (data) {
-		console.log("run TestGoodPlugin with '" + data + "' data");
+	// write
+
+	install (data) {
+		console.log("install TestGoodPlugin with '" + data + "' data");
 	}
 
-	free () {
+	update (data) {
+		console.log("update TestGoodPlugin with '" + data + "' data");
+	}
 
-		super.free();
-		console.log('free TestGoodPlugin');
-
+	uninstall (data) {
+		console.log("install TestGoodPlugin with '" + data + "' data");
 	}
 
 }
