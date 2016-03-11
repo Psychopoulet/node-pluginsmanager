@@ -117,7 +117,9 @@ oPluginsManager
         console.log(err);
     });
 
-    oPluginsManager.remove(
+    // works also with updateByDirectory(<pluginDirectory>, <optional data>)
+
+    oPluginsManager.uninstall(
         <plugin>,
         <optional data to pass to the 'unload' && 'uninstall' plugins methods>
     ).then(function(pluginName) {
@@ -125,6 +127,8 @@ oPluginsManager
     }).catch(function(err) {
         console.log(err);
     });
+
+    // works also with uninstallByDirectory(<pluginDirectory>, <optional data>)
 
 })
 .catch(function(err) {
