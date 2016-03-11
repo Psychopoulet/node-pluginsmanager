@@ -213,7 +213,7 @@ module.exports = class SimplePluginsManager extends require('events').EventEmitt
 							else {
 
 								directories.forEach(function(dir) {
-									that.loadByDirectory(dir, (data) ? data : null);
+									that.loadByDirectory(path.join(that.directory, dir), (data) ? data : null);
 								});
 
 								resolve();
@@ -337,7 +337,7 @@ module.exports = class SimplePluginsManager extends require('events').EventEmitt
 						var dir = that.plugins[key].directory;
 
 						that.plugins[key].unload((data) ? data : null, false);
-						that.emit('unloaded', plugin);
+						that.emit('unloaded', that.plugins[key]);
 
 						that.plugins.splice(key, 1);
 
@@ -406,7 +406,7 @@ module.exports = class SimplePluginsManager extends require('events').EventEmitt
 							if (that.plugins[i].directory === dir) { key = i; break; }
 						}
 
-						if (0 < key) {
+						if (-1 < key) {
 							that.updateByKey(key, (data) ? data : null).then(resolve).catch(reject);
 						}
 						else {
@@ -496,7 +496,7 @@ module.exports = class SimplePluginsManager extends require('events').EventEmitt
 							if (that.plugins[i].directory === dir) { key = i; break; }
 						}
 
-						if (0 < key) {
+						if (-1 < key) {
 							that.uninstallByKey(key, (data) ? data : null).then(resolve).catch(reject);
 						}
 						else {

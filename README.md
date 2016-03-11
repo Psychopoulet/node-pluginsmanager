@@ -12,7 +12,7 @@ $ npm install simplepluginsmanager
   * simply manage plugins (on SimplePlugin model)
   * install plugins manually or via github & load them
   * update plugins via github
-  * uninstall plugins and free there ressources
+  * uninstall plugins and unload there ressources
 
 ## Create your plugin with SimplePlugin
 
