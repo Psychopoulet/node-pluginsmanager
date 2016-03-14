@@ -160,16 +160,8 @@ module.exports = class SimplePluginsManager extends require('events').EventEmitt
 
 					})
 					.catch(function(err) {
-
-						that.emit('error', "SimplePluginsManager/loadByDirectory : '" + ((err.message) ? err.message : err));
-
-						that.uninstallByDirectory(dir, (data) ? data : null).then(function() {
-							reject("SimplePluginsManager/loadByDirectory : " + err);
-						})
-						.catch(function(_err) {
-							reject("SimplePluginsManager/loadByDirectory : " + err + ", " + _err);
-						});
-
+						that.emit('error', "SimplePluginsManager/loadByDirectory : '" + err);
+						reject("SimplePluginsManager/loadByDirectory : " + err);
 					});
 
 				}
