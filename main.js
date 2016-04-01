@@ -14,7 +14,7 @@ function _executeGIT(params) {
 
 	return new Promise(function(resolve, reject) {
 
-		var oSpawn, sResult = '';
+		let oSpawn, sResult = '';
 
 		try {
 
@@ -73,7 +73,7 @@ function _createPluginByDirectory(dir) {
 			}
 			else {
 
-				var _Plugin = require(dir), oPlugin;
+				let _Plugin = require(dir), oPlugin;
 
 				if ('function' !== typeof _Plugin) {
 					reject("'" + dir + "' is not a function");
@@ -130,7 +130,7 @@ module.exports = class SimplePluginsManager extends require('events').EventEmitt
 
 		getPluginsNames () {
 
-			var result = [];
+			let result = [];
 
 				this.plugins.forEach(function (plugin) {
 					result.push(plugin.name);
@@ -144,7 +144,7 @@ module.exports = class SimplePluginsManager extends require('events').EventEmitt
 
 		loadByDirectory (dir, data) {
 
-			var that = this;
+			let that = this;
 
 			return new Promise(function(resolve, reject) {
 
@@ -176,7 +176,7 @@ module.exports = class SimplePluginsManager extends require('events').EventEmitt
 
 		loadAll (data) {
 
-			var that = this;
+			let that = this;
 
 			return new Promise(function(resolve, reject) {
 
@@ -232,7 +232,7 @@ module.exports = class SimplePluginsManager extends require('events').EventEmitt
 
 		installViaGithub (url, data) {
 
-			var that = this;
+			let that = this;
 
 			return new Promise(function(resolve, reject) {
 
@@ -248,7 +248,7 @@ module.exports = class SimplePluginsManager extends require('events').EventEmitt
 					}
 					else {
 
-						var tabUrl = url.split('/'), dir = path.join(that.directory, tabUrl[tabUrl.length - 1]);
+						let tabUrl = url.split('/'), dir = path.join(that.directory, tabUrl[tabUrl.length - 1]);
 
 						if (fs.dirExists(dir)) {
 							that.emit('error', "SimplePluginsManager/installViaGithub : '" + dir + "' aldready exists.");
@@ -310,7 +310,7 @@ module.exports = class SimplePluginsManager extends require('events').EventEmitt
 
 		updateByKey (key, data) {
 
-			var that = this;
+			let that = this;
 
 			return new Promise(function(resolve, reject) {
 
@@ -326,7 +326,7 @@ module.exports = class SimplePluginsManager extends require('events').EventEmitt
 					}
 					else {
 
-						var dir = that.plugins[key].directory;
+						let dir = that.plugins[key].directory;
 
 						that.plugins[key].unload((data) ? data : null, false);
 						that.emit('unloaded', that.plugins[key]);
@@ -380,7 +380,7 @@ module.exports = class SimplePluginsManager extends require('events').EventEmitt
 
 		updateByDirectory (dir, data) {
 
-			var that = this;
+			let that = this;
 
 			return new Promise(function(resolve, reject) {
 
@@ -392,9 +392,9 @@ module.exports = class SimplePluginsManager extends require('events').EventEmitt
 					}
 					else {
 
-						var key = -1;
+						let key = -1;
 
-						for (var i = 0; i < that.plugins.length; ++i) {
+						for (let i = 0; i < that.plugins.length; ++i) {
 							if (that.plugins[i].directory === dir) { key = i; break; }
 						}
 
@@ -426,7 +426,7 @@ module.exports = class SimplePluginsManager extends require('events').EventEmitt
 
 		uninstallByKey (key, data) {
 
-			var that = this;
+			let that = this;
 
 			return new Promise(function(resolve, reject) {
 
@@ -450,7 +450,7 @@ module.exports = class SimplePluginsManager extends require('events').EventEmitt
 						}
 						else {
 
-							var name = that.plugins[key].name;
+							let name = that.plugins[key].name;
 							that.plugins.splice(key, 1);
 							resolve(name);
 
@@ -470,7 +470,7 @@ module.exports = class SimplePluginsManager extends require('events').EventEmitt
 
 		uninstallByDirectory (dir, data) {
 
-			var that = this;
+			let that = this;
 
 			return new Promise(function(resolve, reject) {
 
@@ -482,9 +482,9 @@ module.exports = class SimplePluginsManager extends require('events').EventEmitt
 					}
 					else {
 
-						var key = -1;
+						let key = -1;
 
-						for (var i = 0; i < that.plugins.length; ++i) {
+						for (let i = 0; i < that.plugins.length; ++i) {
 							if (that.plugins[i].directory === dir) { key = i; break; }
 						}
 
