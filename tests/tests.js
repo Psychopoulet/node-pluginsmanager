@@ -46,6 +46,7 @@ try {
 
 		console.log('plugins loaded');
 
+		console.log("");
 		console.log("----------------");
 		console.log("");
 
@@ -83,6 +84,7 @@ try {
 
 					console.log('added');
 
+					console.log("");
 					console.log("----------------");
 					console.log("");
 
@@ -103,22 +105,30 @@ try {
 
 						console.log(err);
 
+						console.log("");
+						console.log("must be == 'SimplePluginsManager/updateByDirectory : there is no '<path>' plugins' directory. :");
 						oPluginsManager.updateByDirectory(path.join(oPluginsManager.directory, 'simplefs')).then(function (plugin) {
 
 							console.log("'" + plugin.name +  "' updated");
 
+							console.log("");
 							console.log("----------------");
 							console.log("");
 
 						})
 						.catch(function(err) {
 							
+							console.log(err);
+
+							console.log("");
+							console.log("must be == 'SimplePluginsManager/updateByDirectory : there is no '<path>' plugins' directory. :");
 							oPluginsManager.uninstallByDirectory(path.join(oPluginsManager.directory, 'simplefs')).then(function () {
 
 								console.log("");
 								console.log("must be == [] :");
 								console.log(oPluginsManager.plugins);
 
+								console.log("");
 								console.log("----------------");
 								console.log("");
 
@@ -127,6 +137,7 @@ try {
 
 								console.log(err);
 
+								console.log("");
 								console.log("----------------");
 								console.log("");
 
