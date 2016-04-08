@@ -7,7 +7,7 @@ const 	path = require('path'),
 
 try {
 
-	var oPluginsManager = new SimplePluginsManager();
+	let oPluginsManager = new SimplePluginsManager();
 
 	console.log("----------------");
 	console.log("tests");
@@ -25,6 +25,9 @@ try {
 
 		.on('loaded', function(plugin) {
 			console.log("--- [event/loaded] '" + plugin.name + "' (v" + plugin.version + ") loaded ---");
+		})
+		.on('allloaded', function() {
+			console.log("--- [event/allloaded] ---");
 		})
 		.on('unloaded', function(plugin) {
 			console.log("--- [event/unloaded] '" + plugin.name + "' (v" + plugin.version + ") unloaded ---");
@@ -57,7 +60,7 @@ try {
 
 		oPluginsManager.directory = path.join(__dirname, 'plugins');
 
-		var sEmptyPlugin = path.join(oPluginsManager.directory, 'TestEmptyPlugin');
+		let sEmptyPlugin = path.join(oPluginsManager.directory, 'TestEmptyPlugin');
 
 		fs.mkdirp(sEmptyPlugin);
 
