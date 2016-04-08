@@ -204,11 +204,19 @@ module.exports = class SimplePluginsManager extends require('events').EventEmitt
 							}
 							else {
 
-								directories.forEach(function(dir) {
-									that.loadByDirectory(path.join(that.directory, dir), (data) ? data : null);
-								});
+								let i = directories.length;
 
-								resolve();
+								directories.forEach(function(dir) {
+
+									that.loadByDirectory(path.join(that.directory, dir), (data) ? data : null).then(function() {
+										i--;
+										if (0 === i) { that.emit('allloaded'); resolve(); }
+									}).catch(function(err) {
+										i--;
+										if (0 === i) { that.emit('allloaded'); resolve(); }
+									});
+
+								});
 
 							}
 

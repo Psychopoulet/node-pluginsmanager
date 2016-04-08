@@ -78,6 +78,9 @@ oPluginsManager
         .on('loaded', function(plugin) {
             console.log("--- [event/loaded] '" + plugin.name + "' (v" + plugin.version + ") loaded ---");
         })
+        .on('allloaded', function() {
+            console.log("--- [event/loaded] all loaded ---");
+        })
         .on('unloaded', function(plugin) {
             console.log("--- [event/unloaded] '" + plugin.name + "' (v" + plugin.version + ") unloaded ---");
         })
