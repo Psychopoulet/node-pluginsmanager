@@ -1,6 +1,6 @@
 {
   "name": "simplepluginsmanager",
-  "version": "2.0.3",
+  "version": "2.0.4",
   "description": "A plugins manager's object, using simpleplugin",
   "main": "main.js",
   "scripts": {
@@ -20,7 +20,7 @@
     "url": "https://github.com/Psychopoulet/simplepluginsmanager/issues"
   },
   "dependencies": {
-    "simplefs": "^1.2.2"
+    "simplefs": "^1.3.0"
   },
   "devDependencies": {},
   "homepage": "https://github.com/Psychopoulet/simplepluginsmanager#readme"

@@ -452,17 +452,21 @@ module.exports = class SimplePluginsManager extends require('events').EventEmitt
 						that.plugins[key].uninstall((data) ? data : null);
 						that.emit('uninstalled', that.plugins[key]);
 
-						if (!fs.rmdirp(that.plugins[key].directory)) {
-							that.emit('error', "SimplePluginsManager/uninstallByKey : impossible to remove '" + that.plugins[key].directory + "' directory.");
-							reject("SimplePluginsManager/uninstallByKey : impossible to remove '" + that.plugins[key].directory + "' directory.");
-						}
-						else {
+						fs.armdirp(that.plugins[key].directory, function(err) {
 
-							let name = that.plugins[key].name;
-							that.plugins.splice(key, 1);
-							resolve(name);
+							if (err) {
+								that.emit('error', "SimplePluginsManager/uninstallByKey : impossible to remove '" + that.plugins[key].directory + "' directory : " + err + ".");
+								reject("SimplePluginsManager/uninstallByKey : impossible to remove '" + that.plugins[key].directory + "' directory : " + err + ".");
+							}
+							else {
 
-						}
+								let name = that.plugins[key].name;
+								that.plugins.splice(key, 1);
+								resolve(name);
+
+							}
+
+						});
 
 					}
 
@@ -500,14 +504,18 @@ module.exports = class SimplePluginsManager extends require('events').EventEmitt
 							that.uninstallByKey(key, (data) ? data : null).then(resolve).catch(reject);
 						}
 						else {
-							
-							if (!fs.rmdirp(dir)) {
-								that.emit('error', "SimplePluginsManager/uninstallByDirectory : impossible to remove '" + dir + "' directory.");
-								reject("SimplePluginsManager/uninstallByDirectory : impossible to remove '" + dir + "' directory.");
-							}
-							else {
-								resolve(path.basename(dir));
-							}
+
+							fs.armdirp(dir, function(err) {
+
+								if (err) {
+									that.emit('error', "SimplePluginsManager/uninstallByDirectory : impossible to remove '" + dir + "' directory : " + err + ".");
+									reject("SimplePluginsManager/uninstallByDirectory : impossible to remove '" + dir + "' directory : " + err + ".");
+								}
+								else {
+									resolve(path.basename(dir));
+								}
+
+							});
 
 						}
 
