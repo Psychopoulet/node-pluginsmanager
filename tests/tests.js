@@ -101,6 +101,7 @@ try {
 						
 						console.log('simplecontainer added');
 
+						console.log("");
 						console.log("----------------");
 						console.log("");
 
@@ -157,6 +158,7 @@ try {
 
 				console.log(err);
 
+				console.log("");
 				console.log("----------------");
 				console.log("");
 
