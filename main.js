@@ -65,42 +65,46 @@ function _createPluginByDirectory(dir) {
 
 		try {
 
-			if (!fs.dirExists(dir)) {
-				reject("'" + dir + "' does not exist");
-			}
-			else if (!path.isAbsolute(dir)) {
-				reject("'" + dir + "' is not an absolute path");
-			}
-			else {
+			fs.pdirExists(dir).then(function(exists) {
 
-				let _Plugin = require(dir), oPlugin;
-
-				if ('function' !== typeof _Plugin) {
-					reject("'" + dir + "' is not a function");
+				if (!exists) {
+					reject("'" + dir + "' does not exist");
+				}
+				else if (!path.isAbsolute(dir)) {
+					reject("'" + dir + "' is not an absolute path");
 				}
 				else {
 
-					oPlugin = new _Plugin();
-					oPlugin.directory = dir;
-					oPlugin.name = path.basename(dir);
+					let _Plugin = require(dir), oPlugin;
 
-					if (!(oPlugin instanceof SimplePlugin)) {
-						reject("'" + dir + "' is not a SimplePlugin class");
+					if ('function' !== typeof _Plugin) {
+						reject("'" + dir + "' is not a function");
 					}
 					else {
 
-						try {
-							resolve(oPlugin.loadDataFromPackageFile());
+						oPlugin = new _Plugin();
+						oPlugin.directory = dir;
+						oPlugin.name = path.basename(dir);
+
+						if (!(oPlugin instanceof SimplePlugin)) {
+							reject("'" + dir + "' is not a SimplePlugin class");
 						}
-						catch(e) {
-							reject((e.message) ? e.message : e);
+						else {
+
+							try {
+								resolve(oPlugin.loadDataFromPackageFile());
+							}
+							catch(e) {
+								reject((e.message) ? e.message : e);
+							}
+
 						}
 
 					}
 
 				}
 
-			}
+			}).catch(reject);
 
 		}
 		catch(e) {
@@ -186,40 +190,51 @@ module.exports = class SimplePluginsManager extends require('events').EventEmitt
 						that.emit('error', "SimplePluginsManager/loadAll : 'directory' is not defined.");
 						reject("SimplePluginsManager/loadAll : 'directory' is not defined.");
 					}
-					else if (!fs.dirExists(that.directory)) {
-						that.emit('error', "SimplePluginsManager/loadAll : '" + that.directory + "' does not exist.");
-						reject("SimplePluginsManager/loadAll : '" + that.directory + "' does not exist.");
-					}
-					else if (!path.isAbsolute(that.directory)) {
-						that.emit('error', "SimplePluginsManager/loadAll : '" + that.directory + "' is not an absolute path.");
-						reject("SimplePluginsManager/loadAll : '" + that.directory + "' is not an absolute path.");
-					}
 					else {
 
-						fs.readdir(that.directory, function (err, directories) {
+						fs.pdirExists(that.directory).then(function(exists) {
 
-							if (err) {
-								that.emit('error', "SimplePluginsManager/loadAll : '" + ((err.message) ? err.message : err));
-								reject("SimplePluginsManager/loadAll : '" + ((err.message) ? err.message : err));
+							if (!exists) {
+								that.emit('error', "SimplePluginsManager/loadAll : '" + that.directory + "' does not exist.");
+								reject("SimplePluginsManager/loadAll : '" + that.directory + "' does not exist.");
+							}
+							else if (!path.isAbsolute(that.directory)) {
+								that.emit('error', "SimplePluginsManager/loadAll : '" + that.directory + "' is not an absolute path.");
+								reject("SimplePluginsManager/loadAll : '" + that.directory + "' is not an absolute path.");
 							}
 							else {
 
-								let i = directories.length;
+								fs.readdir(that.directory, function (err, directories) {
 
-								directories.forEach(function(dir) {
+									if (err) {
+										that.emit('error', "SimplePluginsManager/loadAll : '" + ((err.message) ? err.message : err));
+										reject("SimplePluginsManager/loadAll : '" + ((err.message) ? err.message : err));
+									}
+									else {
 
-									that.loadByDirectory(path.join(that.directory, dir), (data) ? data : null).then(function() {
-										i--;
-										if (0 === i) { that.emit('allloaded'); resolve(); }
-									}).catch(function(err) {
-										i--;
-										if (0 === i) { that.emit('allloaded'); resolve(); }
-									});
+										let i = directories.length;
+
+										directories.forEach(function(dir) {
+
+											that.loadByDirectory(path.join(that.directory, dir), (data) ? data : null).then(function() {
+												i--;
+												if (0 === i) { that.emit('allloaded'); resolve(); }
+											}).catch(function(err) {
+												i--;
+												if (0 === i) { that.emit('allloaded'); resolve(); }
+											});
+
+										});
+
+									}
 
 								});
 
 							}
 
+						}).catch(function(err) {
+							that.emit('error', "SimplePluginsManager/loadAll : impossible to load all '" + that.directory + "' directory : " + err + ".");
+							reject("SimplePluginsManager/loadAll : impossible to load all '" + that.directory + "' directory : " + err + ".");
 						});
 
 					}
@@ -258,49 +273,56 @@ module.exports = class SimplePluginsManager extends require('events').EventEmitt
 
 						let tabUrl = url.split('/'), dir = path.join(that.directory, tabUrl[tabUrl.length - 1]);
 
-						if (fs.dirExists(dir)) {
-							that.emit('error', "SimplePluginsManager/installViaGithub : '" + dir + "' aldready exists.");
-							reject("SimplePluginsManager/installViaGithub : '" + dir + "' aldready exists.");
-						}
-						else {
+						fs.pdirExists(dir).then(function(exists) {
 
-							_executeGIT([
-								'-c', 'core.quotepath=false', 'clone', '--recursive', '--depth=1',
-								url, dir
-							]).then(function() {
+							if (exists) {
+								that.emit('error', "SimplePluginsManager/installViaGithub : '" + dir + "' aldready exists.");
+								reject("SimplePluginsManager/installViaGithub : '" + dir + "' aldready exists.");
+							}
+							else {
 
-								_createPluginByDirectory(dir).then(function(plugin) {
+								_executeGIT([
+									'-c', 'core.quotepath=false', 'clone', '--recursive', '--depth=1',
+									url, dir
+								]).then(function() {
 
-									plugin.install((data) ? data : null);
-									that.emit('installed', plugin);
+									_createPluginByDirectory(dir).then(function(plugin) {
 
-									plugin.load((data) ? data : null);
-									that.emit('loaded', plugin);
+										plugin.install((data) ? data : null);
+										that.emit('installed', plugin);
 
-									that.plugins.push(plugin);
+										plugin.load((data) ? data : null);
+										that.emit('loaded', plugin);
 
-									resolve(plugin);
+										that.plugins.push(plugin);
 
-								})
-								.catch(function(err) {
+										resolve(plugin);
 
-									that.emit('error', "SimplePluginsManager/installViaGithub : '" + err);
-
-									that.uninstallByDirectory(dir, (data) ? data : null).then(function() {
-										reject("SimplePluginsManager/installViaGithub : '" + err);
 									})
-									.catch(function(_err) {
-										reject("SimplePluginsManager/installViaGithub : " + err + ", " + _err);
+									.catch(function(err) {
+
+										that.emit('error', "SimplePluginsManager/installViaGithub : '" + err);
+
+										that.uninstallByDirectory(dir, (data) ? data : null).then(function() {
+											reject("SimplePluginsManager/installViaGithub : '" + err);
+										})
+										.catch(function(_err) {
+											reject("SimplePluginsManager/installViaGithub : " + err + ", " + _err);
+										});
+
 									});
 
+								}).catch(function(err) {
+									that.emit('error', "SimplePluginsManager/installViaGithub : " + err);
+									reject("SimplePluginsManager/installViaGithub : " + err);
 								});
 
-							}).catch(function(err) {
-								that.emit('error', "SimplePluginsManager/installViaGithub : " + err);
-								reject("SimplePluginsManager/installViaGithub : " + err);
-							});
+							}
 
-						}
+						}).catch(function(err) {
+							that.emit('error', "SimplePluginsManager/installViaGithub : impossible to install '" + dir + "' directory : " + err + ".");
+							reject("SimplePluginsManager/installViaGithub : impossible to install '" + dir + "' directory : " + err + ".");
+						});
 
 					}
 
@@ -394,27 +416,34 @@ module.exports = class SimplePluginsManager extends require('events').EventEmitt
 
 				try {
 
-					if (!fs.dirExists(dir)) {
-						that.emit('error', "SimplePluginsManager/updateByDirectory : there is no '" + dir + "' plugins' directory.");
-						reject("SimplePluginsManager/updateByDirectory : there is no '" + dir + "' plugins' directory.");
-					}
-					else {
+					fs.pdirExists(dir).then(function(exists) {
 
-						let key = -1;
-
-						for (let i = 0; i < that.plugins.length; ++i) {
-							if (that.plugins[i].directory === dir) { key = i; break; }
-						}
-
-						if (-1 < key) {
-							that.updateByKey(key, (data) ? data : null).then(resolve).catch(reject);
+						if (!exists) {
+							that.emit('error', "SimplePluginsManager/updateByDirectory : there is no '" + dir + "' plugins' directory.");
+							reject("SimplePluginsManager/updateByDirectory : there is no '" + dir + "' plugins' directory.");
 						}
 						else {
-							that.emit('error', "SimplePluginsManager/updateByDirectory : impossible to find '" + dir + "' directory.");
-							reject("SimplePluginsManager/updateByDirectory : impossible to find '" + dir + "' directory.");
+
+							let key = -1;
+
+							for (let i = 0; i < that.plugins.length; ++i) {
+								if (that.plugins[i].directory === dir) { key = i; break; }
+							}
+
+							if (-1 < key) {
+								that.updateByKey(key, (data) ? data : null).then(resolve).catch(reject);
+							}
+							else {
+								that.emit('error', "SimplePluginsManager/updateByDirectory : impossible to find '" + dir + "' directory.");
+								reject("SimplePluginsManager/updateByDirectory : impossible to find '" + dir + "' directory.");
+							}
+
 						}
 
-					}
+					}).catch(function(err) {
+						that.emit('error', "SimplePluginsManager/updateByDirectory : impossible to update '" + dir + "' directory : " + err + ".");
+						reject("SimplePluginsManager/updateByDirectory : impossible to update '" + dir + "' directory : " + err + ".");
+					});
 
 				}
 				catch(e) {
@@ -452,20 +481,15 @@ module.exports = class SimplePluginsManager extends require('events').EventEmitt
 						that.plugins[key].uninstall((data) ? data : null);
 						that.emit('uninstalled', that.plugins[key]);
 
-						fs.armdirp(that.plugins[key].directory, function(err) {
+						fs.prmdirp(that.plugins[key].directory).then(function() {
 
-							if (err) {
-								that.emit('error', "SimplePluginsManager/uninstallByKey : impossible to remove '" + that.plugins[key].directory + "' directory : " + err + ".");
-								reject("SimplePluginsManager/uninstallByKey : impossible to remove '" + that.plugins[key].directory + "' directory : " + err + ".");
-							}
-							else {
+							let name = that.plugins[key].name;
+							that.plugins.splice(key, 1);
+							resolve(name);
 
-								let name = that.plugins[key].name;
-								that.plugins.splice(key, 1);
-								resolve(name);
-
-							}
-
+						}).catch(function(err) {
+							that.emit('error', "SimplePluginsManager/uninstallByKey : impossible to remove '" + that.plugins[key].directory + "' directory : " + err + ".");
+							reject("SimplePluginsManager/uninstallByKey : impossible to remove '" + that.plugins[key].directory + "' directory : " + err + ".");
 						});
 
 					}
@@ -488,38 +512,40 @@ module.exports = class SimplePluginsManager extends require('events').EventEmitt
 
 				try {
 
-					if (!fs.dirExists(dir)) {
-						that.emit('error', "SimplePluginsManager/uninstallByDirectory : there is no '" + dir + "' plugins' directory.");
-						reject("SimplePluginsManager/uninstallByDirectory : there is no '" + dir + "' plugins' directory.");
-					}
-					else {
+					fs.pdirExists(dir).then(function(exists) {
 
-						let key = -1;
-
-						for (let i = 0; i < that.plugins.length; ++i) {
-							if (that.plugins[i].directory === dir) { key = i; break; }
-						}
-
-						if (-1 < key) {
-							that.uninstallByKey(key, (data) ? data : null).then(resolve).catch(reject);
+						if (!exists) {
+							that.emit('error', "SimplePluginsManager/uninstallByDirectory : there is no '" + dir + "' plugins' directory.");
+							reject("SimplePluginsManager/uninstallByDirectory : there is no '" + dir + "' plugins' directory.");
 						}
 						else {
 
-							fs.armdirp(dir, function(err) {
+							let key = -1;
 
-								if (err) {
+							for (let i = 0; i < that.plugins.length; ++i) {
+								if (that.plugins[i].directory === dir) { key = i; break; }
+							}
+
+							if (-1 < key) {
+								that.uninstallByKey(key, (data) ? data : null).then(resolve).catch(reject);
+							}
+							else {
+
+								fs.prmdirp(dir).then(function() {
+									resolve(path.basename(dir));
+								}).catch(function(err) {
 									that.emit('error', "SimplePluginsManager/uninstallByDirectory : impossible to remove '" + dir + "' directory : " + err + ".");
 									reject("SimplePluginsManager/uninstallByDirectory : impossible to remove '" + dir + "' directory : " + err + ".");
-								}
-								else {
-									resolve(path.basename(dir));
-								}
+								});
 
-							});
+							}
 
 						}
 
-					}
+					}).catch(function(err) {
+						that.emit('error', "SimplePluginsManager/uninstallByDirectory : impossible to remove '" + dir + "' directory : " + err + ".");
+						reject("SimplePluginsManager/uninstallByDirectory : impossible to remove '" + dir + "' directory : " + err + ".");
+					});
 
 				}
 				catch(e) {

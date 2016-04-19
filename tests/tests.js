@@ -1,19 +1,255 @@
-
 "use strict";
 
-const 	path = require('path'),
-		fs = require('simplefs'),
-		SimplePluginsManager = require('../main.js');
+// deps
 
-try {
+	const 	path = require('path'),
+			fs = require('simplefs'),
+			SimplePluginsManager = require('../main.js');
 
-	let oPluginsManager = new SimplePluginsManager();
+// private
 
-	console.log("----------------");
-	console.log("tests");
-	console.log("----------------");
-	console.log("");
-	console.log("must be == 'SimplePluginsManager/loadAll : '<path>' does not exist.' :");
+	var oPluginsManager = new SimplePluginsManager();
+
+// tests
+
+	function testErrorsLoad() {
+
+		return new Promise(function(resolve, reject) {
+
+			try {
+
+				console.log("");
+				console.log("----------------");
+				console.log("test errors load");
+				console.log("----------------");
+				console.log("");
+
+				console.log("must be == 'SimplePluginsManager/loadAll : '<path>' does not exist.' :");
+
+				oPluginsManager.loadAll().then(reject).catch(function(err) {
+
+					console.log(err);
+
+					console.log("");
+					console.log("----------------");
+					console.log("");
+
+					resolve();
+
+				});
+
+			}
+			catch(e) {
+				reject((e.message) ? e.message : e);
+			}
+
+		});
+
+	}
+
+	function testErrorsEmptyPlugin() {
+
+		return new Promise(function(resolve, reject) {
+
+			try {
+
+				let sEmptyPlugin = path.join(oPluginsManager.directory, 'TestEmptyPlugin');
+
+				console.log("");
+				console.log("----------------");
+				console.log("test errors empty plugin");
+				console.log("----------------");
+				console.log("");
+
+				fs.pmkdirp(sEmptyPlugin).then(function() {
+
+					console.log("must be == 'SimplePluginsManager/loadByDirectory : 'Cannot find module '<path>''");
+					oPluginsManager.loadByDirectory(sEmptyPlugin).then(reject)
+					.catch(function(err) {
+
+						console.log(err);
+
+						console.log("");
+						console.log("must be == ''<name>' uninstalled'");
+						oPluginsManager.uninstallByDirectory(sEmptyPlugin).then(function (name) {
+
+							console.log("'" + name + "' uninstalled");
+
+							console.log("");
+							console.log("----------------");
+							console.log("");
+
+							resolve();
+
+						}).catch(reject);
+
+					});
+
+
+				}).catch(reject);
+
+			}
+			catch(e) {
+				reject((e.message) ? e.message : e);
+			}
+
+		});
+
+	}
+
+	function testErrorsInstallation() {
+
+		return new Promise(function(resolve, reject) {
+
+			try {
+
+				console.log("");
+				console.log("----------------");
+				console.log("test errors installation");
+				console.log("----------------");
+				console.log("");
+
+				console.log("must be == 'SimplePluginsManager/installViaGithub : '' is not a valid github url.' :");
+				oPluginsManager.installViaGithub('').then(reject).catch(function(err) {
+
+					console.log(err);
+
+					console.log("");
+					console.log("must be == 'SimplePluginsManager/installViaGithub : '<path>' is not a SimplePlugin class' :");
+					oPluginsManager.installViaGithub('https://github.com/Psychopoulet/simplecontainer').then(reject).catch(function(err) {
+
+						console.log(err);
+
+						console.log("");
+						console.log("----------------");
+						console.log("");
+
+						resolve();
+
+					});
+
+				});
+
+			}
+			catch(e) {
+				reject((e.message) ? e.message : e);
+			}
+
+		});
+
+	}
+
+	function testErrorsUpdate() {
+
+		return new Promise(function(resolve, reject) {
+
+			try {
+
+				console.log("");
+				console.log("----------------");
+				console.log("test errors update");
+				console.log("----------------");
+				console.log("");
+
+				console.log("must be == 'SimplePluginsManager/updateByDirectory : there is no '<path>' plugins' directory. :");
+				oPluginsManager.updateByDirectory(path.join(oPluginsManager.directory, 'simplefs')).then(reject)
+				.catch(function(err) {
+					
+					console.log(err);
+
+					console.log("");
+					console.log("----------------");
+					console.log("");
+
+					resolve();
+
+				});
+
+			}
+			catch(e) {
+				reject((e.message) ? e.message : e);
+			}
+
+		});
+
+	}
+
+	function testErrorsUninstall() {
+
+		return new Promise(function(resolve, reject) {
+
+			try {
+
+				console.log("");
+				console.log("----------------");
+				console.log("test errors uninstall");
+				console.log("----------------");
+				console.log("");
+
+				console.log("must be == 'SimplePluginsManager/updateByDirectory : there is no '<path>' plugins' directory. :");
+				oPluginsManager.uninstallByDirectory(path.join(oPluginsManager.directory, 'simplefs')).then(reject)
+				.catch(function(err) {
+
+					console.log(err);
+
+					console.log("");
+					console.log("----------------");
+					console.log("");
+
+					resolve();
+
+				});
+
+			}
+			catch(e) {
+				reject((e.message) ? e.message : e);
+			}
+
+		});
+
+	}
+
+	function testLoads() {
+
+		return new Promise(function(resolve, reject) {
+
+			try {
+
+				console.log("");
+				console.log("----------------");
+				console.log("test loads");
+				console.log("----------------");
+				console.log("");
+
+				console.log("must be == 'load TestGoodPlugin with 'test' data' :");
+				oPluginsManager.loadByDirectory(path.join(oPluginsManager.directory, 'TestGoodPlugin'), 'test').then(function(plugin) {
+
+					console.log("");
+					console.log("must be == 1 :", oPluginsManager.plugins.length);
+
+					console.log("");
+					console.log("must be == 'unload TestGoodPlugin with 'test' data' :");
+					plugin.unload('test');
+
+					console.log("");
+					console.log("----------------");
+					console.log("");
+
+					resolve();
+
+				})
+				.catch(reject);
+
+			}
+			catch(e) {
+				reject((e.message) ? e.message : e);
+			}
+
+		});
+
+	}
+
+// run
 
 	oPluginsManager
 
@@ -43,132 +279,22 @@ try {
 		})
 		.on('uninstalled', function(plugin) {
 			console.log("--- [event/uninstalled] '" + plugin.name + "' uninstalled ---");
-		})
+		});
 
-	.loadAll().then(function() {
-
-		console.log('plugins loaded');
-
-		console.log("");
-		console.log("----------------");
-		console.log("");
-
-	})
-	.catch(function(err) {
-
-		console.log(err);
+	testErrorsLoad().then(function() {
 
 		oPluginsManager.directory = path.join(__dirname, 'plugins');
 
-		let sEmptyPlugin = path.join(oPluginsManager.directory, 'TestEmptyPlugin');
+		return testErrorsEmptyPlugin();
 
-		fs.mkdirp(sEmptyPlugin);
-
-		console.log("");
-		console.log("must be == 'SimplePluginsManager/loadByDirectory : 'Cannot find module '<path>''");
-		oPluginsManager.loadByDirectory(sEmptyPlugin).then(function() {
-			console.log('loaded');
-		})
-		.catch(function(err) {
-
-			console.log(err);
-
-			fs.mkdirp(sEmptyPlugin);
-
-			console.log("");
-			console.log("must be == ''<name>' uninstalled'");
-			oPluginsManager.uninstallByDirectory(sEmptyPlugin).then(function (name) {
-
-				console.log("'" + name + "' uninstalled");
-
-				console.log("");
-				console.log("must be == 'SimplePluginsManager/installViaGithub : '' is not a valid github url.' :");
-				oPluginsManager.installViaGithub('').then(function() {
-
-					console.log('added');
-
-					console.log("");
-					console.log("----------------");
-					console.log("");
-
-				}).catch(function(err) {
-
-					console.log(err);
-
-					console.log("");
-					console.log("must be == 'SimplePluginsManager/installViaGithub : '<path>' is not a SimplePlugin class' :");
-					oPluginsManager.installViaGithub('https://github.com/Psychopoulet/simplecontainer').then(function() {
-						
-						console.log('simplecontainer added');
-
-						console.log("");
-						console.log("----------------");
-						console.log("");
-
-					}).catch(function(err) {
-
-						console.log(err);
-
-						console.log("");
-						console.log("must be == 'SimplePluginsManager/updateByDirectory : there is no '<path>' plugins' directory. :");
-						oPluginsManager.updateByDirectory(path.join(oPluginsManager.directory, 'simplefs')).then(function (plugin) {
-
-							console.log("'" + plugin.name +  "' updated");
-
-							console.log("");
-							console.log("----------------");
-							console.log("");
-
-						})
-						.catch(function(err) {
-							
-							console.log(err);
-
-							console.log("");
-							console.log("must be == 'SimplePluginsManager/updateByDirectory : there is no '<path>' plugins' directory. :");
-							oPluginsManager.uninstallByDirectory(path.join(oPluginsManager.directory, 'simplefs')).then(function () {
-
-								console.log("");
-								console.log("must be == [] :");
-								console.log(oPluginsManager.plugins);
-
-								console.log("");
-								console.log("----------------");
-								console.log("");
-
-							})
-							.catch(function(err) {
-
-								console.log(err);
-
-								console.log("");
-								console.log("----------------");
-								console.log("");
-
-							});
-
-						});
-
-					});
-
-				});
-
-			})
-			.catch(function(err) {
-
-				console.log(err);
-
-				console.log("");
-				console.log("----------------");
-				console.log("");
-
-			});
-
-		});
-
+	}).then(function() {
+		return testErrorsInstallation();
+	}).then(function() {
+		return testErrorsUpdate();
+	}).then(function() {
+		return testErrorsUninstall();
+	}).then(function() {
+		return testLoads();
+	}).catch(function(err) {
+		console.log('tests interruption', err);
 	});
-
-}
-catch(e) {
-	console.log(e);
-}
