@@ -17,6 +17,7 @@ $ npm install simplepluginsmanager
 ## Create your plugin with SimplePlugin
 
 ```js
+
 "use strict";
 
 const SimplePluginsManager = require('simplepluginsmanager');
@@ -27,44 +28,71 @@ class MyPlugin extends SimplePluginsManager.SimplePlugin {
 
         // 'data' is optionnal, null if not sended by the manager
         load (data) {
-            // your working place
+
+            return new Promise(function(resolve, reject) {
+                // your working place
+                resolve();
+            });
+
         }
 
         // 'data' is optionnal, null if not sended by the manager
         unload (data) {
+
             super.unload(); // must be called
-            // used on delete & update plugin, unload ressources like array, sockets, etc...
+
+            return new Promise(function(resolve, reject) {
+                // used on delete & update plugin, unload ressources like array, sockets, etc...
+                resolve();
+            });
+
         }
 
     // write
 
         // 'data' is optionnal, null if not sended by the manager
         install (data) {
-            // on the first use, create ressources like directories, files, etc...
+
+            return new Promise(function(resolve, reject) {
+                // on the first use, create ressources like directories, files, etc...
+                resolve();
+            });
+
         }
 
         // 'data' is optionnal, null if not sended by the manager
         update (data) {
-            // update your ressources like sql database, etc...
+
+            return new Promise(function(resolve, reject) {
+                // update your ressources like sql database, etc...
+                resolve();
+            });
+
         }
 
         // 'data' is optionnal, null if not sended by the manager
         uninstall (data) {
-            // remove all the created ressources like directories, files, etc...
+
+            return new Promise(function(resolve, reject) {
+                // remove all the created ressources like directories, files, etc...
+                resolve();
+            });
+
         }
 
 }
+
 ```
 
 ## Examples
 
 ```js
+
 "use strict";
 
-const SimplePluginsManager = require('simplepluginsmanager'),
-      path = require('path');
+const SimplePluginsManager = require('simplepluginsmanager'), path = require('path');
 
-var oPluginsManager = new SimplePluginsManager(path.join(__dirname, 'plugins')); // param optional : automaticly set to this value if not given...
+var oPluginsManager = new SimplePluginsManager(path.join(__dirname, 'plugins')); // param optional : automatically setted to this value if not given...
 oPluginsManager.directory = path.join(__dirname, 'plugins'); // ... or changed like this
 
 oPluginsManager
@@ -137,6 +165,7 @@ oPluginsManager
 .catch(function(err) {
     console.log(err);
 });
+
 ```
 
 ## Tests

@@ -142,18 +142,32 @@ module.exports = class SimplePlugin {
 
 	// load
 
-	load () { }
+	
+	load () {
+		return new Promise(function(resolve, reject) { resolve(); });
+	}
+
 	unload () {
-		
+
 		delete this.templates;
 		delete this.javascripts;
+
+		return new Promise(function(resolve, reject) { resolve(); });
 
 	}
 
 	// write
 
-	install () { }
-	update () { }
-	uninstall () { }
+	install () {
+		return new Promise(function(resolve, reject) { resolve(); });
+	}
+
+	update () {
+		return new Promise(function(resolve, reject) { resolve(); });
+	}
+	
+	uninstall () {
+		return new Promise(function(resolve, reject) { resolve(); });
+	}
 
 }
