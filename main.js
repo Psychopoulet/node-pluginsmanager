@@ -87,26 +87,10 @@ function _createPluginByDirectory(dir) {
 						oPlugin.name = path.basename(dir);
 
 						if (!(oPlugin instanceof SimplePlugin)) {
-							reject("'" + dir + "' is not a SimplePlugin class");
+							reject("'" + path.basename(dir) + "' is not a SimplePlugin class");
 						}
 						else {
-
-							try {
-
-								let loadResult = oPlugin.loadDataFromPackageFile();
-
-								if (loadResult instanceof Promise) {
-									loadResult.then(resolve).catch(reject);
-								}
-								else {
-									resolve(loadResult);
-								}
-
-							}
-							catch(e) {
-								reject((e.message) ? e.message : e);
-							}
-
+							oPlugin.loadDataFromPackageFile().then(resolve).catch(reject);
 						}
 
 					}
@@ -163,16 +147,21 @@ module.exports = class SimplePluginsManager extends require('events').EventEmitt
 
 				try {
 
-					_createPluginByDirectory(dir).then(function(plugin) {
+					let plugin;
 
-						plugin.load((data) ? data : null);
+					_createPluginByDirectory(dir).then(function(_plugin) {
+
+						plugin = _plugin;
+						return plugin.load((data) ? data : null);
+
+					}).then(function() {
+
 						that.emit('loaded', plugin);
 						that.plugins.push(plugin);
 
 						resolve(plugin);
 
-					})
-					.catch(function(err) {
+					}).catch(function(err) {
 						that.emit('error', "SimplePluginsManager/loadByDirectory : '" + err);
 						reject("SimplePluginsManager/loadByDirectory : " + err);
 					});
@@ -213,13 +202,13 @@ module.exports = class SimplePluginsManager extends require('events').EventEmitt
 							}
 							else {
 
-								fs.readdirProm(that.directory).then(function (directories) {
+								fs.readdirProm(that.directory).then(function (files) {
 
-									let i = directories.length;
+									let i = files.length;
 
-									directories.forEach(function(dir) {
+									files.forEach(function(file) {
 
-										that.loadByDirectory(path.join(that.directory, dir), (data) ? data : null).then(function() {
+										that.loadByDirectory(path.join(that.directory, file), (data) ? data : null).then(function() {
 											i--;
 											if (0 === i) { that.emit('allloaded'); resolve(); }
 										}).catch(function(err) {
@@ -285,47 +274,46 @@ module.exports = class SimplePluginsManager extends require('events').EventEmitt
 							}
 							else {
 
+								let plugin;
+
 								_executeGIT([
 									'-c', 'core.quotepath=false', 'clone', '--recursive', '--depth=1',
 									url, dir
 								]).then(function() {
+									return _createPluginByDirectory(dir);
+								}).then(function(_plugin) {
 
-									_createPluginByDirectory(dir).then(function(plugin) {
+									plugin = _plugin;
+									return plugin.install((data) ? data : null);
 
-										plugin.install((data) ? data : null);
-										that.emit('installed', plugin);
+								}).then(function() {
 
-										plugin.load((data) ? data : null);
-										that.emit('loaded', plugin);
+									that.emit('installed', plugin);
+									return plugin.load((data) ? data : null);
 
-										that.plugins.push(plugin);
+								}).then(function() {
 
-										resolve(plugin);
-
-									})
-									.catch(function(err) {
-
-										that.emit('error', "SimplePluginsManager/installViaGithub : '" + err);
-
-										that.uninstallByDirectory(dir, (data) ? data : null).then(function() {
-											reject("SimplePluginsManager/installViaGithub : '" + err);
-										})
-										.catch(function(_err) {
-											reject("SimplePluginsManager/installViaGithub : " + err + ", " + _err);
-										});
-
-									});
+									that.emit('loaded', plugin);
+									that.plugins.push(plugin);
+									resolve(plugin);
 
 								}).catch(function(err) {
-									that.emit('error', "SimplePluginsManager/installViaGithub : " + err);
-									reject("SimplePluginsManager/installViaGithub : " + err);
+
+									that.emit('error', "SimplePluginsManager/installViaGithub : impossible to install '" + dir + "' directory : " + err + ".");
+
+									that.uninstallByDirectory(dir, (data) ? data : null).then(function() {
+										reject("SimplePluginsManager/installViaGithub : impossible to install '" + dir + "' directory : " + err);
+									}).catch(function(_err) {
+										reject("SimplePluginsManager/installViaGithub : impossible to install '" + dir + "' directory : " + err + ", " + _err);
+									});
+
 								});
 
 							}
 
 						}).catch(function(err) {
 							that.emit('error', "SimplePluginsManager/installViaGithub : impossible to install '" + dir + "' directory : " + err + ".");
-							reject("SimplePluginsManager/installViaGithub : impossible to install '" + dir + "' directory : " + err + ".");
+							reject("SimplePluginsManager/installViaGithub : impossible to install '" + dir + "' directory : " + err);
 						});
 
 					}
@@ -360,36 +348,38 @@ module.exports = class SimplePluginsManager extends require('events').EventEmitt
 					}
 					else {
 
-						let dir = that.plugins[key].directory;
+						let dir = that.plugins[key].directory, plugin;
 
-						that.plugins[key].unload((data) ? data : null, false);
-						that.emit('unloaded', that.plugins[key]);
+						that.plugins[key].unload((data) ? data : null, false).then(function() {
 
-						that.plugins.splice(key, 1);
+							that.emit('unloaded', that.plugins[key]);
+							that.plugins.splice(key, 1);
 
-						_executeGIT([ '-c', dir, 'pull' ]).then(function() {
+							_executeGIT([ '-c', dir, 'pull' ]).then(function() {
+								return _createPluginByDirectory(dir);
+							}).then(function(_plugin) {
 
-							_createPluginByDirectory(dir).then(function(plugin) {
+								plugin = _plugin;
+								return plugin.update((data) ? data : null);
 
-								plugin.update((data) ? data : null);
+							}).then(function() {
+
 								that.emit('updated', plugin);
+								return plugin.load((data) ? data : null);
 
-								plugin.load((data) ? data : null);
+							}).then(function() {
+
 								that.emit('loaded', plugin);
-
 								that.plugins.push(plugin);
-
 								resolve(plugin);
 
-							})
-							.catch(function(err) {
-								
-								that.emit('error', "SimplePluginsManager/updateByKey : '" + err);
+							}).catch(function(err) {
+
+								that.emit('error', "SimplePluginsManager/updateByKey : " + err);
 
 								that.uninstallByDirectory(dir, (data) ? data : null).then(function() {
 									reject("SimplePluginsManager/updateByKey : '" + err);
-								})
-								.catch(function(_err) {
+								}).catch(function(_err) {
 									reject("SimplePluginsManager/updateByKey : " + err + ", " + _err);
 								});
 
@@ -397,7 +387,7 @@ module.exports = class SimplePluginsManager extends require('events').EventEmitt
 
 						}).catch(function(err) {
 							that.emit('error', "SimplePluginsManager/updateByKey : " + err);
-							reject("SimplePluginsManager/updateByKey : " + err);
+							reject("SimplePluginsManager/updateByKey : '" + err);
 						});
 
 					}
@@ -479,16 +469,21 @@ module.exports = class SimplePluginsManager extends require('events').EventEmitt
 					}
 					else {
 
-						that.plugins[key].unload((data) ? data : null);
-						that.emit('unloaded', that.plugins[key]);
+						that.plugins[key].unload((data) ? data : null).then(function() {
 
-						that.plugins[key].uninstall((data) ? data : null);
-						that.emit('uninstalled', that.plugins[key]);
+							that.emit('unloaded', that.plugins[key]);
+							return that.plugins[key].uninstall((data) ? data : null);
 
-						fs.rmdirpProm(that.plugins[key].directory).then(function() {
+						}).then(function() {
+
+							that.emit('uninstalled', that.plugins[key]);
+							return fs.rmdirpProm(that.plugins[key].directory);
+
+						}).then(function() {
 
 							let name = that.plugins[key].name;
 							that.plugins.splice(key, 1);
+
 							resolve(name);
 
 						}).catch(function(err) {
@@ -519,8 +514,7 @@ module.exports = class SimplePluginsManager extends require('events').EventEmitt
 					fs.isDirectoryProm(dir).then(function(exists) {
 
 						if (!exists) {
-							that.emit('error', "SimplePluginsManager/uninstallByDirectory : there is no '" + dir + "' plugins' directory.");
-							reject("SimplePluginsManager/uninstallByDirectory : there is no '" + dir + "' plugins' directory.");
+							resolve(path.basename(dir));
 						}
 						else {
 

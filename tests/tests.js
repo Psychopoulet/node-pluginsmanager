@@ -63,8 +63,7 @@
 				require('simplefs').mkdirpProm(sEmptyPlugin).then(function() {
 
 					console.log("must be == 'SimplePluginsManager/loadByDirectory : 'Cannot find module '<path>''");
-					oPluginsManager.loadByDirectory(sEmptyPlugin).then(reject)
-					.catch(function(err) {
+					oPluginsManager.loadByDirectory(sEmptyPlugin).then(reject).catch(function(err) {
 
 						console.log(err);
 
@@ -151,8 +150,7 @@
 				console.log("");
 
 				console.log("must be == 'SimplePluginsManager/updateByDirectory : there is no '<path>' plugins' directory. :");
-				oPluginsManager.updateByDirectory(path.join(oPluginsManager.directory, 'simplefs')).then(reject)
-				.catch(function(err) {
+				oPluginsManager.updateByDirectory(path.join(oPluginsManager.directory, 'simplefs')).then(reject).catch(function(err) {
 					
 					console.log(err);
 
@@ -185,11 +183,10 @@
 				console.log("----------------");
 				console.log("");
 
-				console.log("must be == 'SimplePluginsManager/updateByDirectory : there is no '<path>' plugins' directory. :");
-				oPluginsManager.uninstallByDirectory(path.join(oPluginsManager.directory, 'simplefs')).then(reject)
-				.catch(function(err) {
+				console.log("must be == 'simplefs' uninstalled :");
+				oPluginsManager.uninstallByDirectory(path.join(oPluginsManager.directory, 'simplefs')).then(function(pluginName) {
 
-					console.log(err);
+					console.log(pluginName + ' uninstalled');
 
 					console.log("");
 					console.log("----------------");
@@ -197,7 +194,7 @@
 
 					resolve();
 
-				});
+				}).catch(reject);
 
 			}
 			catch(e) {
@@ -228,7 +225,19 @@
 
 					console.log("");
 					console.log("must be == 'unload TestGoodPlugin with 'test' data' :");
-					plugin.unload('test');
+
+					return plugin.unload('test');
+
+				}).then(function() {
+
+					console.log("");
+					console.log("must be == 'load TestGoodPlugin with 'test' data' and 'all loaded' :");
+
+					return oPluginsManager.loadAll('test');
+
+				}).then(function() {
+					
+					console.log("all loaded");
 
 					console.log("");
 					console.log("----------------");
@@ -236,8 +245,7 @@
 
 					resolve();
 
-				})
-				.catch(reject);
+				}).catch(reject);
 
 			}
 			catch(e) {
@@ -283,7 +291,6 @@
 	testErrorsLoad().then(function() {
 
 		oPluginsManager.directory = path.join(__dirname, 'plugins');
-
 		return testErrorsEmptyPlugin();
 
 	}).then(function() {

@@ -6,28 +6,62 @@ module.exports = class TestGoodPlugin extends require('../../../main.js').Simple
 	// load
 
 	load (data) {
-		console.log("load TestGoodPlugin with '" + data + "' data");
+
+		return new Promise(function(resolve, reject) {
+
+			console.log("load TestGoodPlugin with '" + data + "' data");
+			resolve();
+
+		});
+
 	}
 
 	unload (data) {
 
 		super.unload();
-		console.log("unload TestGoodPlugin with '" + data + "' data");
+
+		return new Promise(function(resolve, reject) {
+
+			console.log("unload TestGoodPlugin with '" + data + "' data");
+			resolve();
+
+		});
 
 	}
 
 	// write
 
 	install (data) {
-		console.log("install TestGoodPlugin with '" + data + "' data");
+
+		return new Promise(function(resolve, reject) {
+
+			console.log("install TestGoodPlugin with '" + data + "' data");
+			resolve();
+
+		});
+
 	}
 
 	update (data) {
-		console.log("update TestGoodPlugin with '" + data + "' data");
+		
+		return new Promise(function(resolve, reject) {
+
+			console.log("update TestGoodPlugin with '" + data + "' data");
+			resolve();
+
+		});
+
 	}
 
 	uninstall (data) {
-		console.log("install TestGoodPlugin with '" + data + "' data");
+		
+		return new Promise(function(resolve, reject) {
+
+			console.log("install TestGoodPlugin with '" + data + "' data");
+			resolve();
+
+		});
+
 	}
 
 }
