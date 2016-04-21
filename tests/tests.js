@@ -3,7 +3,6 @@
 // deps
 
 	const 	path = require('path'),
-			fs = require('simplefs'),
 			SimplePluginsManager = require('../main.js');
 
 // private
@@ -61,7 +60,7 @@
 				console.log("----------------");
 				console.log("");
 
-				fs.pmkdirp(sEmptyPlugin).then(function() {
+				require('simplefs').mkdirpProm(sEmptyPlugin).then(function() {
 
 					console.log("must be == 'SimplePluginsManager/loadByDirectory : 'Cannot find module '<path>''");
 					oPluginsManager.loadByDirectory(sEmptyPlugin).then(reject)

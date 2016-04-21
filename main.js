@@ -65,7 +65,7 @@ function _createPluginByDirectory(dir) {
 
 		try {
 
-			fs.pdirExists(dir).then(function(exists) {
+			fs.isDirectoryProm(dir).then(function(exists) {
 
 				if (!exists) {
 					reject("'" + dir + "' does not exist");
@@ -92,7 +92,16 @@ function _createPluginByDirectory(dir) {
 						else {
 
 							try {
-								resolve(oPlugin.loadDataFromPackageFile());
+
+								let loadResult = oPlugin.loadDataFromPackageFile();
+
+								if (loadResult instanceof Promise) {
+									loadResult.then(resolve).catch(reject);
+								}
+								else {
+									resolve(loadResult);
+								}
+
 							}
 							catch(e) {
 								reject((e.message) ? e.message : e);
@@ -192,7 +201,7 @@ module.exports = class SimplePluginsManager extends require('events').EventEmitt
 					}
 					else {
 
-						fs.pdirExists(that.directory).then(function(exists) {
+						fs.isDirectoryProm(that.directory).then(function(exists) {
 
 							if (!exists) {
 								that.emit('error', "SimplePluginsManager/loadAll : '" + that.directory + "' does not exist.");
@@ -204,30 +213,25 @@ module.exports = class SimplePluginsManager extends require('events').EventEmitt
 							}
 							else {
 
-								fs.readdir(that.directory, function (err, directories) {
+								fs.readdirProm(that.directory).then(function (directories) {
 
-									if (err) {
-										that.emit('error', "SimplePluginsManager/loadAll : '" + ((err.message) ? err.message : err));
-										reject("SimplePluginsManager/loadAll : '" + ((err.message) ? err.message : err));
-									}
-									else {
+									let i = directories.length;
 
-										let i = directories.length;
+									directories.forEach(function(dir) {
 
-										directories.forEach(function(dir) {
-
-											that.loadByDirectory(path.join(that.directory, dir), (data) ? data : null).then(function() {
-												i--;
-												if (0 === i) { that.emit('allloaded'); resolve(); }
-											}).catch(function(err) {
-												i--;
-												if (0 === i) { that.emit('allloaded'); resolve(); }
-											});
-
+										that.loadByDirectory(path.join(that.directory, dir), (data) ? data : null).then(function() {
+											i--;
+											if (0 === i) { that.emit('allloaded'); resolve(); }
+										}).catch(function(err) {
+											i--;
+											if (0 === i) { that.emit('allloaded'); resolve(); }
 										});
 
-									}
+									});
 
+								}).catch(function(err) {
+									that.emit('error', "SimplePluginsManager/loadAll : '" + ((err.message) ? err.message : err));
+									reject("SimplePluginsManager/loadAll : '" + ((err.message) ? err.message : err));
 								});
 
 							}
@@ -273,7 +277,7 @@ module.exports = class SimplePluginsManager extends require('events').EventEmitt
 
 						let tabUrl = url.split('/'), dir = path.join(that.directory, tabUrl[tabUrl.length - 1]);
 
-						fs.pdirExists(dir).then(function(exists) {
+						fs.isDirectoryProm(dir).then(function(exists) {
 
 							if (exists) {
 								that.emit('error', "SimplePluginsManager/installViaGithub : '" + dir + "' aldready exists.");
@@ -416,7 +420,7 @@ module.exports = class SimplePluginsManager extends require('events').EventEmitt
 
 				try {
 
-					fs.pdirExists(dir).then(function(exists) {
+					fs.isDirectoryProm(dir).then(function(exists) {
 
 						if (!exists) {
 							that.emit('error', "SimplePluginsManager/updateByDirectory : there is no '" + dir + "' plugins' directory.");
@@ -481,7 +485,7 @@ module.exports = class SimplePluginsManager extends require('events').EventEmitt
 						that.plugins[key].uninstall((data) ? data : null);
 						that.emit('uninstalled', that.plugins[key]);
 
-						fs.prmdirp(that.plugins[key].directory).then(function() {
+						fs.rmdirpProm(that.plugins[key].directory).then(function() {
 
 							let name = that.plugins[key].name;
 							that.plugins.splice(key, 1);
@@ -512,7 +516,7 @@ module.exports = class SimplePluginsManager extends require('events').EventEmitt
 
 				try {
 
-					fs.pdirExists(dir).then(function(exists) {
+					fs.isDirectoryProm(dir).then(function(exists) {
 
 						if (!exists) {
 							that.emit('error', "SimplePluginsManager/uninstallByDirectory : there is no '" + dir + "' plugins' directory.");
@@ -531,7 +535,7 @@ module.exports = class SimplePluginsManager extends require('events').EventEmitt
 							}
 							else {
 
-								fs.prmdirp(dir).then(function() {
+								fs.rmdirpProm(dir).then(function() {
 									resolve(path.basename(dir));
 								}).catch(function(err) {
 									that.emit('error', "SimplePluginsManager/uninstallByDirectory : impossible to remove '" + dir + "' directory : " + err + ".");
