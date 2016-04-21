@@ -32,85 +32,111 @@ module.exports = class SimplePlugin {
 
 	loadDataFromPackageFile () {
 
-		if ('' == this.directory) {
-			throw "SimplePlugin/loadDataFromPackageFile : 'directory' is not defined.";
-		}
-		else if (!fs.dirExists(this.directory)) {
-			throw "SimplePlugin/loadDataFromPackageFile : '" + this.directory + "' does not exist.";
-		}
-		else {
+		let that = this;
 
-			var file = path.join(this.directory, 'package.json');
+		return new Promise(function(resolve, reject) {
 
-			if (!fs.fileExists(file)) {
-				throw "SimplePlugin/loadDataFromPackageFile : '" + file + "' does not exist.";
+			try {
+
+				fs.isDirectoryProm(that.directory).then(function(exists) {
+
+					if (!exists) {
+						reject("SimplePlugin/loadDataFromPackageFile : '" + that.directory + "' does not exist.");
+					}
+					else {
+
+						let file = path.join(that.directory, 'package.json');
+
+						fs.isFileProm(file).then(function(exists) {
+
+							if (!exists) {
+								reject("SimplePlugin/loadDataFromPackageFile : '" + file + "' does not exist.");
+							}
+							else {
+
+								fs.readFileProm(file, 'utf8').then(function(data) {
+
+									data = JSON.parse(data);
+
+									if (data.name) {
+										that.name = data.name;
+									}
+									if (data.description) {
+										that.description = data.description;
+									}
+									if (data.version) {
+										that.version = data.version;
+									}
+									if (data.author) {
+										that.author = data.author;
+									}
+									if (data.license) {
+										that.license = data.license;
+									}
+									if (data.github) {
+										that.github = data.github;
+									}
+
+									if (data.widget) {
+
+										data.widget = path.join(that.directory, data.widget);
+
+										if (fs.isFileSync(data.widget)) {
+											that.widget = data.widget;
+										}
+
+									}
+
+									if (data.templates instanceof Array && 0 < data.templates.length) {
+
+										for (let i = 0, l = data.templates.length; i < l; ++i) {
+
+											data.templates[i] = path.join(that.directory, data.templates[i]);
+
+											if (fs.isFileSync(data.templates[i])) {
+												that.templates.push(data.templates[i]);
+											}
+
+										}
+
+									}
+
+									if (data.javascripts instanceof Array && 0 < data.javascripts.length) {
+
+										for (let i = 0, l = data.javascripts.length; i < l; ++i) {
+
+											data.javascripts[i] = path.join(that.directory, data.javascripts[i]);
+
+											if (fs.isFileSync(data.javascripts[i])) {
+												that.javascripts.push(data.javascripts[i]);
+											}
+
+										}
+
+									}
+
+									resolve(that);
+				
+								}).catch(reject);
+
+							}
+
+						}).catch(function(err) {
+							reject("SimplePlugin/loadDataFromPackageFile : '" + file + "' does not exist (" + err + ").");
+						});
+
+					}
+
+				}).catch(function(err) {
+					reject("SimplePlugin/loadDataFromPackageFile : '" + that.directory + "' does not exist (" + err + ").");
+				});
+
 			}
-			else {
-
-				var data = JSON.parse(fs.readFileSync(file, 'utf8'));
-
-				if (data.name) {
-					this.name = data.name;
-				}
-				if (data.description) {
-					this.description = data.description;
-				}
-				if (data.version) {
-					this.version = data.version;
-				}
-				if (data.author) {
-					this.author = data.author;
-				}
-				if (data.license) {
-					this.license = data.license;
-				}
-				if (data.github) {
-					this.github = data.github;
-				}
-
-				if (data.widget) {
-
-					data.widget = path.join(this.directory, data.widget);
-
-					if (fs.fileExists(data.widget)) {
-						this.widget = data.widget;
-					}
-
-				}
-
-				if (data.templates instanceof Array && 0 < data.templates.length) {
-
-					for (var i = 0, l = data.templates.length; i < l; ++i) {
-
-						data.templates[i] = path.join(this.directory, data.templates[i]);
-
-						if (fs.fileExists(data.templates[i])) {
-							this.templates.push(data.templates[i]);
-						}
-
-					}
-
-				}
-
-				if (data.javascripts instanceof Array && 0 < data.javascripts.length) {
-
-					for (var i = 0, l = data.javascripts.length; i < l; ++i) {
-
-						data.javascripts[i] = path.join(this.directory, data.javascripts[i]);
-
-						if (fs.fileExists(data.javascripts[i])) {
-							this.javascripts.push(data.javascripts[i]);
-						}
-
-					}
-
-				}
-
+			catch(e) {
+				reject((e.message) ? e.message : e);
 			}
-		
-		}
 
-		return this;
+		});
 
 	}
 
