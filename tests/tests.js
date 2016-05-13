@@ -3,6 +3,10 @@
 // deps
 
 	const 	path = require('path'),
+			assert = require('assert'),
+
+			fs = require('simplefs'),
+
 			SimplePluginsManager = require('../main.js');
 
 // private
@@ -11,256 +15,34 @@
 
 // tests
 
-	function testErrorsLoad() {
+describe('events', function() {
 
-		return new Promise(function(resolve, reject) {
+	before(function(done) {
+		oPluginsManager.directory = path.join(__dirname, '..', 'plugins');
+		fs.rmdirpProm(path.join(__dirname, '..', 'plugins')).then(done).catch(done);
+	});
 
-			try {
+	after(function(done) {
+		fs.rmdirpProm(path.join(__dirname, '..', 'plugins')).then(done).catch(done);
+	});
 
-				console.log("");
-				console.log("----------------");
-				console.log("test errors load");
-				console.log("----------------");
-				console.log("");
+	it('should test not existing directory without event', function(done) {
 
-				console.log("must be == 'SimplePluginsManager/loadAll : '<path>' does not exist.' :");
-
-				oPluginsManager.loadAll().then(reject).catch(function(err) {
-
-					console.log(err);
-
-					console.log("");
-					console.log("----------------");
-					console.log("");
-
-					resolve();
-
-				});
-
-			}
-			catch(e) {
-				reject((e.message) ? e.message : e);
-			}
-
+		oPluginsManager.loadAll().then(function() {
+			assert.ok(false, "tests does not generate error");
+			done();
+		}).catch(function(err) {
+			assert.strictEqual('string', typeof err, "generated error is not a string");
+			done();
 		});
 
-	}
+	});
 
-	function testErrorsEmptyPlugin() {
+	it('should test not existing directory with events', function(done) {
 
-		return new Promise(function(resolve, reject) {
+		// errors
 
-			try {
-
-				let sEmptyPlugin = path.join(oPluginsManager.directory, 'TestEmptyPlugin');
-
-				console.log("");
-				console.log("----------------");
-				console.log("test errors empty plugin");
-				console.log("----------------");
-				console.log("");
-
-				require('simplefs').mkdirpProm(sEmptyPlugin).then(function() {
-
-					console.log("must be == 'SimplePluginsManager/loadByDirectory : 'Cannot find module '<path>''");
-					oPluginsManager.loadByDirectory(sEmptyPlugin).then(reject).catch(function(err) {
-
-						console.log(err);
-
-						console.log("");
-						console.log("must be == ''<name>' uninstalled'");
-						oPluginsManager.uninstallByDirectory(sEmptyPlugin).then(function (name) {
-
-							console.log("'" + name + "' uninstalled");
-
-							console.log("");
-							console.log("----------------");
-							console.log("");
-
-							resolve();
-
-						}).catch(reject);
-
-					});
-
-
-				}).catch(reject);
-
-			}
-			catch(e) {
-				reject((e.message) ? e.message : e);
-			}
-
-		});
-
-	}
-
-	function testErrorsInstallation() {
-
-		return new Promise(function(resolve, reject) {
-
-			try {
-
-				console.log("");
-				console.log("----------------");
-				console.log("test errors installation");
-				console.log("----------------");
-				console.log("");
-
-				console.log("must be == 'SimplePluginsManager/installViaGithub : '' is not a valid github url.' :");
-				oPluginsManager.installViaGithub('').then(reject).catch(function(err) {
-
-					console.log(err);
-
-					console.log("");
-					console.log("must be == 'SimplePluginsManager/installViaGithub : '<path>' is not a SimplePlugin class' :");
-					oPluginsManager.installViaGithub('https://github.com/Psychopoulet/simplecontainer').then(reject).catch(function(err) {
-
-						console.log(err);
-
-						console.log("");
-						console.log("----------------");
-						console.log("");
-
-						resolve();
-
-					});
-
-				});
-
-			}
-			catch(e) {
-				reject((e.message) ? e.message : e);
-			}
-
-		});
-
-	}
-
-	function testErrorsUpdate() {
-
-		return new Promise(function(resolve, reject) {
-
-			try {
-
-				console.log("");
-				console.log("----------------");
-				console.log("test errors update");
-				console.log("----------------");
-				console.log("");
-
-				console.log("must be == 'SimplePluginsManager/updateByDirectory : there is no '<path>' plugins' directory. :");
-				oPluginsManager.updateByDirectory(path.join(oPluginsManager.directory, 'simplefs')).then(reject).catch(function(err) {
-					
-					console.log(err);
-
-					console.log("");
-					console.log("----------------");
-					console.log("");
-
-					resolve();
-
-				});
-
-			}
-			catch(e) {
-				reject((e.message) ? e.message : e);
-			}
-
-		});
-
-	}
-
-	function testErrorsUninstall() {
-
-		return new Promise(function(resolve, reject) {
-
-			try {
-
-				console.log("");
-				console.log("----------------");
-				console.log("test errors uninstall");
-				console.log("----------------");
-				console.log("");
-
-				console.log("must be == 'simplefs' uninstalled :");
-				oPluginsManager.uninstallByDirectory(path.join(oPluginsManager.directory, 'simplefs')).then(function(pluginName) {
-
-					console.log(pluginName + ' uninstalled');
-
-					console.log("");
-					console.log("----------------");
-					console.log("");
-
-					resolve();
-
-				}).catch(reject);
-
-			}
-			catch(e) {
-				reject((e.message) ? e.message : e);
-			}
-
-		});
-
-	}
-
-	function testLoads() {
-
-		return new Promise(function(resolve, reject) {
-
-			try {
-
-				console.log("");
-				console.log("----------------");
-				console.log("test loads");
-				console.log("----------------");
-				console.log("");
-
-				console.log("must be == 'load TestGoodPlugin with 'test' data' :");
-				oPluginsManager.loadByDirectory(path.join(oPluginsManager.directory, 'TestGoodPlugin'), 'test').then(function(plugin) {
-
-					console.log("");
-					console.log("must be == 1 :", oPluginsManager.plugins.length);
-
-					console.log("");
-					console.log("must be == 'unload TestGoodPlugin with 'test' data' :");
-
-					return plugin.unload('test');
-
-				}).then(function() {
-
-					console.log("");
-					console.log("must be == 'load TestGoodPlugin with 'test' data' and 'all loaded' :");
-
-					return oPluginsManager.loadAll('test');
-
-				}).then(function() {
-					
-					console.log("all loaded");
-
-					console.log("");
-					console.log("----------------");
-					console.log("");
-
-					resolve();
-
-				}).catch(reject);
-
-			}
-			catch(e) {
-				reject((e.message) ? e.message : e);
-			}
-
-		});
-
-	}
-
-// run
-
-	oPluginsManager
-
-		.on('error', function(msg) {
+		oPluginsManager.on('error', function(msg) {
 			console.log("--- [event/error] '" + msg + "' ---");
 		})
 
@@ -268,11 +50,9 @@
 
 		.on('loaded', function(plugin) {
 			console.log("--- [event/loaded] '" + plugin.name + "' (v" + plugin.version + ") loaded ---");
-		})
-		.on('allloaded', function() {
+		}).on('allloaded', function() {
 			console.log("--- [event/allloaded] ---");
-		})
-		.on('unloaded', function(plugin) {
+		}).on('unloaded', function(plugin) {
 			console.log("--- [event/unloaded] '" + plugin.name + "' (v" + plugin.version + ") unloaded ---");
 		})
 
@@ -280,27 +60,179 @@
 
 		.on('installed', function(plugin) {
 			console.log("--- [event/installed] '" + plugin.name + "' (v" + plugin.version + ") installed ---");
-		})
-		.on('updated', function(plugin) {
+		}).on('updated', function(plugin) {
 			console.log("--- [event/updated] '" + plugin.name + "' (v" + plugin.version + ") updated ---");
-		})
-		.on('uninstalled', function(plugin) {
+		}).on('uninstalled', function(plugin) {
 			console.log("--- [event/uninstalled] '" + plugin.name + "' uninstalled ---");
+		})
+
+		.loadAll().then(function() {
+			assert.ok(false, "tests does not generate error");
+			done();
+		}).catch(function(err) {
+			assert.strictEqual('string', typeof err, "generated error is not a string");
+			done();
 		});
 
-	testErrorsLoad().then(function() {
+	});
+
+});
+
+describe('load all', function() {
+
+	let sEmptyPlugin;
+
+	before(function() {
+		oPluginsManager.directory = path.join(__dirname, 'plugins');
+		sEmptyPlugin = path.join(oPluginsManager.directory, 'TestEmptyPlugin');
+	});
+
+	after(function(done) {
+
+		fs.rmdirpProm(path.join(__dirname, '..', 'plugins')).then(function() {
+			return fs.unlinkProm(sEmptyPlugin);
+		}).then(done).catch(done);
+
+	});
+
+	it('should test empty plugin', function(done) {
 
 		oPluginsManager.directory = path.join(__dirname, 'plugins');
-		return testErrorsEmptyPlugin();
 
-	}).then(function() {
-		return testErrorsInstallation();
-	}).then(function() {
-		return testErrorsUpdate();
-	}).then(function() {
-		return testErrorsUninstall();
-	}).then(function() {
-		return testLoads();
-	}).catch(function(err) {
-		console.log('tests interruption', err);
+		fs.mkdirpProm(sEmptyPlugin).then(function() {
+			return oPluginsManager.loadByDirectory(sEmptyPlugin);
+		}).then(function() {
+			assert.ok(false, "tests does not generate error");
+			done();
+		}).catch(function(err) {
+			assert.strictEqual('string', typeof err, "generated error is not a string");
+			done();
+		});
+
 	});
+
+});
+
+describe('install via github', function() {
+
+	after(function(done) {
+		fs.rmdirpProm(path.join(oPluginsManager.directory, 'simplecontainer')).then(done).catch(done);
+	});
+
+	it('should test download an empty url', function(done) {
+
+		oPluginsManager.installViaGithub('').then(function() {
+			assert.ok(false, "tests does not generate error");
+			done();
+		}).catch(function(err) {
+			assert.strictEqual('string', typeof err, "generated error is not a string");
+			done();
+		});
+
+	});
+
+	it('should test download an invalid github url', function(done) {
+
+		oPluginsManager.installViaGithub('test').then(function() {
+			assert.ok(false, "tests does not generate error");
+			done();
+		}).catch(function(err) {
+			assert.strictEqual('string', typeof err, "generated error is not a string");
+			done();
+		});
+
+	});
+
+	it('should test download an invalid SimplePlugin', function(done) {
+
+		oPluginsManager.installViaGithub('https://github.com/Psychopoulet/simplecontainer').then(function() {
+			assert.ok(false, "tests does not generate error");
+			done();
+		}).catch(function(err) {
+			assert.strictEqual('string', typeof err, "generated error is not a string");
+			done();
+		});
+
+	}).timeout(10000);
+
+});
+
+describe('update via github', function() {
+
+	it('should test update on an inexistant plugin', function(done) {
+
+		oPluginsManager.updateByDirectory(path.join(oPluginsManager.directory, 'simplefs')).then(function() {
+			assert.ok(false, "tests does not generate error");
+			done();
+		}).catch(function(err) {
+			assert.strictEqual('string', typeof err, "generated error is not a string");
+			done();
+		});
+
+	}).timeout(10000);
+
+});
+
+describe('uninstall', function() {
+
+	let sEmptyPlugin;
+
+	before(function(done) {
+		sEmptyPlugin = path.join(oPluginsManager.directory, 'TestEmptyPlugin');
+		fs.mkdirpProm(sEmptyPlugin).then(done).catch(done);
+	});
+
+	after(function(done) {
+		fs.rmdirpProm(sEmptyPlugin).then(done).catch(done);
+	});
+
+	it('should uninstall empty plugin', function(done) {
+
+		oPluginsManager.uninstallByDirectory(sEmptyPlugin).then(function() {
+			done();
+		}).catch(done);
+
+	});
+
+});
+
+describe('load', function() {
+
+	it('load good plugin', function(done) {
+
+		oPluginsManager.loadByDirectory(path.join(oPluginsManager.directory, 'TestGoodPlugin')).then(function(plugin) {
+
+			assert.strictEqual("TestGoodPlugin", plugin.name, "Loaded plugin name is no correct");
+			assert.strictEqual(1, oPluginsManager.plugins.length, "Loaded plugins length is no correct");
+
+			done();
+
+		}).catch(done);
+
+	});
+
+	it('unload good plugin', function(done) {
+
+		assert.strictEqual(1, oPluginsManager.plugins.length, "Loaded plugins length is no correct");
+
+		if (0 < oPluginsManager.plugins.length) {
+			oPluginsManager.plugins[0].unload('test').then(function() { done(); }).catch(done);
+			oPluginsManager.plugins.splice(0, 1);
+		}
+		else {
+			done();
+		}
+
+	});
+
+	it('load all', function(done) {
+
+		oPluginsManager.loadAll('test').then(function(plugin) {
+			console.log(oPluginsManager.plugins);
+			assert.strictEqual(1, oPluginsManager.plugins.length, "Loaded plugins length is no correct");
+			done();
+		}).catch(done);
+
+	});
+
+});
