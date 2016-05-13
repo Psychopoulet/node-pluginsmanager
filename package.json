@@ -1,11 +1,11 @@
 {
   "name": "simplepluginsmanager",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "A plugins manager's object, using simpleplugin",
   "main": "main.js",
   "scripts": {
     "start": "node main.js",
-    "test": "node tests/tests.js"
+    "test": "mocha tests/tests.js"
   },
   "repository": {
     "type": "git",
@@ -20,7 +20,7 @@
     "url": "https://github.com/Psychopoulet/simplepluginsmanager/issues"
   },
   "dependencies": {
-    "simplefs": "^2.0.2"
+    "simplefs": "^2.2.1"
   },
   "devDependencies": {},
   "homepage": "https://github.com/Psychopoulet/simplepluginsmanager#readme"

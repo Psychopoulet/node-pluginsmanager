@@ -3,9 +3,11 @@
 
 // deps
 	
-const 	fs = require('simplefs'),
-		path = require('path'),
+const 	path = require('path'),
 		spawn = require('child_process').spawn,
+		
+		fs = require('simplefs'),
+		
 		SimplePlugin = require(path.join(__dirname, 'simpleplugin.js'));
 
 // private
@@ -137,12 +139,28 @@ module.exports = class SimplePluginsManager extends require('events').EventEmitt
 
 		}
 
+	// inherited
+
+		emit(eventName, eventData) {
+
+			if (0 < this.listenerCount(eventName)) {
+
+				if (eventData) {
+					super.emit(eventName, eventData);
+				}
+				else {
+					super.emit(eventName);
+				}
+
+			}
+
+		}
+
 	// load
 
 		loadByDirectory (dir, data) {
 
 			let that = this;
-
 			return new Promise(function(resolve, reject) {
 
 				try {
@@ -162,8 +180,17 @@ module.exports = class SimplePluginsManager extends require('events').EventEmitt
 						resolve(plugin);
 
 					}).catch(function(err) {
-						that.emit('error', "SimplePluginsManager/loadByDirectory : '" + err);
-						reject("SimplePluginsManager/loadByDirectory : " + err);
+
+						if (plugin) {
+							err = "SimplePluginsManager/loadByDirectory/" + plugin.name + " : " + err;
+						}
+						else {
+							err = "SimplePluginsManager/loadByDirectory : " + err;
+						}
+
+						that.emit('error', err);
+						reject(err);
+
 					});
 
 				}
@@ -179,7 +206,6 @@ module.exports = class SimplePluginsManager extends require('events').EventEmitt
 		loadAll (data) {
 
 			let that = this;
-
 			return new Promise(function(resolve, reject) {
 
 				try {
@@ -204,19 +230,26 @@ module.exports = class SimplePluginsManager extends require('events').EventEmitt
 
 								fs.readdirProm(that.directory).then(function (files) {
 
-									let i = files.length;
+									if (0 >= files.length) {
+										that.emit('allloaded'); resolve();
+									}
+									else {
 
-									files.forEach(function(file) {
+										let i = files.length;
 
-										that.loadByDirectory(path.join(that.directory, file), (data) ? data : null).then(function() {
-											i--;
-											if (0 === i) { that.emit('allloaded'); resolve(); }
-										}).catch(function(err) {
-											i--;
-											if (0 === i) { that.emit('allloaded'); resolve(); }
+										files.forEach(function(file) {
+
+											that.loadByDirectory(path.join(that.directory, file), (data) ? data : null).then(function() {
+												i--;
+												if (0 === i) { that.emit('allloaded'); resolve(); }
+											}).catch(function(err) {
+												i--;
+												if (0 === i) { that.emit('allloaded'); resolve(); }
+											});
+
 										});
-
-									});
+										
+									}
 
 								}).catch(function(err) {
 									that.emit('error', "SimplePluginsManager/loadAll : '" + ((err.message) ? err.message : err));
