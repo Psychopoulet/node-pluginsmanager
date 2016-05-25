@@ -54,71 +54,67 @@ module.exports = class SimplePlugin {
 							}
 							else {
 
-								fs.readFileProm(file, 'utf8').then(function(data) {
+								let data = require(file);
 
-									data = JSON.parse(data);
+								if (data.name) {
+									that.name = data.name;
+								}
+								if (data.description) {
+									that.description = data.description;
+								}
+								if (data.version) {
+									that.version = data.version;
+								}
+								if (data.author) {
+									that.author = data.author;
+								}
+								if (data.license) {
+									that.license = data.license;
+								}
+								if (data.github) {
+									that.github = data.github;
+								}
 
-									if (data.name) {
-										that.name = data.name;
-									}
-									if (data.description) {
-										that.description = data.description;
-									}
-									if (data.version) {
-										that.version = data.version;
-									}
-									if (data.author) {
-										that.author = data.author;
-									}
-									if (data.license) {
-										that.license = data.license;
-									}
-									if (data.github) {
-										that.github = data.github;
+								if (data.widget) {
+
+									data.widget = path.join(that.directory, data.widget);
+
+									if (fs.isFileSync(data.widget)) {
+										that.widget = data.widget;
 									}
 
-									if (data.widget) {
+								}
 
-										data.widget = path.join(that.directory, data.widget);
+								if (data.templates instanceof Array && 0 < data.templates.length) {
 
-										if (fs.isFileSync(data.widget)) {
-											that.widget = data.widget;
+									for (let i = 0, l = data.templates.length; i < l; ++i) {
+
+										data.templates[i] = path.join(that.directory, data.templates[i]);
+
+										if (fs.isFileSync(data.templates[i])) {
+											that.templates.push(data.templates[i]);
 										}
 
 									}
 
-									if (data.templates instanceof Array && 0 < data.templates.length) {
+								}
 
-										for (let i = 0, l = data.templates.length; i < l; ++i) {
+								if (data.javascripts instanceof Array && 0 < data.javascripts.length) {
 
-											data.templates[i] = path.join(that.directory, data.templates[i]);
+									for (let i = 0, l = data.javascripts.length; i < l; ++i) {
 
-											if (fs.isFileSync(data.templates[i])) {
-												that.templates.push(data.templates[i]);
-											}
+										data.javascripts[i] = path.join(that.directory, data.javascripts[i]);
 
+										if (fs.isFileSync(data.javascripts[i])) {
+											that.javascripts.push(data.javascripts[i]);
 										}
 
 									}
 
-									if (data.javascripts instanceof Array && 0 < data.javascripts.length) {
+								}
 
-										for (let i = 0, l = data.javascripts.length; i < l; ++i) {
-
-											data.javascripts[i] = path.join(that.directory, data.javascripts[i]);
-
-											if (fs.isFileSync(data.javascripts[i])) {
-												that.javascripts.push(data.javascripts[i]);
-											}
-
-										}
-
-									}
-
-									resolve(that);
+								resolve(that);
 				
-								}).catch(reject);
-
 							}
 
 						}).catch(function(err) {

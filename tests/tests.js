@@ -228,7 +228,6 @@ describe('load', function() {
 	it('load all', function(done) {
 
 		oPluginsManager.loadAll('test').then(function(plugin) {
-			console.log(oPluginsManager.plugins);
 			assert.strictEqual(1, oPluginsManager.plugins.length, "Loaded plugins length is no correct");
 			done();
 		}).catch(done);
