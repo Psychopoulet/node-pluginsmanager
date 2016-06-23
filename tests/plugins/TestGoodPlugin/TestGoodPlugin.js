@@ -1,18 +1,16 @@
 
 "use strict";
 
-module.exports = class TestGoodPlugin extends require('../../../main.js').SimplePlugin {
+var cn = console;
+
+module.exports = class TestGoodPlugin extends require(require("path").join("..", "..", "..", "lib", "main.js")).plugin {
 
 	// load
 
 	load (data) {
 
-		return new Promise(function(resolve, reject) {
-
-			console.log("load TestGoodPlugin with '" + data + "' data");
-			resolve();
-
-		});
+		cn.log("load TestGoodPlugin with \"" + data + "\" data");
+		return Promise.resolve();
 
 	}
 
@@ -20,12 +18,8 @@ module.exports = class TestGoodPlugin extends require('../../../main.js').Simple
 
 		super.unload();
 
-		return new Promise(function(resolve, reject) {
-
-			console.log("unload TestGoodPlugin with '" + data + "' data");
-			resolve();
-
-		});
+		cn.log("unload TestGoodPlugin with \"" + data + "\" data");
+		return Promise.resolve();
 
 	}
 
@@ -33,35 +27,23 @@ module.exports = class TestGoodPlugin extends require('../../../main.js').Simple
 
 	install (data) {
 
-		return new Promise(function(resolve, reject) {
-
-			console.log("install TestGoodPlugin with '" + data + "' data");
-			resolve();
-
-		});
+		cn.log("install TestGoodPlugin with \"" + data + "\" data");
+		return Promise.resolve();
 
 	}
 
 	update (data) {
 		
-		return new Promise(function(resolve, reject) {
-
-			console.log("update TestGoodPlugin with '" + data + "' data");
-			resolve();
-
-		});
+		cn.log("update TestGoodPlugin with \"" + data + "\" data");
+		return Promise.resolve();
 
 	}
 
 	uninstall (data) {
 		
-		return new Promise(function(resolve, reject) {
-
-			console.log("install TestGoodPlugin with '" + data + "' data");
-			resolve();
-
-		});
+		cn.log("install TestGoodPlugin with \"" + data + "\" data");
+		return Promise.resolve();
 
 	}
 
-}
+};
