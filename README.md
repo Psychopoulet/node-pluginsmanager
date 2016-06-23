@@ -123,6 +123,10 @@ oPluginsManager
             console.log("--- [event/uninstalled] '" + plugin.name + "' uninstalled ---");
         })
 
+.beforeLoad(function() { // optionnal. MUST return a promise
+    return Promise.resolve();
+})
+
 .loadAll(<optional data to pass to the 'load' plugins methods>).then(function() {
 
     console.log('all plugins loaded');
