@@ -116,7 +116,7 @@ describe("load all", function() {
 describe("install via github", function() {
 
 	after(function() {
-		return fs.rmdirpProm(path.join(oPluginsManager.directory, "simplecontainer"));
+		return fs.rmdirpProm(path.join(oPluginsManager.directory, "node-containerpattern"));
 	});
 
 	it("should test download an empty url", function(done) {
@@ -143,9 +143,9 @@ describe("install via github", function() {
 
 	});
 
-	it("should test download an invalid SimplePlugin", function(done) {
+	it("should test download an invalid node-containerpattern", function(done) {
 
-		oPluginsManager.installViaGithub("https://github.com/Psychopoulet/simplecontainer").then(function() {
+		oPluginsManager.installViaGithub("https://github.com/Psychopoulet/node-containerpattern").then(function() {
 			assert.ok(false, "tests does not generate error");
 			done();
 		}).catch(function(err) {
@@ -161,7 +161,7 @@ describe("update via github", function() {
 
 	it("should test update on an inexistant plugin", function(done) {
 
-		oPluginsManager.updateByDirectory(path.join(oPluginsManager.directory, "simplefs")).then(function() {
+		oPluginsManager.updateByDirectory(path.join(oPluginsManager.directory, "node-containerpattern")).then(function() {
 			assert.ok(false, "tests does not generate error");
 			done();
 		}).catch(function(err) {
