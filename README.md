@@ -1,28 +1,26 @@
-# simplepluginsmanager
-A plugins manager's object, using SimplePlugin
+# node-pluginsmanager
+A plugins manager
 
 ## Installation
 
 ```bash
-$ npm install simplepluginsmanager
+$ npm install node-pluginsmanager
 ```
 
 ## Features
 
-  * simply manage plugins (on SimplePlugin model)
+  * simply manage plugins (on plugin model)
   * install plugins manually or via github & load them
   * update plugins via github
   * uninstall plugins and unload there ressources
 
-## Create your plugin with SimplePlugin
+## Create your plugin with "plugin" extend
 
 ```js
 
 "use strict";
 
-const SimplePluginsManager = require('simplepluginsmanager');
-
-class MyPlugin extends SimplePluginsManager.SimplePlugin {
+class MyPlugin extends require('node-pluginsmanager').plugin {
 
     // load
 
@@ -90,9 +88,9 @@ class MyPlugin extends SimplePluginsManager.SimplePlugin {
 
 "use strict";
 
-const SimplePluginsManager = require('simplepluginsmanager'), path = require('path');
+const path = require('path');
 
-var oPluginsManager = new SimplePluginsManager(path.join(__dirname, 'plugins')); // param optional : automatically setted to this value if not given...
+var oPluginsManager = (new require('node-pluginsmanager'))(path.join(__dirname, 'plugins')); // param optional : automatically setted to this value if not given...
 oPluginsManager.directory = path.join(__dirname, 'plugins'); // ... or changed like this
 
 oPluginsManager
@@ -124,6 +122,10 @@ oPluginsManager
         .on('uninstalled', function(plugin) {
             console.log("--- [event/uninstalled] '" + plugin.name + "' uninstalled ---");
         })
+
+.beforeLoad(function() { // optionnal. MUST return a promise
+    return Promise.resolve();
+})
 
 .loadAll(<optional data to pass to the 'load' plugins methods>).then(function() {
 
@@ -171,7 +173,7 @@ oPluginsManager
 ## Tests
 
 ```bash
-$ mocha tests/tests.js
+$ gulp
 ```
 
 ## License
