@@ -1,6 +1,6 @@
 {
   "name": "node-pluginsmanager",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A plugins manager",
   "main": "lib/main.js",
   "scripts": {
@@ -29,5 +29,6 @@
     "gulp-mocha": "^2.0.0",
     "gulp-plumber": "^1.0.0"
   },
-  "homepage": "https://github.com/Psychopoulet/node-pluginsmanager#readme"
+  "homepage": "https://github.com/Psychopoulet/node-pluginsmanager#readme",
+  "engines" : { "node" : ">=4.0.0" }
 }

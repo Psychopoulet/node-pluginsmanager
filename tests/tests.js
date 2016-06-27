@@ -9,7 +9,7 @@
 
 // private
 
-	var oPluginsManager = new (require(path.join(__dirname, "..", "lib", "main.js")))(), cn = console;
+	var oPluginsManager = new (require(path.join(__dirname, "..", "lib", "main.js")))();
 
 // tests
 
@@ -40,27 +40,27 @@ describe("events", function() {
 		// errors
 
 		oPluginsManager.on("error", function(msg) {
-			cn.log("--- [event/error] \"" + msg + "\" ---");
+			(1, console).log("--- [event/error] \"" + msg + "\" ---");
 		})
 
 		// load
 
 		.on("loaded", function(plugin) {
-			cn.log("--- [event/loaded] \"" + plugin.name + "\" (v" + plugin.version + ") loaded ---");
+			(1, console).log("--- [event/loaded] \"" + plugin.name + "\" (v" + plugin.version + ") loaded ---");
 		}).on("allloaded", function() {
-			cn.log("--- [event/allloaded] ---");
+			(1, console).log("--- [event/allloaded] ---");
 		}).on("unloaded", function(plugin) {
-			cn.log("--- [event/unloaded] \"" + plugin.name + "\" (v" + plugin.version + ") unloaded ---");
+			(1, console).log("--- [event/unloaded] \"" + plugin.name + "\" (v" + plugin.version + ") unloaded ---");
 		})
 
 		// write
 
 		.on("installed", function(plugin) {
-			cn.log("--- [event/installed] \"" + plugin.name + "\" (v" + plugin.version + ") installed ---");
+			(1, console).log("--- [event/installed] \"" + plugin.name + "\" (v" + plugin.version + ") installed ---");
 		}).on("updated", function(plugin) {
-			cn.log("--- [event/updated] \"" + plugin.name + "\" (v" + plugin.version + ") updated ---");
+			(1, console).log("--- [event/updated] \"" + plugin.name + "\" (v" + plugin.version + ") updated ---");
 		}).on("uninstalled", function(plugin) {
-			cn.log("--- [event/uninstalled] \"" + plugin.name + "\" uninstalled ---");
+			(1, console).log("--- [event/uninstalled] \"" + plugin.name + "\" uninstalled ---");
 		})
 
 		.loadAll().then(function() {
