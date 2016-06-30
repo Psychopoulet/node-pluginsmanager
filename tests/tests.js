@@ -5,7 +5,7 @@
 	const 	path = require("path"),
 			assert = require("assert"),
 
-			fs = require("simplefs");
+			fs = require("node-promfs");
 
 // private
 

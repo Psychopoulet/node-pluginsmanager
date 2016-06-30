@@ -1,6 +1,6 @@
 {
   "name": "node-pluginsmanager",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "A plugins manager",
   "main": "lib/main.js",
   "scripts": {
@@ -20,7 +20,7 @@
     "url": "https://github.com/Psychopoulet/node-pluginsmanager/issues"
   },
   "dependencies": {
-    "simplefs": "^2.2.1"
+    "node-promfs": "^0.1.0"
   },
   "devDependencies": {
     "gulp": "^3.9.0",
