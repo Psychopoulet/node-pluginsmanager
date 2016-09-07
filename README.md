@@ -17,7 +17,6 @@ $ npm install node-pluginsmanager
 ## Create your plugin with "plugin" extend
 
 ```js
-
 "use strict";
 
 class MyPlugin extends require('node-pluginsmanager').plugin {
@@ -27,7 +26,7 @@ class MyPlugin extends require('node-pluginsmanager').plugin {
         // 'data' is optionnal, null if not sended by the manager
         load (data) {
 
-            return new Promise(function(resolve, reject) {
+            return new Promise((resolve) => {
                 // your working place
                 resolve();
             });
@@ -39,7 +38,7 @@ class MyPlugin extends require('node-pluginsmanager').plugin {
 
             super.unload(); // must be called
 
-            return new Promise(function(resolve, reject) {
+            return new Promise((resolve) => {
                 // used on delete & update plugin, unload ressources like array, sockets, etc...
                 resolve();
             });
@@ -51,7 +50,7 @@ class MyPlugin extends require('node-pluginsmanager').plugin {
         // 'data' is optionnal, null if not sended by the manager
         install (data) {
 
-            return new Promise(function(resolve, reject) {
+            return new Promise((resolve) => {
                 // on the first use, create ressources like directories, files, etc...
                 resolve();
             });
@@ -61,7 +60,7 @@ class MyPlugin extends require('node-pluginsmanager').plugin {
         // 'data' is optionnal, null if not sended by the manager
         update (data) {
 
-            return new Promise(function(resolve, reject) {
+            return new Promise((resolve) => {
                 // update your ressources like sql database, etc...
                 resolve();
             });
@@ -71,7 +70,7 @@ class MyPlugin extends require('node-pluginsmanager').plugin {
         // 'data' is optionnal, null if not sended by the manager
         uninstall (data) {
 
-            return new Promise(function(resolve, reject) {
+            return new Promise((resolve) => {
                 // remove all the created ressources like directories, files, etc...
                 resolve();
             });
@@ -79,13 +78,11 @@ class MyPlugin extends require('node-pluginsmanager').plugin {
         }
 
 }
-
 ```
 
 ## Examples
 
 ```js
-
 "use strict";
 
 const path = require('path');
@@ -95,39 +92,39 @@ oPluginsManager.directory = path.join(__dirname, 'plugins'); // ... or changed l
 
 oPluginsManager
 
-    .on('error', function(msg) {
+    .on('error', (msg) => {
         console.log("--- [event/error] '" + msg + "' ---");
     })
 
     // load
 
-        .on('loaded', function(plugin) {
+        .on('loaded', (plugin) => {
             console.log("--- [event/loaded] '" + plugin.name + "' (v" + plugin.version + ") loaded ---");
         })
-        .on('allloaded', function() {
+        .on('allloaded', () => {
             console.log("--- [event/loaded] all loaded ---");
         })
-        .on('unloaded', function(plugin) {
+        .on('unloaded', (plugin) => {
             console.log("--- [event/unloaded] '" + plugin.name + "' (v" + plugin.version + ") unloaded ---");
         })
 
     // write
 
-        .on('installed', function(plugin) {
+        .on('installed', (plugin) => {
             console.log("--- [event/installed] '" + plugin.name + "' (v" + plugin.version + ") installed ---");
         })
-        .on('updated', function(plugin) {
+        .on('updated', (plugin) => {
             console.log("--- [event/updated] '" + plugin.name + "' (v" + plugin.version + ") updated ---");
         })
-        .on('uninstalled', function(plugin) {
+        .on('uninstalled', (plugin) => {
             console.log("--- [event/uninstalled] '" + plugin.name + "' uninstalled ---");
         })
 
-.beforeLoad(function() { // optionnal. MUST return a promise
+.beforeLoad(() => { // optionnal. MUST return a promise
     return Promise.resolve();
 })
 
-.loadAll(<optional data to pass to the 'load' plugins methods>).then(function() {
+.loadAll(<optional data to pass to the 'load' plugins methods>).then(() => {
 
     console.log('all plugins loaded');
     console.log(oPluginsManager.getPluginsNames());
@@ -135,18 +132,18 @@ oPluginsManager
     oPluginsManager.installViaGithub(
         'https://github.com/<account>/<plugin>',
         <optional data to pass to the 'install' && 'load' plugins methods>
-    ).then(function(plugin) {
+    ).then((plugin) => {
         console.log(plugin.name + ' installed & loaded');
-    }).catch(function(err) {
+    }).catch((err) => {
         console.log(err);
     });
 
     oPluginsManager.update( // use "github"'s plugin data if exists
         <plugin>,
         <optional data to pass to the 'unload', 'update', && 'load' plugins methods>
-    ).then(function(plugin) {
+    ).then((plugin) => {
         console.log(plugin.name + ' updated & loaded');
-    }).catch(function(err) {
+    }).catch((err) => {
         console.log(err);
     });
 
@@ -155,19 +152,17 @@ oPluginsManager
     oPluginsManager.uninstall(
         <plugin>,
         <optional data to pass to the 'unload' && 'uninstall' plugins methods>
-    ).then(function(pluginName) {
+    ).then((pluginName) => {
         console.log(pluginName + ' removed');
-    }).catch(function(err) {
+    }).catch((err) => {
         console.log(err);
     });
 
     // works also with uninstallByDirectory(<pluginDirectory>, <optional data>)
 
-})
-.catch(function(err) {
+}).catch((err) => {
     console.log(err);
 });
-
 ```
 
 ## Tests
