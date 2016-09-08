@@ -178,6 +178,17 @@ describe("load", () => {
 			assert.strictEqual("TestGoodPlugin", plugin.name, "Loaded plugin name is no correct");
 			assert.strictEqual(1, oPluginsManager.plugins.length, "Loaded plugins length is no correct");
 
+			assert.deepStrictEqual(["Sébastien VIDAL"], oPluginsManager.plugins[0].authors, "Loaded plugin's authors is not correct");
+			assert.strictEqual("A test for simpleplugin", oPluginsManager.plugins[0].description, "Loaded plugin's description is not correct");
+			assert.deepStrictEqual([path.join(__dirname, "plugins", "TestGoodPlugin", "design.css")], oPluginsManager.plugins[0].designs, "Loaded plugin's designs is not correct");
+			assert.strictEqual(path.join(__dirname, "plugins", "TestGoodPlugin"), oPluginsManager.plugins[0].directory, "Loaded plugin's directory is not correct");
+			assert.strictEqual("", oPluginsManager.plugins[0].github, "Loaded plugin's github is not correct");
+			assert.deepStrictEqual([path.join(__dirname, "plugins", "TestGoodPlugin", "javascript.js")], oPluginsManager.plugins[0].javascripts, "Loaded plugin's javascripts is not correct");
+			assert.strictEqual("ISC", oPluginsManager.plugins[0].license, "Loaded plugin's license is not correct");
+			assert.strictEqual("TestGoodPlugin", oPluginsManager.plugins[0].name, "Loaded plugin's name is not correct");
+			assert.deepStrictEqual([path.join(__dirname, "plugins", "TestGoodPlugin", "template.html")], oPluginsManager.plugins[0].templates, "Loaded plugin's templates is not correct");
+			assert.strictEqual("0.0.2", oPluginsManager.plugins[0].version, "Loaded plugin's version is not correct");
+
 		});
 
 	});

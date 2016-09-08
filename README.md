@@ -18,16 +18,16 @@ $ npm install node-pluginsmanager
 
 ### AbstractPlugin
 
-  * ``` string directory ``` plugin's directory path
-  * ``` string name ``` plugin's name
+  * ``` array authors ``` plugin's author
   * ``` string description ``` plugin's description
-  * ``` string version ``` plugin's version
-  * ``` string author ``` plugin's author
-  * ``` string license ``` plugin's license
-  * ``` string github ``` plugin's github
-  * ``` array templates ``` plugin's templates (HTML)
-  * ``` array javascripts ``` plugin's scripts (javascript)
   * ``` array designs ``` plugin's designs (CSS)
+  * ``` string directory ``` plugin's directory path
+  * ``` string github ``` plugin's github
+  * ``` array javascripts ``` plugin's scripts (javascript)
+  * ``` string license ``` plugin's license
+  * ``` string name ``` plugin's name
+  * ``` array templates ``` plugin's templates (HTML)
+  * ``` string version ``` plugin's version
 
   * ``` constructor() ```
   * ``` loadDataFromPackageFile() : Promise ``` used in PluginsManager

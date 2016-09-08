@@ -1,11 +1,11 @@
 {
   "name": "TestGoodPlugin",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A test for simpleplugin",
   "main": "TestGoodPlugin.js",
-  "author": "Sébastien VIDAL",
+  "authors": [ "Sébastien VIDAL" ],
   "license": "ISC",
-  "widget": "widget.html",
   "templates" : [ "template.html" ],
-  "javascripts" :[ "javascript.js"]
+  "javascripts" :[ "javascript.js"],
+  "designs" :[ "design.css"]
 }
