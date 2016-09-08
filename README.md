@@ -14,6 +14,20 @@ $ npm install node-pluginsmanager
   * update plugins via github
   * uninstall plugins and unload there ressources
 
+## Doc
+### PluginsManager (extends asynchronous-eventemitter)
+
+  * ``` string directory ``` plugins' directory path
+  * ``` array plugins ``` plugins' data
+  * ``` static AbstractPlugin plugin ``` abstract class for plugin creation
+  * ``` constructor([string directory = "<PluginsManager>/plugins"]) ```
+  * ``` getPluginsNames() : array ``` return plugins' names
+  * ``` loadByDirectory(string directory [, mixed data ]) : array ``` load a plugin by its directory, using "data" in arguments for "load" plugin's method
+  * ``` beforeLoadAll(function callback) : Promise ``` add a function executed before loading all plugins ("callback" must return a Promise instance)
+  * ``` loadAll([mixed data]) : Promise ``` load all plugins, using "data" in arguments for "load" plugin's method
+  * ``` installViaGithub(string url [, mixed data]) : Promise ``` install a plugin via github, using "data" in arguments for "install" plugin's method
+  * ``` updateByKey([mixed data]) : Promise ``` update a plugin, using "data" in arguments for "update" plugin's method
+
 ## Create your plugin with "plugin" extend
 
 ```js
