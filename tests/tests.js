@@ -135,21 +135,6 @@ describe("install via github", () => {
 
 });
 
-describe("update via github", () => {
-
-	it("should test update on an inexistant plugin", (done) => {
-
-		oPluginsManager.updateByDirectory(path.join(oPluginsManager.directory, "node-containerpattern")).then(() => {
-			done("tests does not generate error");
-		}).catch((err) => {
-			assert.strictEqual("string", typeof err, "generated error is not a string");
-			done();
-		});
-
-	}).timeout(10000);
-
-});
-
 describe("uninstall", () => {
 
 	let sEmptyPlugin;
@@ -254,5 +239,24 @@ describe("beforeLoadAll", () => {
 		});
 
 	});
+
+});
+
+describe("update via github", () => {
+
+	it("should test update on an inexistant plugin", (done) => {
+
+		oPluginsManager.updateByDirectory(path.join(oPluginsManager.directory, "node-containerpattern")).then(() => {
+			done("tests does not generate error");
+		}).catch((err) => {
+			assert.strictEqual("string", typeof err, "generated error is not a string");
+			done();
+		});
+
+	}).timeout(10000);
+
+	it("should test update plugins and dependances", () => {
+		return oPluginsManager.updateByDirectory(path.join(path.join(oPluginsManager.directory, "TestGoodPlugin")));
+	}).timeout(10000);
 
 });

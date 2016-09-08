@@ -62,7 +62,28 @@ $ npm install node-pluginsmanager
 
 ## Examples
 
-### Create your plugin with "plugin" extend
+### Create your plugin with "plugin" extend and add a package.json file to the plugin's directory
+
+ * package.json sample
+
+```js
+{
+  "authors": [ "Sébastien VIDAL" ],
+  "dependencies": {
+    "simpletts": "^1.3.0"
+  },
+  "designs": [ "design.css"],
+  "description": "A test for simpleplugin",
+  "javascripts": [ "javascript.js"],
+  "license": "ISC",
+  "main": "main.js",
+  "name": "MyPlugin",
+  "version": "0.0.2",
+  "templates": [ "template.html" ]
+}
+```
+
+ * main.js sample
 
 ```js
 "use strict";
