@@ -15,20 +15,54 @@ $ npm install node-pluginsmanager
   * uninstall plugins and unload there ressources
 
 ## Doc
-### PluginsManager (extends asynchronous-eventemitter)
+
+### AbstractPlugin
+
+  * ``` string directory ``` plugin's directory path
+  * ``` string name ``` plugin's name
+  * ``` string description ``` plugin's description
+  * ``` string version ``` plugin's version
+  * ``` string author ``` plugin's author
+  * ``` string license ``` plugin's license
+  * ``` string github ``` plugin's github
+  * ``` array templates ``` plugin's templates (HTML)
+  * ``` array javascripts ``` plugin's scripts (javascript)
+  * ``` array designs ``` plugin's designs (CSS)
+
+  * ``` constructor() ```
+  * ``` loadDataFromPackageFile() : Promise ``` used in PluginsManager
+  * ``` load([mixed data]) : Promise ``` fired on "load", "update" or "install" plugin event
+  * ``` unload([mixed data]) : Promise ``` fired on "update" or "uninstall" plugin event
+  * ``` install([mixed data]) : Promise ``` fired on "install" plugin event
+  * ``` update([mixed data]) : Promise ```fired on "update" plugin event
+  * ``` uninstall([mixed data]) : Promise ```fired on "uninstall" plugin event
+
+### PluginsManager (extends [asynchronous-eventemitter](https://www.npmjs.com/package/asynchronous-eventemitter))
 
   * ``` string directory ``` plugins' directory path
   * ``` array plugins ``` plugins' data
   * ``` static AbstractPlugin plugin ``` abstract class for plugin creation
+
   * ``` constructor([string directory = "<PluginsManager>/plugins"]) ```
+
   * ``` getPluginsNames() : array ``` return plugins' names
   * ``` loadByDirectory(string directory [, mixed data ]) : array ``` load a plugin by its directory, using "data" in arguments for "load" plugin's method
   * ``` beforeLoadAll(function callback) : Promise ``` add a function executed before loading all plugins ("callback" must return a Promise instance)
   * ``` loadAll([mixed data]) : Promise ``` load all plugins, using "data" in arguments for "load" plugin's method
-  * ``` installViaGithub(string url [, mixed data]) : Promise ``` install a plugin via github, using "data" in arguments for "install" plugin's method
-  * ``` updateByKey([mixed data]) : Promise ``` update a plugin, using "data" in arguments for "update" plugin's method
 
-## Create your plugin with "plugin" extend
+  * ``` installViaGithub(string url [, mixed data]) : Promise ``` install a plugin via github, using "data" in arguments for "install" and "load" plugin's methods
+
+  * ``` updateByKey(integer key, [mixed data]) : Promise ``` update a plugin by its key (in "plugins" placement), using "data" in arguments for "unload", "update" and "load" plugin's method
+  * ``` updateByDirectory(string directory [, mixed data]) : Promise ``` update a plugin by its directory, using "data" in arguments for "unload", "update" and "load" plugin's methods
+  * ``` update(object plugin [, mixed data]) : Promise ``` update a plugin, using "data" in arguments for "unload", "update" and "load" plugin's methods
+
+  * ``` uninstallByKey(integer key, [mixed data]) : Promise ``` uninstall a plugin by its key (in "plugins" placement), using "data" in arguments for "unload" and "uninstall" plugin's methods
+  * ``` uninstallByDirectory(string directory [, mixed data]) : Promise ``` uninstall a plugin by its directory, using "data" in arguments for "unload" and "uninstall" plugin's methods
+  * ``` uninstall(object plugin [, mixed data]) : Promise ``` uninstall a plugin, using "data" in arguments for "unload" and "uninstall" plugin's methods
+
+## Examples
+
+### Create your plugin with "plugin" extend
 
 ```js
 "use strict";
@@ -94,7 +128,7 @@ class MyPlugin extends require('node-pluginsmanager').plugin {
 }
 ```
 
-## Examples
+### Use PluginsManager
 
 ```js
 "use strict";
