@@ -1,15 +1,13 @@
 
 "use strict";
 
-var cn = console;
-
 module.exports = class TestGoodPlugin extends require(require("path").join("..", "..", "..", "lib", "main.js")).plugin {
 
 	// load
 
 	load (data) {
 
-		cn.log("load TestGoodPlugin with \"" + data + "\" data");
+		(0, console).log("load TestGoodPlugin with \"" + data + "\" data");
 		return Promise.resolve();
 
 	}
@@ -18,7 +16,7 @@ module.exports = class TestGoodPlugin extends require(require("path").join("..",
 
 		super.unload();
 
-		cn.log("unload TestGoodPlugin with \"" + data + "\" data");
+		(0, console).log("unload TestGoodPlugin with \"" + data + "\" data");
 		return Promise.resolve();
 
 	}
@@ -27,21 +25,21 @@ module.exports = class TestGoodPlugin extends require(require("path").join("..",
 
 	install (data) {
 
-		cn.log("install TestGoodPlugin with \"" + data + "\" data");
+		(0, console).log("install TestGoodPlugin with \"" + data + "\" data");
 		return Promise.resolve();
 
 	}
 
 	update (data) {
 		
-		cn.log("update TestGoodPlugin with \"" + data + "\" data");
+		(0, console).log("update TestGoodPlugin with \"" + data + "\" data");
 		return Promise.resolve();
 
 	}
 
 	uninstall (data) {
 		
-		cn.log("install TestGoodPlugin with \"" + data + "\" data");
+		(0, console).log("install TestGoodPlugin with \"" + data + "\" data");
 		return Promise.resolve();
 
 	}

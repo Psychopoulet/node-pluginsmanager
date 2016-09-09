@@ -46,23 +46,50 @@ $ npm install node-pluginsmanager
   * ``` constructor([string directory = "<PluginsManager>/plugins"]) ```
 
   * ``` getPluginsNames() : array ``` return plugins' names
-  * ``` loadByDirectory(string directory [, mixed data ]) : array ``` load a plugin by its directory, using "data" in arguments for "load" plugin's method
   * ``` beforeLoadAll(function callback) : Promise ``` add a function executed before loading all plugins ("callback" must return a Promise instance)
+
   * ``` loadAll([mixed data]) : Promise ``` load all plugins, using "data" in arguments for "load" plugin's method
+  * ``` loadByDirectory(string directory [, mixed data ]) : array ``` load a plugin by its directory, using "data" in arguments for "load" plugin's method
+
+  * ``` unload(object plugin [, mixed data]) : Promise ``` unload a plugin, using "data" in arguments for "unload" plugin's method
+  * ``` unloadByDirectory(string directory [, mixed data]) : Promise ``` unload a plugin by its directory, using "data" in arguments for "unload" plugin's method
+  * ``` updateByKey(string directory [, mixed data]) : Promise ``` unload a plugin by its key (in "plugins" placement), using "data" in arguments for "unload" plugin's method
+  * ``` unloadAll([mixed data]) : Promise ``` unload all plugins, using "data" in arguments for "unload" plugin's method
 
   * ``` installViaGithub(string url [, mixed data]) : Promise ``` install a plugin via github, using "data" in arguments for "install" and "load" plugin's methods
 
-  * ``` updateByKey(integer key, [mixed data]) : Promise ``` update a plugin by its key (in "plugins" placement), using "data" in arguments for "unload", "update" and "load" plugin's method
-  * ``` updateByDirectory(string directory [, mixed data]) : Promise ``` update a plugin by its directory, using "data" in arguments for "unload", "update" and "load" plugin's methods
   * ``` update(object plugin [, mixed data]) : Promise ``` update a plugin, using "data" in arguments for "unload", "update" and "load" plugin's methods
+  * ``` updateByDirectory(string directory [, mixed data]) : Promise ``` update a plugin by its directory, using "data" in arguments for "unload", "update" and "load" plugin's methods
+  * ``` updateByKey(integer key, [mixed data]) : Promise ``` update a plugin by its key (in "plugins" placement), using "data" in arguments for "unload", "update" and "load" plugin's method
 
-  * ``` uninstallByKey(integer key, [mixed data]) : Promise ``` uninstall a plugin by its key (in "plugins" placement), using "data" in arguments for "unload" and "uninstall" plugin's methods
-  * ``` uninstallByDirectory(string directory [, mixed data]) : Promise ``` uninstall a plugin by its directory, using "data" in arguments for "unload" and "uninstall" plugin's methods
   * ``` uninstall(object plugin [, mixed data]) : Promise ``` uninstall a plugin, using "data" in arguments for "unload" and "uninstall" plugin's methods
+  * ``` uninstallByDirectory(string directory [, mixed data]) : Promise ``` uninstall a plugin by its directory, using "data" in arguments for "unload" and "uninstall" plugin's methods
+  * ``` uninstallByKey(integer key, [mixed data]) : Promise ``` uninstall a plugin by its key (in "plugins" placement), using "data" in arguments for "unload" and "uninstall" plugin's methods
 
 ## Examples
 
-### Create your plugin with "plugin" extend
+### Create your plugin with "plugin" extend and add a package.json file to the plugin's directory
+
+ * package.json sample
+
+```js
+{
+  "authors": [ "Sébastien VIDAL" ],
+  "dependencies": {
+    "simpletts": "^1.3.0"
+  },
+  "designs": [ "design.css"],
+  "description": "A test for simpleplugin",
+  "javascripts": [ "javascript.js"],
+  "license": "ISC",
+  "main": "main.js",
+  "name": "MyPlugin",
+  "version": "0.0.2",
+  "templates": [ "template.html" ]
+}
+```
+
+ * main.js sample
 
 ```js
 "use strict";
