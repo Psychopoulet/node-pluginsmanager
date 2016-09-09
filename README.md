@@ -47,8 +47,13 @@ $ npm install node-pluginsmanager
 
   * ``` getPluginsNames() : array ``` return plugins' names
   * ``` beforeLoadAll(function callback) : Promise ``` add a function executed before loading all plugins ("callback" must return a Promise instance)
+
   * ``` loadAll([mixed data]) : Promise ``` load all plugins, using "data" in arguments for "load" plugin's method
   * ``` loadByDirectory(string directory [, mixed data ]) : array ``` load a plugin by its directory, using "data" in arguments for "load" plugin's method
+
+  * ``` unload(object plugin [, mixed data]) : Promise ``` unload a plugin, using "data" in arguments for "unload" plugin's method
+  * ``` unloadByDirectory(string directory [, mixed data]) : Promise ``` unload a plugin by its directory, using "data" in arguments for "unload" plugin's method
+  * ``` updateByKey(string directory [, mixed data]) : Promise ``` unload a plugin by its key (in "plugins" placement), using "data" in arguments for "unload" plugin's method
   * ``` unloadAll([mixed data]) : Promise ``` unload all plugins, using "data" in arguments for "unload" plugin's method
 
   * ``` installViaGithub(string url [, mixed data]) : Promise ``` install a plugin via github, using "data" in arguments for "install" and "load" plugin's methods
