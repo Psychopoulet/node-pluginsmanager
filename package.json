@@ -1,6 +1,6 @@
 {
   "name": "node-pluginsmanager",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "A plugins manager",
   "main": "lib/main.js",
   "scripts": {
@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "asynchronous-eventemitter": "^0.1.0",
-    "node-promfs": "^0.2.0"
+    "node-promfs": "^1.0.0"
   },
   "devDependencies": {
     "gulp": "^3.9.0",
