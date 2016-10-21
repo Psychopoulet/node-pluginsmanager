@@ -21,14 +21,14 @@
   },
   "dependencies": {
     "asynchronous-eventemitter": "^0.1.0",
-    "node-promfs": "^1.0.1"
+    "node-promfs": "^1.0.2"
   },
   "devDependencies": {
-    "gulp": "^3.9.0",
-    "gulp-eslint": "^2.0.0",
+    "gulp": "^3.9.1",
+    "gulp-eslint": "^2.1.0",
     "gulp-exclude-gitignore": "^1.0.0",
-    "gulp-mocha": "^2.0.0",
-    "gulp-plumber": "^1.0.0"
+    "gulp-mocha": "^2.2.0",
+    "gulp-plumber": "^1.1.0"
   },
   "homepage": "https://github.com/Psychopoulet/node-pluginsmanager#readme",
   "engines" : { "node" : ">=4.0.0" }
