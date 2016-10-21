@@ -31,29 +31,29 @@ describe("events", () => {
 		// errors
 
 		return oPluginsManager.on("error", (msg) => {
-			(1, console).log("--- [event/error] \"" + msg + "\" ---");
+			(1, console).log("--- [PluginsManager/events/error] \"" + msg + "\" ---");
 		})
 
 		// load
 
 		.on("loaded", (plugin) => {
-			(1, console).log("--- [event/loaded] \"" + plugin.name + "\" (v" + plugin.version + ") loaded ---");
+			(1, console).log("--- [PluginsManager/events/loaded] \"" + plugin.name + "\" (v" + plugin.version + ") loaded ---");
 		}).on("allloaded", () => {
-			(1, console).log("--- [event/allloaded] ---");
+			(1, console).log("--- [PluginsManager/events/allloaded] ---");
 		}).on("unloaded", (plugin) => {
-			(1, console).log("--- [event/unloaded] \"" + plugin.name + "\" (v" + plugin.version + ") unloaded ---");
+			(1, console).log("--- [PluginsManager/events/unloaded] \"" + plugin.name + "\" (v" + plugin.version + ") unloaded ---");
 		}).on("allunloaded", () => {
-			(1, console).log("--- [event/allunloaded] ---");
+			(1, console).log("--- [PluginsManager/events/allunloaded] ---");
 		})
 
 		// write
 
 		.on("installed", (plugin) => {
-			(1, console).log("--- [event/installed] \"" + plugin.name + "\" (v" + plugin.version + ") installed ---");
+			(1, console).log("--- [PluginsManager/events/installed] \"" + plugin.name + "\" (v" + plugin.version + ") installed ---");
 		}).on("updated", (plugin) => {
-			(1, console).log("--- [event/updated] \"" + plugin.name + "\" (v" + plugin.version + ") updated ---");
+			(1, console).log("--- [PluginsManager/events/updated] \"" + plugin.name + "\" (v" + plugin.version + ") updated ---");
 		}).on("uninstalled", (plugin) => {
-			(1, console).log("--- [event/uninstalled] \"" + plugin.name + "\" uninstalled ---");
+			(1, console).log("--- [PluginsManager/events/uninstalled] \"" + plugin.name + "\" uninstalled ---");
 		}).loadAll();
 
 	});
@@ -62,23 +62,36 @@ describe("events", () => {
 
 describe("load all", () => {
 
-	let sEmptyPlugin = path.join(testsPluginsDirectory, "TestEmptyPlugin");
 	oPluginsManager.directory = testsPluginsDirectory;
 
 	before(() => { oPluginsManager.directory = testsPluginsDirectory; return oPluginsManager.unloadAll(); });
-	after(() => { return fs.unlinkProm(sEmptyPlugin).then(() => { return oPluginsManager.unloadAll(); }); });
 
 	it("should test empty plugin", (done) => {
 
-		oPluginsManager.directory = testsPluginsDirectory;
+		let sEmptyPluginDirectory = path.join(testsPluginsDirectory, "TestEmptyPlugin");
 
-		fs.mkdirpProm(sEmptyPlugin).then(() => {
-			return oPluginsManager.loadByDirectory(sEmptyPlugin);
+		fs.mkdirpProm(sEmptyPluginDirectory).then(() => {
+			return oPluginsManager.loadByDirectory(sEmptyPluginDirectory);
 		}).then(() => {
 			done("tests does not generate error");
 		}).catch((err) => {
+
 			assert.strictEqual("string", typeof err, "generated error is not a string");
-			done();
+
+			fs.rmdirpProm(sEmptyPluginDirectory).then(() => {
+				return oPluginsManager.unloadAll();
+			}).then(() => {
+				done();
+			}).catch(done);
+
+		});
+
+	});
+
+	it("should test normal loading", () => {
+
+		return oPluginsManager.loadAll().then(() => {
+			return oPluginsManager.unloadAll();
 		});
 
 	});
@@ -88,7 +101,14 @@ describe("load all", () => {
 describe("install via github", () => {
 
 	before(() => { return oPluginsManager.unloadAll(); });
-	after(() => { return fs.rmdirpProm(path.join(oPluginsManager.directory, "node-containerpattern")).then(() => { return oPluginsManager.unloadAll(); }); });
+
+	after(() => {
+
+		return fs.rmdirpProm(path.join(oPluginsManager.directory, "node-containerpattern")).then(() => {
+			return oPluginsManager.unloadAll();
+		});
+
+	});
 
 	it("should test download an empty url", (done) => {
 

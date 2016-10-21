@@ -49,6 +49,7 @@ $ npm install node-pluginsmanager
   -- Attributes -- 
 
   * ``` string directory ``` plugins' directory path
+  * ``` array orderedDirectoriesBaseNames ``` plugins' names order for loading
   * ``` array plugins ``` plugins' data
   * ``` static AbstractPlugin plugin ``` abstract class for plugin creation
 
@@ -58,6 +59,8 @@ $ npm install node-pluginsmanager
 
   -- Methods --
 
+  * ``` setOrder(array pluginsDirectoriesBaseNames) : this ``` create a forced order for loading plugins. not ordered plugins are synchronously loaded after
+  
   * ``` getPluginsNames() : array ``` return plugins' names
   * ``` beforeLoadAll(function callback) : Promise ``` add a function executed before loading all plugins ("callback" must return a Promise instance)
 
