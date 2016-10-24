@@ -1,5 +1,9 @@
 "use strict";
 
+// const
+
+	const MAX_TIMOUT = 10 * 1000;
+
 // deps
 
 	const 	path = require("path"),
@@ -115,6 +119,76 @@ describe("load all", () => {
 
 });
 
+describe("load all with order", () => {
+
+	before(() => {
+		oPluginsManager.directory = testsPluginsDirectory;
+		return oPluginsManager.unloadAll();
+	});
+
+	after(() => {
+		oPluginsManager.orderedDirectoriesBaseNames = [];
+		return oPluginsManager.unloadAll();
+	});
+
+	it("should add empty order", (done) => {
+
+		oPluginsManager.setOrder().then(() => {
+			done("tests does not generate error");
+		}).catch((err) => {
+			assert.strictEqual("string", typeof err, "generated error is not a string");
+			done();
+		});
+
+	});
+
+	it("should add wrong order", (done) => {
+
+		oPluginsManager.setOrder(false).then(() => {
+			done("tests does not generate error");
+		}).catch((err) => {
+			assert.strictEqual("string", typeof err, "generated error is not a string");
+			done();
+		});
+
+	});
+
+	it("should add normal order with wrong directories basenames", (done) => {
+
+		oPluginsManager.setOrder([ false, false ]).then(() => {
+			done("tests does not generate error");
+		}).catch((err) => {
+			assert.strictEqual("string", typeof err, "generated error is not a string");
+			done();
+		});
+
+	});
+
+	it("should add normal order with empty directories basenames", (done) => {
+
+		oPluginsManager.setOrder([ "", "" ]).then(() => {
+			done("tests does not generate error");
+		}).catch((err) => {
+			assert.strictEqual("string", typeof err, "generated error is not a string");
+			done();
+		});
+
+	});
+
+	it("should add normal order with normal directories basenames", () => {
+		return oPluginsManager.setOrder([ "TestGoodPlugin" ]);
+	});
+
+	it("should test normal loading with order", () => {
+
+		return oPluginsManager.loadAll().then(() => {
+			return oPluginsManager.unloadAll();
+		});
+
+	});
+
+});
+
 describe("install via github", () => {
 
 	before(() => {
@@ -139,7 +213,7 @@ describe("install via github", () => {
 			done();
 		});
 
-	}).timeout(10000);
+	}).timeout(MAX_TIMOUT);
 
 	it("should test download an invalid github url", (done) => {
 
@@ -150,7 +224,7 @@ describe("install via github", () => {
 			done();
 		});
 
-	}).timeout(10000);
+	}).timeout(MAX_TIMOUT);
 
 	it("should test download an invalid node-containerpattern", (done) => {
 
@@ -161,7 +235,7 @@ describe("install via github", () => {
 			done();
 		});
 
-	}).timeout(10000);
+	}).timeout(MAX_TIMOUT);
 
 });
 
@@ -324,7 +398,7 @@ describe("update via github", () => {
 			done();
 		});
 
-	}).timeout(10000);
+	}).timeout(MAX_TIMOUT);
 
 	it("should test update plugins and dependances", () => {
 
@@ -345,6 +419,6 @@ describe("update via github", () => {
 
 		});
 
-	}).timeout(10000);
+	}).timeout(MAX_TIMOUT);
 
 });
