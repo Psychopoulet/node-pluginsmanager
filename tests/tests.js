@@ -17,10 +17,24 @@
 describe("events", () => {
 
 	let pluginsDirectory = path.join(__dirname, "..", "plugins");
-	oPluginsManager.directory = pluginsDirectory;
 
-	before(() => { return fs.rmdirpProm(pluginsDirectory).then(() => { return oPluginsManager.unloadAll(); }); });
-	after(() => { return fs.rmdirpProm(pluginsDirectory).then(() => { return oPluginsManager.unloadAll(); }); });
+	before(() => {
+
+		oPluginsManager.directory = pluginsDirectory;
+
+		return fs.rmdirpProm(pluginsDirectory).then(() => {
+			return oPluginsManager.unloadAll();
+		});
+
+	});
+
+	after(() => {
+
+		return fs.rmdirpProm(pluginsDirectory).then(() => {
+			return oPluginsManager.unloadAll();
+		});
+
+	});
 
 	it("should test not existing directory without event", () => {
 		return oPluginsManager.loadAll();
@@ -62,9 +76,12 @@ describe("events", () => {
 
 describe("load all", () => {
 
-	oPluginsManager.directory = testsPluginsDirectory;
+	before(() => {
+		oPluginsManager.directory = testsPluginsDirectory;
+		return oPluginsManager.unloadAll();
+	});
 
-	before(() => { oPluginsManager.directory = testsPluginsDirectory; return oPluginsManager.unloadAll(); });
+	after(() => { return oPluginsManager.unloadAll(); });
 
 	it("should test empty plugin", (done) => {
 
@@ -100,11 +117,14 @@ describe("load all", () => {
 
 describe("install via github", () => {
 
-	before(() => { return oPluginsManager.unloadAll(); });
+	before(() => {
+		oPluginsManager.directory = testsPluginsDirectory;
+		return oPluginsManager.unloadAll();
+	});
 
 	after(() => {
 
-		return fs.rmdirpProm(path.join(oPluginsManager.directory, "node-containerpattern")).then(() => {
+		return fs.rmdirpProm(path.join(testsPluginsDirectory, "node-containerpattern")).then(() => {
 			return oPluginsManager.unloadAll();
 		});
 
@@ -149,8 +169,23 @@ describe("uninstall", () => {
 
 	let sEmptyPlugin = path.join(testsPluginsDirectory, "TestEmptyPlugin");
 
-	before(() => { return fs.mkdirpProm(sEmptyPlugin).then(() => { return oPluginsManager.unloadAll(); }); });
-	after(() => { return fs.rmdirpProm(sEmptyPlugin).then(() => { return oPluginsManager.unloadAll(); }); });
+	before(() => {
+
+		oPluginsManager.directory = testsPluginsDirectory;
+
+		return fs.mkdirpProm(sEmptyPlugin).then(() => {
+			return oPluginsManager.unloadAll();
+		});
+
+	});
+
+	after(() => {
+
+		return fs.rmdirpProm(sEmptyPlugin).then(() => {
+			return oPluginsManager.unloadAll();
+		});
+
+	});
 
 	it("should uninstall empty plugin", () => {
 		return oPluginsManager.uninstallByDirectory(sEmptyPlugin);
@@ -160,7 +195,11 @@ describe("uninstall", () => {
 
 describe("load", () => {
 
-	before(() => { oPluginsManager.directory = testsPluginsDirectory; return oPluginsManager.unloadAll(); });
+	before(() => {
+		oPluginsManager.directory = testsPluginsDirectory;
+		return oPluginsManager.unloadAll();
+	});
+
 	after(() => { return oPluginsManager.unloadAll(); });
 
 	it("should load good plugin", () => {
@@ -213,7 +252,11 @@ describe("load", () => {
 
 describe("beforeLoadAll", () => {
 
-	before(() => { oPluginsManager.directory = testsPluginsDirectory; return oPluginsManager.unloadAll(); });
+	before(() => {
+		oPluginsManager.directory = testsPluginsDirectory;
+		return oPluginsManager.unloadAll();
+	});
+
 	after(() => { return oPluginsManager.unloadAll(); });
 
 	it("should fail on beforeLoadAll creation", (done) => {
@@ -256,11 +299,21 @@ describe("beforeLoadAll", () => {
 
 describe("update via github", () => {
 
-	let TestGoodPluginDirectory = path.join(path.join(oPluginsManager.directory, "TestGoodPlugin")),
+	let TestGoodPluginDirectory = path.join(path.join(testsPluginsDirectory, "TestGoodPlugin")),
 		npmDirectory = path.join(TestGoodPluginDirectory, "node_modules");
 
-	before(() => { oPluginsManager.directory = testsPluginsDirectory; return oPluginsManager.unloadAll(); });
-	after(() => { return fs.rmdirpProm(npmDirectory).then(() => { return oPluginsManager.unloadAll(); }); });
+	before(() => {
+		oPluginsManager.directory = testsPluginsDirectory;
+		return oPluginsManager.unloadAll();
+	});
+
+	after(() => {
+
+		return fs.rmdirpProm(npmDirectory).then(() => {
+			return oPluginsManager.unloadAll();
+		});
+
+	});
 
 	it("should test update on an inexistant plugin", (done) => {
 
