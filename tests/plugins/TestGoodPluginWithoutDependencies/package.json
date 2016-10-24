@@ -1,14 +1,12 @@
 {
   "authors": [ "Sébastien VIDAL" ],
-  "dependencies": {
-    "simpletts": "^1.3.0"
-  },
+  "dependencies": { },
   "designs": [ "design.css"],
   "description": "A test for node-pluginsmanager",
   "javascripts": [ "javascript.js"],
   "license": "ISC",
-  "main": "TestGoodPlugin.js",
-  "name": "TestGoodPlugin",
+  "main": "TestGoodPluginWithoutDependencies.js",
+  "name": "TestGoodPluginWithoutDependencies",
   "version": "0.0.2",
   "templates": [ "template.html" ]
 }

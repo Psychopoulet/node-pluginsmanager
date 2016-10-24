@@ -1,5 +1,9 @@
 "use strict";
 
+// const
+
+	const MAX_TIMOUT = 10 * 1000;
+
 // deps
 
 	const 	path = require("path"),
@@ -17,10 +21,24 @@
 describe("events", () => {
 
 	let pluginsDirectory = path.join(__dirname, "..", "plugins");
-	oPluginsManager.directory = pluginsDirectory;
 
-	before(() => { return fs.rmdirpProm(pluginsDirectory).then(() => { return oPluginsManager.unloadAll(); }); });
-	after(() => { return fs.rmdirpProm(pluginsDirectory).then(() => { return oPluginsManager.unloadAll(); }); });
+	before(() => {
+
+		oPluginsManager.directory = pluginsDirectory;
+
+		return fs.rmdirpProm(pluginsDirectory).then(() => {
+			return oPluginsManager.unloadAll();
+		});
+
+	});
+
+	after(() => {
+
+		return fs.rmdirpProm(pluginsDirectory).then(() => {
+			return oPluginsManager.unloadAll();
+		});
+
+	});
 
 	it("should test not existing directory without event", () => {
 		return oPluginsManager.loadAll();
@@ -31,29 +49,29 @@ describe("events", () => {
 		// errors
 
 		return oPluginsManager.on("error", (msg) => {
-			(1, console).log("--- [event/error] \"" + msg + "\" ---");
+			(1, console).log("--- [PluginsManager/events/error] \"" + msg + "\" ---");
 		})
 
 		// load
 
 		.on("loaded", (plugin) => {
-			(1, console).log("--- [event/loaded] \"" + plugin.name + "\" (v" + plugin.version + ") loaded ---");
+			(1, console).log("--- [PluginsManager/events/loaded] \"" + plugin.name + "\" (v" + plugin.version + ") loaded ---");
 		}).on("allloaded", () => {
-			(1, console).log("--- [event/allloaded] ---");
+			(1, console).log("--- [PluginsManager/events/allloaded] ---");
 		}).on("unloaded", (plugin) => {
-			(1, console).log("--- [event/unloaded] \"" + plugin.name + "\" (v" + plugin.version + ") unloaded ---");
+			(1, console).log("--- [PluginsManager/events/unloaded] \"" + plugin.name + "\" (v" + plugin.version + ") unloaded ---");
 		}).on("allunloaded", () => {
-			(1, console).log("--- [event/allunloaded] ---");
+			(1, console).log("--- [PluginsManager/events/allunloaded] ---");
 		})
 
 		// write
 
 		.on("installed", (plugin) => {
-			(1, console).log("--- [event/installed] \"" + plugin.name + "\" (v" + plugin.version + ") installed ---");
+			(1, console).log("--- [PluginsManager/events/installed] \"" + plugin.name + "\" (v" + plugin.version + ") installed ---");
 		}).on("updated", (plugin) => {
-			(1, console).log("--- [event/updated] \"" + plugin.name + "\" (v" + plugin.version + ") updated ---");
+			(1, console).log("--- [PluginsManager/events/updated] \"" + plugin.name + "\" (v" + plugin.version + ") updated ---");
 		}).on("uninstalled", (plugin) => {
-			(1, console).log("--- [event/uninstalled] \"" + plugin.name + "\" uninstalled ---");
+			(1, console).log("--- [PluginsManager/events/uninstalled] \"" + plugin.name + "\" uninstalled ---");
 		}).loadAll();
 
 	});
@@ -62,19 +80,60 @@ describe("events", () => {
 
 describe("load all", () => {
 
-	let sEmptyPlugin = path.join(testsPluginsDirectory, "TestEmptyPlugin");
-	oPluginsManager.directory = testsPluginsDirectory;
+	before(() => {
+		oPluginsManager.directory = testsPluginsDirectory;
+		return oPluginsManager.unloadAll();
+	});
 
-	before(() => { oPluginsManager.directory = testsPluginsDirectory; return oPluginsManager.unloadAll(); });
-	after(() => { return fs.unlinkProm(sEmptyPlugin).then(() => { return oPluginsManager.unloadAll(); }); });
+	after(() => { return oPluginsManager.unloadAll(); });
 
 	it("should test empty plugin", (done) => {
 
-		oPluginsManager.directory = testsPluginsDirectory;
+		let sEmptyPluginDirectory = path.join(testsPluginsDirectory, "TestEmptyPlugin");
 
-		fs.mkdirpProm(sEmptyPlugin).then(() => {
-			return oPluginsManager.loadByDirectory(sEmptyPlugin);
+		fs.mkdirpProm(sEmptyPluginDirectory).then(() => {
+			return oPluginsManager.loadByDirectory(sEmptyPluginDirectory);
 		}).then(() => {
+			done("tests does not generate error");
+		}).catch((err) => {
+
+			assert.strictEqual("string", typeof err, "generated error is not a string");
+
+			fs.rmdirpProm(sEmptyPluginDirectory).then(() => {
+				return oPluginsManager.unloadAll();
+			}).then(() => {
+				done();
+			}).catch(done);
+
+		});
+
+	});
+
+	it("should test normal loading", () => {
+
+		return oPluginsManager.loadAll().then(() => {
+			return oPluginsManager.unloadAll();
+		});
+
+	});
+
+});
+
+describe("load all with order", () => {
+
+	before(() => {
+		oPluginsManager.directory = testsPluginsDirectory;
+		return oPluginsManager.unloadAll();
+	});
+
+	after(() => {
+		oPluginsManager.orderedDirectoriesBaseNames = [];
+		return oPluginsManager.unloadAll();
+	});
+
+	it("should add empty order", (done) => {
+
+		oPluginsManager.setOrder().then(() => {
 			done("tests does not generate error");
 		}).catch((err) => {
 			assert.strictEqual("string", typeof err, "generated error is not a string");
@@ -83,12 +142,87 @@ describe("load all", () => {
 
 	});
 
+	it("should add wrong order", (done) => {
+
+		oPluginsManager.setOrder(false).then(() => {
+			done("tests does not generate error");
+		}).catch((err) => {
+			assert.strictEqual("string", typeof err, "generated error is not a string");
+			done();
+		});
+
+	});
+
+	it("should add normal order with wrong directories basenames", (done) => {
+
+		oPluginsManager.setOrder([ false, false ]).then(() => {
+			done("tests does not generate error");
+		}).catch((err) => {
+			assert.strictEqual("string", typeof err, "generated error is not a string");
+			done();
+		});
+
+	});
+
+	it("should add normal order with empty directories basenames", (done) => {
+
+		oPluginsManager.setOrder([ "", "" ]).then(() => {
+			done("tests does not generate error");
+		}).catch((err) => {
+			assert.strictEqual("string", typeof err, "generated error is not a string");
+			done();
+		});
+
+	});
+
+	it("should add normal order with normal directories basenames", () => {
+		return oPluginsManager.setOrder([ "TestGoodPlugin" ]);
+	});
+
+	it("should test normal loading with order and twice the same plugin", () => {
+
+		return oPluginsManager.setOrder([ "TestGoodPlugin", "TestGoodPlugin" ]).then(() => {
+			return oPluginsManager.loadAll();
+		}).then(() => {
+
+			assert.strictEqual(2, oPluginsManager.plugins.length, "too much plugins loaded");
+
+			return oPluginsManager.unloadAll()
+
+		});
+
+	});
+
+	it("should test normal loading with order", () => {
+
+		return oPluginsManager.setOrder([ "TestGoodPluginWithoutDependencies" ]).then(() => {
+			return oPluginsManager.loadAll();
+		}).then(() => {
+
+			assert.strictEqual(2, oPluginsManager.plugins.length, "too much plugins loaded");
+
+			return oPluginsManager.unloadAll()
+
+		});
+
+	});
+
 });
 
 describe("install via github", () => {
 
-	before(() => { return oPluginsManager.unloadAll(); });
-	after(() => { return fs.rmdirpProm(path.join(oPluginsManager.directory, "node-containerpattern")).then(() => { return oPluginsManager.unloadAll(); }); });
+	before(() => {
+		oPluginsManager.directory = testsPluginsDirectory;
+		return oPluginsManager.unloadAll();
+	});
+
+	after(() => {
+
+		return fs.rmdirpProm(path.join(testsPluginsDirectory, "node-containerpattern")).then(() => {
+			return oPluginsManager.unloadAll();
+		});
+
+	});
 
 	it("should test download an empty url", (done) => {
 
@@ -99,7 +233,7 @@ describe("install via github", () => {
 			done();
 		});
 
-	}).timeout(10000);
+	}).timeout(MAX_TIMOUT);
 
 	it("should test download an invalid github url", (done) => {
 
@@ -110,7 +244,7 @@ describe("install via github", () => {
 			done();
 		});
 
-	}).timeout(10000);
+	}).timeout(MAX_TIMOUT);
 
 	it("should test download an invalid node-containerpattern", (done) => {
 
@@ -121,7 +255,7 @@ describe("install via github", () => {
 			done();
 		});
 
-	}).timeout(10000);
+	}).timeout(MAX_TIMOUT);
 
 });
 
@@ -129,8 +263,23 @@ describe("uninstall", () => {
 
 	let sEmptyPlugin = path.join(testsPluginsDirectory, "TestEmptyPlugin");
 
-	before(() => { return fs.mkdirpProm(sEmptyPlugin).then(() => { return oPluginsManager.unloadAll(); }); });
-	after(() => { return fs.rmdirpProm(sEmptyPlugin).then(() => { return oPluginsManager.unloadAll(); }); });
+	before(() => {
+
+		oPluginsManager.directory = testsPluginsDirectory;
+
+		return fs.mkdirpProm(sEmptyPlugin).then(() => {
+			return oPluginsManager.unloadAll();
+		});
+
+	});
+
+	after(() => {
+
+		return fs.rmdirpProm(sEmptyPlugin).then(() => {
+			return oPluginsManager.unloadAll();
+		});
+
+	});
 
 	it("should uninstall empty plugin", () => {
 		return oPluginsManager.uninstallByDirectory(sEmptyPlugin);
@@ -140,7 +289,11 @@ describe("uninstall", () => {
 
 describe("load", () => {
 
-	before(() => { oPluginsManager.directory = testsPluginsDirectory; return oPluginsManager.unloadAll(); });
+	before(() => {
+		oPluginsManager.directory = testsPluginsDirectory;
+		return oPluginsManager.unloadAll();
+	});
+
 	after(() => { return oPluginsManager.unloadAll(); });
 
 	it("should load good plugin", () => {
@@ -153,7 +306,7 @@ describe("load", () => {
 			assert.strictEqual(1, oPluginsManager.plugins.length, "Loaded plugins length is no correct");
 
 			assert.deepStrictEqual(["Sébastien VIDAL"], plugin.authors, "Loaded plugin's authors is not correct");
-			assert.strictEqual("A test for simpleplugin", plugin.description, "Loaded plugin's description is not correct");
+			assert.strictEqual("A test for node-pluginsmanager", plugin.description, "Loaded plugin's description is not correct");
 			assert.deepStrictEqual([path.join(__dirname, "plugins", "TestGoodPlugin", "design.css")], plugin.designs, "Loaded plugin's designs is not correct");
 			assert.strictEqual(path.join(__dirname, "plugins", "TestGoodPlugin"), plugin.directory, "Loaded plugin's directory is not correct");
 			assert.strictEqual("", plugin.github, "Loaded plugin's github is not correct");
@@ -184,7 +337,7 @@ describe("load", () => {
 	it("should load all", () => {
 
 		return oPluginsManager.loadAll("test").then(() => {
-			assert.strictEqual(1, oPluginsManager.plugins.length, "Loaded plugins length is no correct");
+			assert.strictEqual(2, oPluginsManager.plugins.length, "Loaded plugins length is no correct");
 		});
 
 	});
@@ -193,7 +346,11 @@ describe("load", () => {
 
 describe("beforeLoadAll", () => {
 
-	before(() => { oPluginsManager.directory = testsPluginsDirectory; return oPluginsManager.unloadAll(); });
+	before(() => {
+		oPluginsManager.directory = testsPluginsDirectory;
+		return oPluginsManager.unloadAll();
+	});
+
 	after(() => { return oPluginsManager.unloadAll(); });
 
 	it("should fail on beforeLoadAll creation", (done) => {
@@ -236,11 +393,21 @@ describe("beforeLoadAll", () => {
 
 describe("update via github", () => {
 
-	let TestGoodPluginDirectory = path.join(path.join(oPluginsManager.directory, "TestGoodPlugin")),
+	let TestGoodPluginDirectory = path.join(path.join(testsPluginsDirectory, "TestGoodPlugin")),
 		npmDirectory = path.join(TestGoodPluginDirectory, "node_modules");
 
-	before(() => { oPluginsManager.directory = testsPluginsDirectory; return oPluginsManager.unloadAll(); });
-	after(() => { return fs.rmdirpProm(npmDirectory).then(() => { return oPluginsManager.unloadAll(); }); });
+	before(() => {
+		oPluginsManager.directory = testsPluginsDirectory;
+		return oPluginsManager.unloadAll();
+	});
+
+	after(() => {
+
+		return fs.rmdirpProm(npmDirectory).then(() => {
+			return oPluginsManager.unloadAll();
+		});
+
+	});
 
 	it("should test update on an inexistant plugin", (done) => {
 
@@ -251,7 +418,7 @@ describe("update via github", () => {
 			done();
 		});
 
-	}).timeout(10000);
+	}).timeout(MAX_TIMOUT);
 
 	it("should test update plugins and dependances", () => {
 
@@ -272,6 +439,6 @@ describe("update via github", () => {
 
 		});
 
-	}).timeout(10000);
+	}).timeout(MAX_TIMOUT);
 
 });

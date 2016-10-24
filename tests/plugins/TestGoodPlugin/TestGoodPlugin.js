@@ -7,7 +7,7 @@ module.exports = class TestGoodPlugin extends require(require("path").join("..",
 
 	load (data) {
 
-		(0, console).log("load TestGoodPlugin with \"" + data + "\" data");
+		(0, console).log(" => [TestGoodPlugin] - load TestGoodPlugin with \"" + data + "\" data");
 		return Promise.resolve();
 
 	}
@@ -16,7 +16,7 @@ module.exports = class TestGoodPlugin extends require(require("path").join("..",
 
 		super.unload();
 
-		(0, console).log("unload TestGoodPlugin with \"" + data + "\" data");
+		(0, console).log(" => [TestGoodPlugin] - unload TestGoodPlugin with \"" + data + "\" data");
 		return Promise.resolve();
 
 	}
@@ -25,21 +25,21 @@ module.exports = class TestGoodPlugin extends require(require("path").join("..",
 
 	install (data) {
 
-		(0, console).log("install TestGoodPlugin with \"" + data + "\" data");
+		(0, console).log(" => [TestGoodPlugin] - install TestGoodPlugin with \"" + data + "\" data");
 		return Promise.resolve();
 
 	}
 
 	update (data) {
 		
-		(0, console).log("update TestGoodPlugin with \"" + data + "\" data");
+		(0, console).log(" => [TestGoodPlugin] - update TestGoodPlugin with \"" + data + "\" data");
 		return Promise.resolve();
 
 	}
 
 	uninstall (data) {
 		
-		(0, console).log("install TestGoodPlugin with \"" + data + "\" data");
+		(0, console).log(" => [TestGoodPlugin] - install TestGoodPlugin with \"" + data + "\" data");
 		return Promise.resolve();
 
 	}

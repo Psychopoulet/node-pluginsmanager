@@ -18,6 +18,8 @@ $ npm install node-pluginsmanager
 
 ### AbstractPlugin
 
+  -- Attributes --
+
   * ``` array authors ``` plugin's author
   * ``` string description ``` plugin's description
   * ``` array designs ``` plugin's designs (CSS)
@@ -29,7 +31,12 @@ $ npm install node-pluginsmanager
   * ``` array templates ``` plugin's templates (HTML)
   * ``` string version ``` plugin's version
 
+  -- Constructor --
+
   * ``` constructor() ```
+
+  -- Methods --
+
   * ``` loadDataFromPackageFile() : Promise ``` used in PluginsManager
   * ``` load([mixed data]) : Promise ``` fired on "load", "update" or "install" plugin event
   * ``` unload([mixed data]) : Promise ``` fired on "update" or "uninstall" plugin event
@@ -39,16 +46,25 @@ $ npm install node-pluginsmanager
 
 ### PluginsManager (extends [asynchronous-eventemitter](https://www.npmjs.com/package/asynchronous-eventemitter))
 
+  -- Attributes -- 
+
   * ``` string directory ``` plugins' directory path
+  * ``` array orderedDirectoriesBaseNames ``` plugins' names order for loading
   * ``` array plugins ``` plugins' data
   * ``` static AbstractPlugin plugin ``` abstract class for plugin creation
 
+  -- Constructor --
+
   * ``` constructor([string directory = "<PluginsManager>/plugins"]) ```
 
+  -- Methods --
+
+  * ``` setOrder(array pluginsDirectoriesBaseNames) : this ``` create a forced order to synchronously load plugins. not ordered plugins are asynchronously loaded after.
+  
   * ``` getPluginsNames() : array ``` return plugins' names
   * ``` beforeLoadAll(function callback) : Promise ``` add a function executed before loading all plugins ("callback" must return a Promise instance)
 
-  * ``` loadAll([mixed data]) : Promise ``` load all plugins, using "data" in arguments for "load" plugin's method
+  * ``` loadAll([mixed data]) : Promise ``` load all plugins asynchronously, using "data" in arguments for "load" plugin's method
   * ``` loadByDirectory(string directory [, mixed data ]) : array ``` load a plugin by its directory, using "data" in arguments for "load" plugin's method
 
   * ``` unload(object plugin [, mixed data]) : Promise ``` unload a plugin, using "data" in arguments for "unload" plugin's method
@@ -65,6 +81,20 @@ $ npm install node-pluginsmanager
   * ``` uninstall(object plugin [, mixed data]) : Promise ``` uninstall a plugin, using "data" in arguments for "unload" and "uninstall" plugin's methods
   * ``` uninstallByDirectory(string directory [, mixed data]) : Promise ``` uninstall a plugin by its directory, using "data" in arguments for "unload" and "uninstall" plugin's methods
   * ``` uninstallByKey(integer key, [mixed data]) : Promise ``` uninstall a plugin by its key (in "plugins" placement), using "data" in arguments for "unload" and "uninstall" plugin's methods
+
+  -- Events --
+
+  * ``` on("error", (string err) => {}) : this ``` fires if an error occurs
+
+  * ``` on("loaded", (AbstractPlugin plugin) => {}) : this ``` fires if a plugin is loaded
+  * ``` on("allloaded", () => {}) : this ``` fires if all the plugins are loaded
+  
+  * ``` on("unloaded", (AbstractPlugin plugin) => {}) : this ``` fires if a plugin is unloaded
+  * ``` on("allunloaded", (AbstractPlugin plugin) => {}) : this ``` fires if all the plugins are unloaded
+
+  * ``` on("installed", (AbstractPlugin plugin) => {}) : this ``` fires if a plugin is installed
+  * ``` on("updated", (AbstractPlugin plugin) => {}) : this ``` fires if a plugin is updated
+  * ``` on("uninstalled", (AbstractPlugin plugin) => {}) : this ``` fires if a plugin is uninstalled
 
 ## Examples
 
