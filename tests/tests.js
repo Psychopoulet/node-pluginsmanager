@@ -179,10 +179,30 @@ describe("load all with order", () => {
 		return oPluginsManager.setOrder([ "TestGoodPlugin" ]);
 	});
 
+	it("should test normal loading with order and twice the same plugin", () => {
+
+		return oPluginsManager.setOrder([ "TestGoodPlugin", "TestGoodPlugin" ]).then(() => {
+			return oPluginsManager.loadAll();
+		}).then(() => {
+
+			assert.strictEqual(2, oPluginsManager.plugins.length, "too much plugins loaded");
+
+			return oPluginsManager.unloadAll()
+
+		});
+
+	});
+
 	it("should test normal loading with order", () => {
 
-		return oPluginsManager.loadAll().then(() => {
-			return oPluginsManager.unloadAll();
+		return oPluginsManager.setOrder([ "TestGoodPluginWithoutDependencies" ]).then(() => {
+			return oPluginsManager.loadAll();
+		}).then(() => {
+
+			assert.strictEqual(2, oPluginsManager.plugins.length, "too much plugins loaded");
+
+			return oPluginsManager.unloadAll()
+
 		});
 
 	});
@@ -286,7 +306,7 @@ describe("load", () => {
 			assert.strictEqual(1, oPluginsManager.plugins.length, "Loaded plugins length is no correct");
 
 			assert.deepStrictEqual(["Sébastien VIDAL"], plugin.authors, "Loaded plugin's authors is not correct");
-			assert.strictEqual("A test for simpleplugin", plugin.description, "Loaded plugin's description is not correct");
+			assert.strictEqual("A test for node-pluginsmanager", plugin.description, "Loaded plugin's description is not correct");
 			assert.deepStrictEqual([path.join(__dirname, "plugins", "TestGoodPlugin", "design.css")], plugin.designs, "Loaded plugin's designs is not correct");
 			assert.strictEqual(path.join(__dirname, "plugins", "TestGoodPlugin"), plugin.directory, "Loaded plugin's directory is not correct");
 			assert.strictEqual("", plugin.github, "Loaded plugin's github is not correct");
@@ -317,7 +337,7 @@ describe("load", () => {
 	it("should load all", () => {
 
 		return oPluginsManager.loadAll("test").then(() => {
-			assert.strictEqual(1, oPluginsManager.plugins.length, "Loaded plugins length is no correct");
+			assert.strictEqual(2, oPluginsManager.plugins.length, "Loaded plugins length is no correct");
 		});
 
 	});

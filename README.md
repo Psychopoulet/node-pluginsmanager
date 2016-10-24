@@ -59,12 +59,12 @@ $ npm install node-pluginsmanager
 
   -- Methods --
 
-  * ``` setOrder(array pluginsDirectoriesBaseNames) : this ``` create a forced order for loading plugins. not ordered plugins are asynchronously loaded after
+  * ``` setOrder(array pluginsDirectoriesBaseNames) : this ``` create a forced order to synchronously load plugins. not ordered plugins are asynchronously loaded after.
   
   * ``` getPluginsNames() : array ``` return plugins' names
   * ``` beforeLoadAll(function callback) : Promise ``` add a function executed before loading all plugins ("callback" must return a Promise instance)
 
-  * ``` loadAll([mixed data]) : Promise ``` load all plugins, using "data" in arguments for "load" plugin's method
+  * ``` loadAll([mixed data]) : Promise ``` load all plugins asynchronously, using "data" in arguments for "load" plugin's method
   * ``` loadByDirectory(string directory [, mixed data ]) : array ``` load a plugin by its directory, using "data" in arguments for "load" plugin's method
 
   * ``` unload(object plugin [, mixed data]) : Promise ``` unload a plugin, using "data" in arguments for "unload" plugin's method
