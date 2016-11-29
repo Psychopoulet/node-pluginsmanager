@@ -187,7 +187,7 @@ describe("load all with order", () => {
 
 			assert.strictEqual(2, oPluginsManager.plugins.length, "too much plugins loaded");
 
-			return oPluginsManager.unloadAll()
+			return oPluginsManager.unloadAll();
 
 		});
 
@@ -201,7 +201,7 @@ describe("load all with order", () => {
 
 			assert.strictEqual(2, oPluginsManager.plugins.length, "too much plugins loaded");
 
-			return oPluginsManager.unloadAll()
+			return oPluginsManager.unloadAll();
 
 		});
 
