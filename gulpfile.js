@@ -8,8 +8,6 @@
 			gulp = require("gulp"),
 			plumber = require("gulp-plumber"),
 
-			babel = require("gulp-babel"),
-			
 			eslint = require("gulp-eslint"),
 			mocha = require("gulp-mocha");
 
@@ -25,17 +23,7 @@
 
 // tasks
 
-	gulp.task("babel", () => {
-
-		return gulp.src(_libFiles)
-			.pipe(babel({
-				presets: ["es2015"]
-			}))
-			.pipe(gulp.dest(_distDir));
-
-	});
-
-	gulp.task("eslint", ["babel"], () => {
+	gulp.task("eslint", () => {
 
 		return gulp.src(_toTestFiles)
 			.pipe(plumber())
