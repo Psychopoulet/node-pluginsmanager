@@ -1,5 +1,5 @@
 {
-  "authors": [ "Sébastien VIDAL" ],
+  "authors": [ "Sébastien VIDAL", "test" ],
   "dependencies": { },
   "designs": [ "design.css"],
   "description": "A test for node-pluginsmanager",

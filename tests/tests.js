@@ -94,16 +94,19 @@ describe("load all", () => {
 		fs.mkdirpProm(sEmptyPluginDirectory).then(() => {
 			return oPluginsManager.loadByDirectory(sEmptyPluginDirectory);
 		}).then(() => {
-			done("tests does not generate error");
+			done(new Error("tests does not generate error"));
 		}).catch((err) => {
 
-			assert.strictEqual("string", typeof err, "generated error is not a string");
+			new Promise((resolve, reject) => {
 
-			fs.rmdirpProm(sEmptyPluginDirectory).then(() => {
-				return oPluginsManager.unloadAll();
-			}).then(() => {
-				done();
-			}).catch(done);
+				assert.strictEqual(true, err instanceof Error, "generated error is not an instance of Error");
+				assert.strictEqual("\"TestEmptyPlugin\" => Cannot find module '" + sEmptyPluginDirectory + "'", err.message, "this is not the expected message");
+
+				return fs.rmdirpProm(sEmptyPluginDirectory).then(() => {
+					return oPluginsManager.unloadAll();
+				}).then(resolve).catch(reject);
+
+			}).then(() => { done(); }).catch(done);
 
 		});
 
@@ -112,6 +115,19 @@ describe("load all", () => {
 	it("should test normal loading", () => {
 
 		return oPluginsManager.loadAll().then(() => {
+
+			new Promise((resolve) => {
+
+				assert.strictEqual(true, oPluginsManager.plugins instanceof Array, "loaded plugins are incorrects");
+				assert.strictEqual(2, oPluginsManager.plugins.length, "loaded plugins are incorrects");
+
+				assert.strictEqual(2, oPluginsManager.plugins.length, "loaded plugins are incorrects");
+
+				resolve();
+
+			});
+
+		}).then(() => {
 			return oPluginsManager.unloadAll();
 		});
 
@@ -134,10 +150,18 @@ describe("load all with order", () => {
 	it("should add empty order", (done) => {
 
 		oPluginsManager.setOrder().then(() => {
-			done("tests does not generate error");
+			done(new Error("tests does not generate error"));
 		}).catch((err) => {
-			assert.strictEqual("string", typeof err, "generated error is not a string");
-			done();
+
+			new Promise((resolve) => {
+
+				assert.strictEqual(true, err instanceof Error, "generated error is not an instance of Error");
+				assert.strictEqual("This is not an array", err.message, "this is not the expected message");
+
+				resolve();
+
+			}).then(() => { done(); }).catch(done);
+
 		});
 
 	});
@@ -145,10 +169,18 @@ describe("load all with order", () => {
 	it("should add wrong order", (done) => {
 
 		oPluginsManager.setOrder(false).then(() => {
-			done("tests does not generate error");
+			done(new Error("tests does not generate error"));
 		}).catch((err) => {
-			assert.strictEqual("string", typeof err, "generated error is not a string");
-			done();
+
+			new Promise((resolve) => {
+
+				assert.strictEqual(true, err instanceof Error, "generated error is not an instance of Error");
+				assert.strictEqual("This is not an array", err.message, "this is not the expected message");
+
+				resolve();
+
+			}).then(() => { done(); }).catch(done);
+
 		});
 
 	});
@@ -156,10 +188,18 @@ describe("load all with order", () => {
 	it("should add normal order with wrong directories basenames", (done) => {
 
 		oPluginsManager.setOrder([ false, false ]).then(() => {
-			done("tests does not generate error");
+			done(new Error("tests does not generate error"));
 		}).catch((err) => {
-			assert.strictEqual("string", typeof err, "generated error is not a string");
-			done();
+
+			new Promise((resolve) => {
+
+				assert.strictEqual(true, err instanceof Error, "generated error is not an instance of Error");
+				assert.strictEqual("The directory at index \"0\" must be a string\r\nThe directory at index \"1\" must be a string", err.message, "this is not the expected message");
+
+				resolve();
+
+			}).then(() => { done(); }).catch(done);
+
 		});
 
 	});
@@ -167,10 +207,18 @@ describe("load all with order", () => {
 	it("should add normal order with empty directories basenames", (done) => {
 
 		oPluginsManager.setOrder([ "", "" ]).then(() => {
-			done("tests does not generate error");
+			done(new Error("tests does not generate error"));
 		}).catch((err) => {
-			assert.strictEqual("string", typeof err, "generated error is not a string");
-			done();
+
+			new Promise((resolve) => {
+
+				assert.strictEqual(true, err instanceof Error, "generated error is not an instance of Error");
+				assert.strictEqual("The directory at index \"0\" must be not empty\r\nThe directory at index \"1\" must be not empty", err.message, "this is not the expected message");
+
+				resolve();
+
+			}).then(() => { done(); }).catch(done);
+
 		});
 
 	});
@@ -195,13 +243,38 @@ describe("load all with order", () => {
 
 	it("should test normal loading with order", () => {
 
-		return oPluginsManager.setOrder([ "TestGoodPluginWithoutDependencies" ]).then(() => {
+		return oPluginsManager.setOrder([ "TestGoodPlugin", "TestGoodPluginWithoutDependencies" ]).then(() => {
 			return oPluginsManager.loadAll();
 		}).then(() => {
 
-			assert.strictEqual(2, oPluginsManager.plugins.length, "too much plugins loaded");
+			new Promise((resolve) => {
+				
+				assert.strictEqual(true, oPluginsManager.plugins instanceof Array, "loaded plugins are incorrects");
+				assert.strictEqual(2, oPluginsManager.plugins.length, "loaded plugins are incorrects");
 
-			return oPluginsManager.unloadAll();
+				// TestGoodPlugin
+
+				assert.strictEqual(true, "object" === typeof oPluginsManager.plugins[0], "loaded plugins are incorrects");
+				assert.deepStrictEqual([ "Sébastien VIDAL" ], oPluginsManager.plugins[0].authors, "loaded plugins are incorrects");
+				assert.deepStrictEqual("A test for node-pluginsmanager", oPluginsManager.plugins[0].description, "loaded plugins are incorrects");
+				assert.deepStrictEqual({ simpletts: "^1.3.0" }, oPluginsManager.plugins[0].dependencies, "loaded plugins are incorrects");
+
+				// TestGoodPluginWithoutDependencies
+
+				assert.strictEqual(true, "object" === typeof oPluginsManager.plugins[1], "loaded plugins are incorrects");
+				assert.deepStrictEqual([ "Sébastien VIDAL", "test" ], oPluginsManager.plugins[1].authors, "loaded plugins are incorrects");
+				assert.deepStrictEqual("A test for node-pluginsmanager", oPluginsManager.plugins[1].description, "loaded plugins are incorrects");
+				assert.deepStrictEqual({ }, oPluginsManager.plugins[1].dependencies, "loaded plugins are incorrects");
+
+				resolve();
+
+			}).then(() => {
+
+				return oPluginsManager.unloadAll();
+
+			}).catch((err) => {
+				return Promise.reject(err);
+			});
 
 		});
 
@@ -227,10 +300,18 @@ describe("install via github", () => {
 	it("should test download an empty url", (done) => {
 
 		oPluginsManager.installViaGithub("").then(() => {
-			done("tests does not generate error");
+			done(new Error("tests does not generate error"));
 		}).catch((err) => {
-			assert.strictEqual("string", typeof err, "generated error is not a string");
-			done();
+
+			new Promise((resolve) => {
+
+				assert.strictEqual(true, err instanceof Error, "generated error is not an instance of Error");
+				assert.strictEqual("\"url\" is empty", err.message, "this is not the expected message");
+
+				resolve();
+
+			}).then(() => { done(); }).catch(done);
+
 		});
 
 	}).timeout(MAX_TIMOUT);
@@ -238,10 +319,18 @@ describe("install via github", () => {
 	it("should test download an invalid github url", (done) => {
 
 		oPluginsManager.installViaGithub("test").then(() => {
-			done("tests does not generate error");
+			done(new Error("tests does not generate error"));
 		}).catch((err) => {
-			assert.strictEqual("string", typeof err, "generated error is not a string");
-			done();
+
+			new Promise((resolve) => {
+
+				assert.strictEqual(true, err instanceof Error, "generated error is not an instance of Error");
+				assert.strictEqual("\"test\" is not a valid github url", err.message, "this is not the expected message");
+
+				resolve();
+
+			}).then(() => { done(); }).catch(done);
+
 		});
 
 	}).timeout(MAX_TIMOUT);
@@ -249,10 +338,21 @@ describe("install via github", () => {
 	it("should test download an invalid node-containerpattern", (done) => {
 
 		oPluginsManager.installViaGithub("https://github.com/Psychopoulet/node-containerpattern").then(() => {
-			done("tests does not generate error");
+			done(new Error("tests does not generate error"));
 		}).catch((err) => {
-			assert.strictEqual("string", typeof err, "generated error is not a string");
-			done();
+
+			new Promise((resolve) => {
+
+				console.log(err);
+				console.log(err.message);
+
+				assert.strictEqual(true, err instanceof Error, "generated error is not an instance of Error");
+				assert.strictEqual("\"node-containerpattern\" is not a plugin class", err.message, "this is not the expected message");
+
+				resolve();
+
+			}).then(() => { done(); }).catch(done);
+
 		});
 
 	}).timeout(MAX_TIMOUT);
@@ -298,23 +398,31 @@ describe("load", () => {
 
 	it("should load good plugin", () => {
 
-		assert.strictEqual(0, oPluginsManager.plugins.length, "Loaded plugins length is no correct");
+		return new Promise((resolve) => {
 
-		return oPluginsManager.loadByDirectory(path.join(oPluginsManager.directory, "TestGoodPlugin")).then((plugin) => {
+			assert.strictEqual(0, oPluginsManager.plugins.length, "Loaded plugins length is no correct");
 
-			assert.strictEqual("TestGoodPlugin", plugin.name, "Loaded plugin name is no correct");
-			assert.strictEqual(1, oPluginsManager.plugins.length, "Loaded plugins length is no correct");
+			resolve();
 
-			assert.deepStrictEqual(["Sébastien VIDAL"], plugin.authors, "Loaded plugin's authors is not correct");
-			assert.strictEqual("A test for node-pluginsmanager", plugin.description, "Loaded plugin's description is not correct");
-			assert.deepStrictEqual([path.join(__dirname, "plugins", "TestGoodPlugin", "design.css")], plugin.designs, "Loaded plugin's designs is not correct");
-			assert.strictEqual(path.join(__dirname, "plugins", "TestGoodPlugin"), plugin.directory, "Loaded plugin's directory is not correct");
-			assert.strictEqual("", plugin.github, "Loaded plugin's github is not correct");
-			assert.deepStrictEqual([path.join(__dirname, "plugins", "TestGoodPlugin", "javascript.js")], plugin.javascripts, "Loaded plugin's javascripts is not correct");
-			assert.strictEqual("ISC", plugin.license, "Loaded plugin's license is not correct");
-			assert.strictEqual("TestGoodPlugin", plugin.name, "Loaded plugin's name is not correct");
-			assert.deepStrictEqual([path.join(__dirname, "plugins", "TestGoodPlugin", "template.html")], plugin.templates, "Loaded plugin's templates is not correct");
-			assert.strictEqual("0.0.2", plugin.version, "Loaded plugin's version is not correct");
+		}).then(() => {
+
+			return oPluginsManager.loadByDirectory(path.join(oPluginsManager.directory, "TestGoodPlugin")).then((plugin) => {
+
+				assert.strictEqual("TestGoodPlugin", plugin.name, "Loaded plugin name is no correct");
+				assert.strictEqual(1, oPluginsManager.plugins.length, "Loaded plugins length is no correct");
+
+				assert.deepStrictEqual(["Sébastien VIDAL"], plugin.authors, "Loaded plugin's authors is not correct");
+				assert.strictEqual("A test for node-pluginsmanager", plugin.description, "Loaded plugin's description is not correct");
+				assert.deepStrictEqual([path.join(__dirname, "plugins", "TestGoodPlugin", "design.css")], plugin.designs, "Loaded plugin's designs is not correct");
+				assert.strictEqual(path.join(__dirname, "plugins", "TestGoodPlugin"), plugin.directory, "Loaded plugin's directory is not correct");
+				assert.strictEqual("", plugin.github, "Loaded plugin's github is not correct");
+				assert.deepStrictEqual([path.join(__dirname, "plugins", "TestGoodPlugin", "javascript.js")], plugin.javascripts, "Loaded plugin's javascripts is not correct");
+				assert.strictEqual("ISC", plugin.license, "Loaded plugin's license is not correct");
+				assert.strictEqual("TestGoodPlugin", plugin.name, "Loaded plugin's name is not correct");
+				assert.deepStrictEqual([path.join(__dirname, "plugins", "TestGoodPlugin", "template.html")], plugin.templates, "Loaded plugin's templates is not correct");
+				assert.strictEqual("0.0.2", plugin.version, "Loaded plugin's version is not correct");
+
+			});
 
 		});
 
@@ -322,15 +430,23 @@ describe("load", () => {
 
 	it("should unload good plugin", (done) => {
 
-		assert.strictEqual(1, oPluginsManager.plugins.length, "Loaded plugins length is no correct");
+		new Promise((resolve) => {
 
-		if (0 < oPluginsManager.plugins.length) {
-			oPluginsManager.plugins[0].unload("test").then(() => { done(); }).catch(done);
-			oPluginsManager.plugins.splice(0, 1);
-		}
-		else {
-			done();
-		}
+			assert.strictEqual(1, oPluginsManager.plugins.length, "Loaded plugins length is no correct");
+
+			resolve();
+
+		}).then(() => {
+
+			if (0 < oPluginsManager.plugins.length) {
+				oPluginsManager.plugins[0].unload("test").then(() => { done(); }).catch(done);
+				oPluginsManager.plugins.splice(0, 1);
+			}
+			else {
+				done();
+			}
+
+		});
 
 	});
 
@@ -356,10 +472,17 @@ describe("beforeLoadAll", () => {
 	it("should fail on beforeLoadAll creation", (done) => {
 
 		oPluginsManager.beforeLoadAll(false).then(() => {
-			done("tests does not generate error");
+			done(new Error("tests does not generate error"));
 		}).catch((err) => {
-			assert.strictEqual("string", typeof err, "generated error is not a string");
-			done();
+
+			new Promise((resolve) => {
+
+				assert.strictEqual(true, err instanceof Error, "generated error is not an instance of Error");
+
+				resolve();
+
+			}).then(() => { done(); }).catch(done);
+
 		});
 
 	});
@@ -369,11 +492,16 @@ describe("beforeLoadAll", () => {
 		oPluginsManager.beforeLoadAll(() => {}).then(() => {
 			return oPluginsManager.loadAll();
 		}).then(() => {
-			done("tests does not generate error");
+			done(new Error("tests does not generate error"));
 		}).catch((err) => {
 
-			assert.strictEqual("string", typeof err, "generated error is not a string");
-			done();
+			new Promise((resolve) => {
+
+				assert.strictEqual(true, err instanceof Error, "generated error is not an instance of Error");
+			
+				resolve();
+
+			}).then(() => { done(); }).catch(done);
 
 		});
 
@@ -412,10 +540,17 @@ describe("update via github", () => {
 	it("should test update on an inexistant plugin", (done) => {
 
 		oPluginsManager.updateByDirectory(path.join(oPluginsManager.directory, "node-containerpattern")).then(() => {
-			done("tests does not generate error");
+			done(new Error("tests does not generate error"));
 		}).catch((err) => {
-			assert.strictEqual("string", typeof err, "generated error is not a string");
-			done();
+
+			new Promise((resolve) => {
+
+				assert.strictEqual(true, err instanceof Error, "generated error is not an instance of Error");
+			
+				resolve();
+
+			}).then(() => { done(); }).catch(done);
+
 		});
 
 	}).timeout(MAX_TIMOUT);

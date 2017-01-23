@@ -1,6 +1,6 @@
 {
   "name": "node-pluginsmanager",
-  "version": "0.5.3",
+  "version": "0.6.0",
   "description": "A plugins manager",
   "main": "lib/main.js",
   "scripts": {
@@ -20,8 +20,8 @@
     "url": "https://github.com/Psychopoulet/node-pluginsmanager/issues"
   },
   "dependencies": {
-    "asynchronous-eventemitter": "^0.1.0",
-    "node-promfs": "^2.0.0"
+    "asynchronous-eventemitter": "^0.2.2",
+    "node-promfs": "^2.0.2"
   },
   "devDependencies": {
 
