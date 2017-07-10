@@ -1,18 +1,22 @@
 {
   "name": "node-pluginsmanager",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "A plugins manager",
   "main": "lib/main.js",
   "scripts": {
     "start": "node lib/main.js",
-    "test": "npm update && gulp"
+    "test": "npm update && gulp mocha"
   },
+  "pre-commit": [
+    "test"
+  ],
   "repository": {
     "type": "git",
     "url": "git://github.com/Psychopoulet/node-pluginsmanager"
   },
   "keywords": [
-    "plugin", "manage"
+    "plugin",
+    "manage"
   ],
   "author": "Sébastien VIDAL",
   "license": "ISC",
@@ -24,14 +28,14 @@
     "node-promfs": "^2.0.2"
   },
   "devDependencies": {
-
     "gulp": "^3.9.1",
     "gulp-plumber": "^1.1.0",
-
     "gulp-eslint": "^3.0.1",
-    "gulp-mocha": "^3.0.1"
-
+    "gulp-mocha": "^4.3.1",
+    "pre-commit": "^1.2.2"
   },
   "homepage": "https://github.com/Psychopoulet/node-pluginsmanager#readme",
-  "engines" : { "node" : ">=4.0.0" }
+  "engines": {
+    "node": ">=4.0.0"
+  }
 }
