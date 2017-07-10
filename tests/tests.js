@@ -2,7 +2,7 @@
 
 // const
 
-	const MAX_TIMOUT = 10 * 1000;
+	const MAX_TIMOUT = 30 * 1000;
 
 // deps
 
@@ -87,27 +87,51 @@ describe("load all", () => {
 
 	after(() => { return oPluginsManager.unloadAll(); });
 
-	it("should test empty plugin", (done) => {
+	it("should test file plugin", () => {
+
+		let sFilePlugin = path.join(testsPluginsDirectory, "TestFilePlugin.txt");
+
+		return fs.writeFileProm(sFilePlugin, "").then(() => {
+			return oPluginsManager.loadByDirectory(sFilePlugin);
+		}).then(() => {
+
+			assert.deepStrictEqual("object", typeof oPluginsManager.plugins, "plugins is not an object");
+			assert.strictEqual(true, oPluginsManager.plugins instanceof Array, "plugins is not an Array");
+			assert.strictEqual(0, oPluginsManager.plugins.length, "plugins length is not valid");
+
+			return Promise.resolve();
+
+		}).then(() => {
+			return fs.unlinkProm(sFilePlugin);
+		});
+
+	});
+
+	it("should test empty plugin", () => {
 
 		let sEmptyPluginDirectory = path.join(testsPluginsDirectory, "TestEmptyPlugin");
 
-		fs.mkdirpProm(sEmptyPluginDirectory).then(() => {
+		return fs.mkdirpProm(sEmptyPluginDirectory).then(() => {
 			return oPluginsManager.loadByDirectory(sEmptyPluginDirectory);
 		}).then(() => {
-			done(new Error("tests does not generate error"));
+			return Promise.reject(new Error("tests does not generate error"));
 		}).catch((err) => {
 
-			new Promise((resolve, reject) => {
+			return new Promise((resolve) => {
 
 				assert.strictEqual(true, err instanceof Error, "generated error is not an instance of Error");
 				assert.strictEqual("\"TestEmptyPlugin\" => Cannot find module '" + sEmptyPluginDirectory + "'", err.message, "this is not the expected message");
 
-				return fs.rmdirpProm(sEmptyPluginDirectory).then(() => {
-					return oPluginsManager.unloadAll();
-				}).then(resolve).catch(reject);
+				assert.deepStrictEqual("object", typeof oPluginsManager.plugins, "plugins is not an object");
+				assert.strictEqual(true, oPluginsManager.plugins instanceof Array, "plugins is not an Array");
+				assert.strictEqual(0, oPluginsManager.plugins.length, "plugins length is not valid");
 
-			}).then(() => { done(); }).catch(done);
+				resolve();
 
+			});
+
+		}).then(() => {
+			return fs.rmdirpProm(sEmptyPluginDirectory);
 		});
 
 	});
@@ -116,16 +140,12 @@ describe("load all", () => {
 
 		return oPluginsManager.loadAll().then(() => {
 
-			new Promise((resolve) => {
+			assert.strictEqual(true, oPluginsManager.plugins instanceof Array, "loaded plugins are incorrects");
+			assert.strictEqual(2, oPluginsManager.plugins.length, "loaded plugins are incorrects");
 
-				assert.strictEqual(true, oPluginsManager.plugins instanceof Array, "loaded plugins are incorrects");
-				assert.strictEqual(2, oPluginsManager.plugins.length, "loaded plugins are incorrects");
+			assert.strictEqual(2, oPluginsManager.plugins.length, "loaded plugins are incorrects");
 
-				assert.strictEqual(2, oPluginsManager.plugins.length, "loaded plugins are incorrects");
-
-				resolve();
-
-			});
+			return Promise.resolve();
 
 		}).then(() => {
 			return oPluginsManager.unloadAll();
@@ -147,67 +167,67 @@ describe("load all with order", () => {
 		return oPluginsManager.unloadAll();
 	});
 
-	it("should add empty order", (done) => {
+	it("should add empty order", () => {
 
-		oPluginsManager.setOrder().then(() => {
-			done(new Error("tests does not generate error"));
+		return oPluginsManager.setOrder().then(() => {
+			return Promise.reject(new Error("tests does not generate error"));
 		}).catch((err) => {
 
-			new Promise((resolve) => {
+			return new Promise((resolve) => {
 
 				assert.strictEqual(true, err instanceof Error, "generated error is not an instance of Error");
 				assert.strictEqual("This is not an array", err.message, "this is not the expected message");
 
 				resolve();
 
-			}).then(() => { done(); }).catch(done);
+			});
 
 		});
 
 	});
 
-	it("should add wrong order", (done) => {
+	it("should add wrong order", () => {
 
-		oPluginsManager.setOrder(false).then(() => {
-			done(new Error("tests does not generate error"));
+		return oPluginsManager.setOrder(false).then(() => {
+			return Promise.reject(new Error("tests does not generate error"));
 		}).catch((err) => {
 
-			new Promise((resolve) => {
+			return new Promise((resolve) => {
 
 				assert.strictEqual(true, err instanceof Error, "generated error is not an instance of Error");
 				assert.strictEqual("This is not an array", err.message, "this is not the expected message");
 
 				resolve();
 
-			}).then(() => { done(); }).catch(done);
+			});
 
 		});
 
 	});
 
-	it("should add normal order with wrong directories basenames", (done) => {
+	it("should add normal order with wrong directories basenames", () => {
 
-		oPluginsManager.setOrder([ false, false ]).then(() => {
-			done(new Error("tests does not generate error"));
+		return oPluginsManager.setOrder([ false, false ]).then(() => {
+			return Promise.reject(new Error("tests does not generate error"));
 		}).catch((err) => {
 
-			new Promise((resolve) => {
+			return new Promise((resolve) => {
 
 				assert.strictEqual(true, err instanceof Error, "generated error is not an instance of Error");
 				assert.strictEqual("The directory at index \"0\" must be a string\r\nThe directory at index \"1\" must be a string", err.message, "this is not the expected message");
 
 				resolve();
 
-			}).then(() => { done(); }).catch(done);
+			});
 
 		});
 
 	});
 
-	it("should add normal order with empty directories basenames", (done) => {
+	it("should add normal order with empty directories basenames", () => {
 
-		oPluginsManager.setOrder([ "", "" ]).then(() => {
-			done(new Error("tests does not generate error"));
+		return oPluginsManager.setOrder([ "", "" ]).then(() => {
+			return Promise.reject(new Error("tests does not generate error"));
 		}).catch((err) => {
 
 			new Promise((resolve) => {
@@ -217,7 +237,7 @@ describe("load all with order", () => {
 
 				resolve();
 
-			}).then(() => { done(); }).catch(done);
+			});
 
 		});
 
@@ -269,11 +289,7 @@ describe("load all with order", () => {
 				resolve();
 
 			}).then(() => {
-
 				return oPluginsManager.unloadAll();
-
-			}).catch((err) => {
-				return Promise.reject(err);
 			});
 
 		});
@@ -297,61 +313,60 @@ describe("install via github", () => {
 
 	});
 
-	it("should test download an empty url", (done) => {
+	it("should test download an empty url", () => {
 
 		oPluginsManager.installViaGithub("").then(() => {
-			done(new Error("tests does not generate error"));
+			return Promise.reject(new Error("tests does not generate error"));
 		}).catch((err) => {
 
-			new Promise((resolve) => {
+			return new Promise((resolve) => {
 
 				assert.strictEqual(true, err instanceof Error, "generated error is not an instance of Error");
 				assert.strictEqual("\"url\" is empty", err.message, "this is not the expected message");
 
 				resolve();
 
-			}).then(() => { done(); }).catch(done);
+			});
 
 		});
 
 	}).timeout(MAX_TIMOUT);
 
-	it("should test download an invalid github url", (done) => {
+	it("should test download an invalid github url", () => {
 
-		oPluginsManager.installViaGithub("test").then(() => {
-			done(new Error("tests does not generate error"));
+		return oPluginsManager.installViaGithub("test").then(() => {
+			return Promise.reject(new Error("tests does not generate error"));
 		}).catch((err) => {
 
-			new Promise((resolve) => {
+			return new Promise((resolve) => {
 
 				assert.strictEqual(true, err instanceof Error, "generated error is not an instance of Error");
 				assert.strictEqual("\"test\" is not a valid github url", err.message, "this is not the expected message");
 
 				resolve();
 
-			}).then(() => { done(); }).catch(done);
+			});
 
 		});
 
 	}).timeout(MAX_TIMOUT);
 
-	it("should test download an invalid node-containerpattern", (done) => {
+	it("should test download an invalid node-containerpattern", () => {
 
-		oPluginsManager.installViaGithub("https://github.com/Psychopoulet/node-containerpattern").then(() => {
-			done(new Error("tests does not generate error"));
+		return oPluginsManager.installViaGithub("https://github.com/Psychopoulet/node-containerpattern").then(() => {
+
+			return Promise.reject(new Error("tests does not generate error"));
+
 		}).catch((err) => {
 
-			new Promise((resolve) => {
-
-				console.log(err);
-				console.log(err.message);
+			return new Promise((resolve) => {
 
 				assert.strictEqual(true, err instanceof Error, "generated error is not an instance of Error");
 				assert.strictEqual("\"node-containerpattern\" is not a plugin class", err.message, "this is not the expected message");
 
 				resolve();
 
-			}).then(() => { done(); }).catch(done);
+			});
 
 		});
 
@@ -428,9 +443,9 @@ describe("load", () => {
 
 	});
 
-	it("should unload good plugin", (done) => {
+	it("should unload good plugin", () => {
 
-		new Promise((resolve) => {
+		return new Promise((resolve) => {
 
 			assert.strictEqual(1, oPluginsManager.plugins.length, "Loaded plugins length is no correct");
 
@@ -439,11 +454,14 @@ describe("load", () => {
 		}).then(() => {
 
 			if (0 < oPluginsManager.plugins.length) {
-				oPluginsManager.plugins[0].unload("test").then(() => { done(); }).catch(done);
-				oPluginsManager.plugins.splice(0, 1);
+
+				return oPluginsManager.plugins[0].unload("test").then(() => {
+					oPluginsManager.plugins.splice(0, 1); return Promise.resolve();
+				});
+				
 			}
 			else {
-				done();
+				return Promise.resolve();
 			}
 
 		});
@@ -469,39 +487,39 @@ describe("beforeLoadAll", () => {
 
 	after(() => { return oPluginsManager.unloadAll(); });
 
-	it("should fail on beforeLoadAll creation", (done) => {
+	it("should fail on beforeLoadAll creation", () => {
 
-		oPluginsManager.beforeLoadAll(false).then(() => {
-			done(new Error("tests does not generate error"));
+		return oPluginsManager.beforeLoadAll(false).then(() => {
+			return Promise.reject(new Error("tests does not generate error"));
 		}).catch((err) => {
 
-			new Promise((resolve) => {
+			return new Promise((resolve) => {
 
 				assert.strictEqual(true, err instanceof Error, "generated error is not an instance of Error");
 
 				resolve();
 
-			}).then(() => { done(); }).catch(done);
+			});
 
 		});
 
 	});
 
-	it("should fail on beforeLoadAll call", (done) => {
+	it("should fail on beforeLoadAll call", () => {
 
-		oPluginsManager.beforeLoadAll(() => {}).then(() => {
+		return oPluginsManager.beforeLoadAll(() => {}).then(() => {
 			return oPluginsManager.loadAll();
 		}).then(() => {
-			done(new Error("tests does not generate error"));
+			return Promise.reject(new Error("tests does not generate error"));
 		}).catch((err) => {
 
-			new Promise((resolve) => {
+			return new Promise((resolve) => {
 
 				assert.strictEqual(true, err instanceof Error, "generated error is not an instance of Error");
 			
 				resolve();
 
-			}).then(() => { done(); }).catch(done);
+			});
 
 		});
 
@@ -537,19 +555,19 @@ describe("update via github", () => {
 
 	});
 
-	it("should test update on an inexistant plugin", (done) => {
+	it("should test update on an inexistant plugin", () => {
 
-		oPluginsManager.updateByDirectory(path.join(oPluginsManager.directory, "node-containerpattern")).then(() => {
-			done(new Error("tests does not generate error"));
+		return oPluginsManager.updateByDirectory(path.join(oPluginsManager.directory, "node-containerpattern")).then(() => {
+			return Promise.reject(new Error("tests does not generate error"));
 		}).catch((err) => {
 
-			new Promise((resolve) => {
+			return new Promise((resolve) => {
 
 				assert.strictEqual(true, err instanceof Error, "generated error is not an instance of Error");
 			
 				resolve();
 
-			}).then(() => { done(); }).catch(done);
+			});
 
 		});
 
