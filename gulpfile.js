@@ -13,46 +13,50 @@
 	const eslint = require("gulp-eslint");
 	const mocha = require("gulp-mocha");
 
-// private
+// consts
 
-	var _gulpFile = path.join(__dirname, "gulpfile.js");
-	var _libDir = path.join(__dirname, "lib");
-		var _libFiles = path.join(_libDir, "*.js");
-	var _unitTestsFiles = path.join(__dirname, "tests", "*.js");
-	var _toTestFiles = [_gulpFile, _libFiles, _unitTestsFiles];
+	const UNITTESTSFILES = path.join(__dirname, "tests", "*.js");
+
+	const TOTESTFILES = [
+		path.join(__dirname, "gulpfile.js"),
+		path.join(__dirname, "lib", "**", "*.js"),
+		UNITTESTSFILES
+	];
 
 // tasks
 
 	gulp.task("eslint", () => {
 
-		return gulp.src(_toTestFiles)
+		return gulp.src([])
 			.pipe(plumber())
 			.pipe(eslint({
+				"env": require(path.join(__dirname, "gulpfile", "eslint", "env.json")),
+				"globals": require(path.join(__dirname, "gulpfile", "eslint", "globals.json")),
 				"parserOptions": {
 					"ecmaVersion": 6
 				},
-				"rules": {
-					"linebreak-style": 0,
-					"quotes": [ 1, "double" ],
-					"indent": 0,
-					// "indent": [ 2, "tab" ],
-					"semi": [ 2, "always" ]
-				},
-				"env": {
-					"node": true, "es6": true, "mocha": true
-				},
-				"extends": "eslint:recommended"
+				// http://eslint.org/docs/rules/
+				"rules": require(path.join(__dirname, "gulpfile", "eslint", "rules.json"))
 			}))
 			.pipe(eslint.format())
 			.pipe(eslint.failAfterError());
 
 	});
 
+	gulp.task("istanbul", [ "eslint" ], () => {
+
+		return gulp.src(TOTESTFILES)
+			.pipe(istanbul())
+			.pipe(istanbul.hookRequire());
+
+	});
+
 	gulp.task("mocha", ["eslint"], () => {
 
-		return gulp.src(_unitTestsFiles)
+		return gulp.src(UNITTESTSFILES)
 			.pipe(plumber())
-			.pipe(mocha({reporter: "spec"}));
+			.pipe(mocha())
+			.pipe(istanbul.writeReports());
 
 	});
 
