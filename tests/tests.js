@@ -277,7 +277,7 @@ describe("load all with order", () => {
 				assert.strictEqual(true, "object" === typeof oPluginsManager.plugins[0], "loaded plugins are incorrects");
 				assert.deepStrictEqual([ "Sébastien VIDAL" ], oPluginsManager.plugins[0].authors, "loaded plugins are incorrects");
 				assert.deepStrictEqual("A test for node-pluginsmanager", oPluginsManager.plugins[0].description, "loaded plugins are incorrects");
-				assert.deepStrictEqual({ simpletts: "^1.3.0" }, oPluginsManager.plugins[0].dependencies, "loaded plugins are incorrects");
+				assert.deepStrictEqual({ "simpletts": "^1.4.1" }, oPluginsManager.plugins[0].dependencies, "loaded plugins are incorrects");
 
 				// TestGoodPluginWithoutDependencies
 

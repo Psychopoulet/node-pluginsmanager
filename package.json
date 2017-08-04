@@ -5,7 +5,8 @@
   "main": "lib/main.js",
   "scripts": {
     "start": "node lib/main.js",
-    "test": "npm update && gulp mocha"
+    "test": "gulp eslint",
+    "test-travis": "gulp mocha"
   },
   "pre-commit": [
     "test"
@@ -25,14 +26,19 @@
   },
   "dependencies": {
     "asynchronous-eventemitter": "^0.2.2",
-    "node-promfs": "^2.0.2"
+    "node-promfs": "^2.1.0"
   },
   "devDependencies": {
+
     "gulp": "^3.9.1",
     "gulp-plumber": "^1.1.0",
-    "gulp-eslint": "^3.0.1",
-    "gulp-mocha": "^4.3.1",
+
+    "gulp-eslint": "^4.0.0",
+    "gulp-mocha": "^3.0.1",
+    "gulp-istanbul": "^1.1.2",
+
     "pre-commit": "^1.2.2"
+
   },
   "homepage": "https://github.com/Psychopoulet/node-pluginsmanager#readme",
   "engines": {
