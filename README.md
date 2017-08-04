@@ -1,6 +1,8 @@
 # node-pluginsmanager
 A plugins manager
 
+[![Build Status](https://api.travis-ci.org/Psychopoulet/node-pluginsmanager.svg)](https://travis-ci.org/Psychopoulet/node-pluginsmanager)
+
 ## Installation
 
 ```bash
