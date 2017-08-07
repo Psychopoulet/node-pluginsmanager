@@ -12,6 +12,7 @@
 	// tests
 	const eslint = require("gulp-eslint");
 	const mocha = require("gulp-mocha");
+	const istanbul = require("gulp-istanbul");
 
 // consts
 
@@ -27,7 +28,7 @@
 
 	gulp.task("eslint", () => {
 
-		return gulp.src([])
+		return gulp.src(UNITTESTSFILES)
 			.pipe(plumber())
 			.pipe(eslint({
 				"env": require(path.join(__dirname, "gulpfile", "eslint", "env.json")),

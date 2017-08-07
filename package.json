@@ -4,7 +4,6 @@
   "description": "A plugins manager",
   "main": "lib/main.js",
   "scripts": {
-    "start": "node lib/main.js",
     "test": "gulp eslint",
     "test-travis": "gulp mocha"
   },
@@ -26,7 +25,7 @@
   },
   "dependencies": {
     "asynchronous-eventemitter": "^0.2.2",
-    "node-promfs": "^2.1.0"
+    "node-promfs": "^2.1.2"
   },
   "devDependencies": {
 
