@@ -1,32 +1,31 @@
 "use strict";
 
+// deps
+
+	const { join } = require("path");
+	const assert = require("assert");
+
+	const { isDirectoryProm, mkdirpProm, rmdirpProm, unlinkProm, writeFileProm } = require("node-promfs");
+
 // const
 
 	const MAX_TIMOUT = 30 * 1000;
-
-// deps
-
-	const 	path = require("path"),
-			assert = require("assert"),
-
-			fs = require("node-promfs");
+	const PLUGINS_DIRECTORY = join(__dirname, "..", "plugins");
 
 // private
 
-	var oPluginsManager = new (require(path.join(__dirname, "..", "lib", "main.js")))(),
-		testsPluginsDirectory = path.join(__dirname, "plugins");
+	const oPluginsManager = new (require(join(__dirname, "..", "lib", "main.js")))();
+	const testsPluginsDirectory = join(__dirname, "plugins");
 
 // tests
 
 describe("events", () => {
 
-	let pluginsDirectory = path.join(__dirname, "..", "plugins");
-
 	before(() => {
 
-		oPluginsManager.directory = pluginsDirectory;
+		oPluginsManager.directory = PLUGINS_DIRECTORY;
 
-		return fs.rmdirpProm(pluginsDirectory).then(() => {
+		return rmdirpProm(PLUGINS_DIRECTORY).then(() => {
 			return oPluginsManager.unloadAll();
 		});
 
@@ -34,7 +33,7 @@ describe("events", () => {
 
 	after(() => {
 
-		return fs.rmdirpProm(pluginsDirectory).then(() => {
+		return rmdirpProm(PLUGINS_DIRECTORY).then(() => {
 			return oPluginsManager.unloadAll();
 		});
 
@@ -85,13 +84,15 @@ describe("load all", () => {
 		return oPluginsManager.unloadAll();
 	});
 
-	after(() => { return oPluginsManager.unloadAll(); });
+	after(() => {
+		return oPluginsManager.unloadAll();
+	});
 
 	it("should test file plugin", () => {
 
-		let sFilePlugin = path.join(testsPluginsDirectory, "TestFilePlugin.txt");
+		const sFilePlugin = join(testsPluginsDirectory, "TestFilePlugin.txt");
 
-		return fs.writeFileProm(sFilePlugin, "").then(() => {
+		return writeFileProm(sFilePlugin, "").then(() => {
 			return oPluginsManager.loadByDirectory(sFilePlugin);
 		}).then(() => {
 
@@ -102,16 +103,16 @@ describe("load all", () => {
 			return Promise.resolve();
 
 		}).then(() => {
-			return fs.unlinkProm(sFilePlugin);
+			return unlinkProm(sFilePlugin);
 		});
 
 	});
 
 	it("should test empty plugin", () => {
 
-		let sEmptyPluginDirectory = path.join(testsPluginsDirectory, "TestEmptyPlugin");
+		const sEmptyPluginDirectory = join(testsPluginsDirectory, "TestEmptyPlugin");
 
-		return fs.mkdirpProm(sEmptyPluginDirectory).then(() => {
+		return mkdirpProm(sEmptyPluginDirectory).then(() => {
 			return oPluginsManager.loadByDirectory(sEmptyPluginDirectory);
 		}).then(() => {
 			return Promise.reject(new Error("tests does not generate error"));
@@ -120,7 +121,11 @@ describe("load all", () => {
 			return new Promise((resolve) => {
 
 				assert.strictEqual(true, err instanceof Error, "generated error is not an instance of Error");
-				assert.strictEqual("\"TestEmptyPlugin\" => Cannot find module '" + sEmptyPluginDirectory + "'", err.message, "this is not the expected message");
+				assert.strictEqual(
+					"\"TestEmptyPlugin\" => Cannot find module '" + sEmptyPluginDirectory + "'",
+					err.message,
+					"this is not the expected message"
+				);
 
 				assert.deepStrictEqual("object", typeof oPluginsManager.plugins, "plugins is not an object");
 				assert.strictEqual(true, oPluginsManager.plugins instanceof Array, "plugins is not an Array");
@@ -131,7 +136,7 @@ describe("load all", () => {
 			});
 
 		}).then(() => {
-			return fs.rmdirpProm(sEmptyPluginDirectory);
+			return rmdirpProm(sEmptyPluginDirectory);
 		});
 
 	});
@@ -214,7 +219,11 @@ describe("load all with order", () => {
 			return new Promise((resolve) => {
 
 				assert.strictEqual(true, err instanceof Error, "generated error is not an instance of Error");
-				assert.strictEqual("The directory at index \"0\" must be a string\r\nThe directory at index \"1\" must be a string", err.message, "this is not the expected message");
+				assert.strictEqual(
+					"The directory at index \"0\" must be a string\r\nThe directory at index \"1\" must be a string",
+					err.message,
+					"this is not the expected message"
+				);
 
 				resolve();
 
@@ -230,10 +239,14 @@ describe("load all with order", () => {
 			return Promise.reject(new Error("tests does not generate error"));
 		}).catch((err) => {
 
-			new Promise((resolve) => {
+			return new Promise((resolve) => {
 
 				assert.strictEqual(true, err instanceof Error, "generated error is not an instance of Error");
-				assert.strictEqual("The directory at index \"0\" must be not empty\r\nThe directory at index \"1\" must be not empty", err.message, "this is not the expected message");
+				assert.strictEqual(
+					"The directory at index \"0\" must be not empty\r\nThe directory at index \"1\" must be not empty",
+					err.message,
+					"this is not the expected message"
+				);
 
 				resolve();
 
@@ -267,8 +280,8 @@ describe("load all with order", () => {
 			return oPluginsManager.loadAll();
 		}).then(() => {
 
-			new Promise((resolve) => {
-				
+			return new Promise((resolve) => {
+
 				assert.strictEqual(true, oPluginsManager.plugins instanceof Array, "loaded plugins are incorrects");
 				assert.strictEqual(2, oPluginsManager.plugins.length, "loaded plugins are incorrects");
 
@@ -277,7 +290,7 @@ describe("load all with order", () => {
 				assert.strictEqual(true, "object" === typeof oPluginsManager.plugins[0], "loaded plugins are incorrects");
 				assert.deepStrictEqual([ "Sébastien VIDAL" ], oPluginsManager.plugins[0].authors, "loaded plugins are incorrects");
 				assert.deepStrictEqual("A test for node-pluginsmanager", oPluginsManager.plugins[0].description, "loaded plugins are incorrects");
-				assert.deepStrictEqual({ simpletts: "^1.3.0" }, oPluginsManager.plugins[0].dependencies, "loaded plugins are incorrects");
+				assert.deepStrictEqual({ "simpletts": "^1.4.1" }, oPluginsManager.plugins[0].dependencies, "loaded plugins are incorrects");
 
 				// TestGoodPluginWithoutDependencies
 
@@ -307,7 +320,7 @@ describe("install via github", () => {
 
 	after(() => {
 
-		return fs.rmdirpProm(path.join(testsPluginsDirectory, "node-containerpattern")).then(() => {
+		return rmdirpProm(join(testsPluginsDirectory, "node-containerpattern")).then(() => {
 			return oPluginsManager.unloadAll();
 		});
 
@@ -376,13 +389,13 @@ describe("install via github", () => {
 
 describe("uninstall", () => {
 
-	let sEmptyPlugin = path.join(testsPluginsDirectory, "TestEmptyPlugin");
+	const sEmptyPlugin = join(testsPluginsDirectory, "TestEmptyPlugin");
 
 	before(() => {
 
 		oPluginsManager.directory = testsPluginsDirectory;
 
-		return fs.mkdirpProm(sEmptyPlugin).then(() => {
+		return mkdirpProm(sEmptyPlugin).then(() => {
 			return oPluginsManager.unloadAll();
 		});
 
@@ -390,7 +403,7 @@ describe("uninstall", () => {
 
 	after(() => {
 
-		return fs.rmdirpProm(sEmptyPlugin).then(() => {
+		return rmdirpProm(sEmptyPlugin).then(() => {
 			return oPluginsManager.unloadAll();
 		});
 
@@ -409,32 +422,51 @@ describe("load", () => {
 		return oPluginsManager.unloadAll();
 	});
 
-	after(() => { return oPluginsManager.unloadAll(); });
+	after(() => {
+		return oPluginsManager.unloadAll();
+	});
 
 	it("should load good plugin", () => {
 
 		return new Promise((resolve) => {
 
 			assert.strictEqual(0, oPluginsManager.plugins.length, "Loaded plugins length is no correct");
-
 			resolve();
 
 		}).then(() => {
 
-			return oPluginsManager.loadByDirectory(path.join(oPluginsManager.directory, "TestGoodPlugin")).then((plugin) => {
+			return oPluginsManager.loadByDirectory(join(oPluginsManager.directory, "TestGoodPlugin")).then((plugin) => {
 
 				assert.strictEqual("TestGoodPlugin", plugin.name, "Loaded plugin name is no correct");
 				assert.strictEqual(1, oPluginsManager.plugins.length, "Loaded plugins length is no correct");
 
-				assert.deepStrictEqual(["Sébastien VIDAL"], plugin.authors, "Loaded plugin's authors is not correct");
+				assert.deepStrictEqual([ "Sébastien VIDAL" ], plugin.authors, "Loaded plugin's authors is not correct");
 				assert.strictEqual("A test for node-pluginsmanager", plugin.description, "Loaded plugin's description is not correct");
-				assert.deepStrictEqual([path.join(__dirname, "plugins", "TestGoodPlugin", "design.css")], plugin.designs, "Loaded plugin's designs is not correct");
-				assert.strictEqual(path.join(__dirname, "plugins", "TestGoodPlugin"), plugin.directory, "Loaded plugin's directory is not correct");
+
+				assert.deepStrictEqual(
+					[ join(__dirname, "plugins", "TestGoodPlugin", "design.css") ],
+					plugin.designs, "Loaded plugin's designs is not correct"
+				);
+
+				assert.strictEqual(join(__dirname, "plugins", "TestGoodPlugin"), plugin.directory, "Loaded plugin's directory is not correct");
+
 				assert.strictEqual("", plugin.github, "Loaded plugin's github is not correct");
-				assert.deepStrictEqual([path.join(__dirname, "plugins", "TestGoodPlugin", "javascript.js")], plugin.javascripts, "Loaded plugin's javascripts is not correct");
+
+				assert.deepStrictEqual(
+					[ join(__dirname, "plugins", "TestGoodPlugin", "javascript.js") ],
+					plugin.javascripts,
+					"Loaded plugin's javascripts is not correct"
+				);
+
 				assert.strictEqual("ISC", plugin.license, "Loaded plugin's license is not correct");
 				assert.strictEqual("TestGoodPlugin", plugin.name, "Loaded plugin's name is not correct");
-				assert.deepStrictEqual([path.join(__dirname, "plugins", "TestGoodPlugin", "template.html")], plugin.templates, "Loaded plugin's templates is not correct");
+
+				assert.deepStrictEqual(
+					[ join(__dirname, "plugins", "TestGoodPlugin", "template.html") ],
+					plugin.templates,
+					"Loaded plugin's templates is not correct"
+				);
+
 				assert.strictEqual("0.0.2", plugin.version, "Loaded plugin's version is not correct");
 
 			});
@@ -458,7 +490,7 @@ describe("load", () => {
 				return oPluginsManager.plugins[0].unload("test").then(() => {
 					oPluginsManager.plugins.splice(0, 1); return Promise.resolve();
 				});
-				
+
 			}
 			else {
 				return Promise.resolve();
@@ -485,7 +517,9 @@ describe("beforeLoadAll", () => {
 		return oPluginsManager.unloadAll();
 	});
 
-	after(() => { return oPluginsManager.unloadAll(); });
+	after(() => {
+		return oPluginsManager.unloadAll();
+	});
 
 	it("should fail on beforeLoadAll creation", () => {
 
@@ -507,7 +541,9 @@ describe("beforeLoadAll", () => {
 
 	it("should fail on beforeLoadAll call", () => {
 
-		return oPluginsManager.beforeLoadAll(() => {}).then(() => {
+		return oPluginsManager.beforeLoadAll(() => {
+			// nothing to do here
+		}).then(() => {
 			return oPluginsManager.loadAll();
 		}).then(() => {
 			return Promise.reject(new Error("tests does not generate error"));
@@ -516,7 +552,6 @@ describe("beforeLoadAll", () => {
 			return new Promise((resolve) => {
 
 				assert.strictEqual(true, err instanceof Error, "generated error is not an instance of Error");
-			
 				resolve();
 
 			});
@@ -539,8 +574,8 @@ describe("beforeLoadAll", () => {
 
 describe("update via github", () => {
 
-	let TestGoodPluginDirectory = path.join(path.join(testsPluginsDirectory, "TestGoodPlugin")),
-		npmDirectory = path.join(TestGoodPluginDirectory, "node_modules");
+	const TestGoodPluginDirectory = join(join(testsPluginsDirectory, "TestGoodPlugin"));
+	const npmDirectory = join(TestGoodPluginDirectory, "node_modules");
 
 	before(() => {
 		oPluginsManager.directory = testsPluginsDirectory;
@@ -549,7 +584,7 @@ describe("update via github", () => {
 
 	after(() => {
 
-		return fs.rmdirpProm(npmDirectory).then(() => {
+		return rmdirpProm(npmDirectory).then(() => {
 			return oPluginsManager.unloadAll();
 		});
 
@@ -557,14 +592,13 @@ describe("update via github", () => {
 
 	it("should test update on an inexistant plugin", () => {
 
-		return oPluginsManager.updateByDirectory(path.join(oPluginsManager.directory, "node-containerpattern")).then(() => {
+		return oPluginsManager.updateByDirectory(join(oPluginsManager.directory, "node-containerpattern")).then(() => {
 			return Promise.reject(new Error("tests does not generate error"));
 		}).catch((err) => {
 
 			return new Promise((resolve) => {
 
 				assert.strictEqual(true, err instanceof Error, "generated error is not an instance of Error");
-			
 				resolve();
 
 			});
@@ -579,13 +613,13 @@ describe("update via github", () => {
 			return oPluginsManager.updateByDirectory(TestGoodPluginDirectory);
 		}).then(() => {
 
-			return fs.isDirectoryProm(npmDirectory).then((exists) => {
+			return isDirectoryProm(npmDirectory).then((exists) => {
 
 				if (exists) {
 					return Promise.resolve();
 				}
 				else {
-					return Promise.reject("There is no npm udpate performed");
+					return Promise.reject(new Error("There is no npm udpate performed"));
 				}
 
 			});
