@@ -149,7 +149,7 @@
 	"comma-spacing": [ "error", { "before": false, "after": true } ],
 	"comma-style": [ "error", "last" ],
 	"computed-property-spacing": [ "error", "never" ],
-	"consistent-this": "error",
+	"consistent-this": 0,
 	"eol-last": "error",
 	"func-call-spacing": "error",
 	"func-name-matching": "error",
