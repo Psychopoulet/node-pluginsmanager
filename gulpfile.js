@@ -44,12 +44,13 @@
 	gulp.task("istanbul", [ "eslint" ], () => {
 
 		return gulp.src(APP_FILES)
-			.pipe(istanbul())
+			.pipe(plumber())
+			.pipe(istanbul({ "includeUntested": true }))
 			.pipe(istanbul.hookRequire());
 
 	});
 
-	gulp.task("mocha", [ "eslint" ], () => {
+	gulp.task("mocha", [ "istanbul" ], () => {
 
 		return gulp.src(UNITTESTS_FILES)
 			.pipe(plumber())
