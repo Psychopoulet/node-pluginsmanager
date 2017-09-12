@@ -1,7 +1,5 @@
 {
-  "authors": [
-    "Sébastien VIDAL"
-  ],
+  "author": "Sébastien VIDAL",
   "dependencies": {
     "simpletts": "^1.4.1"
   },

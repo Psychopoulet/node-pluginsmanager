@@ -413,7 +413,7 @@ describe("uninstall", () => {
 
 	const sEmptyPlugin = join(testsPluginsDirectory, "TestEmptyPlugin");
 
-	before(() => {
+	beforeEach(() => {
 
 		pluginsManager.directory = testsPluginsDirectory;
 
@@ -423,7 +423,7 @@ describe("uninstall", () => {
 
 	});
 
-	after(() => {
+	afterEach(() => {
 
 		return rmdirpProm(sEmptyPlugin).then(() => {
 			return pluginsManager.unloadAll();
@@ -431,8 +431,39 @@ describe("uninstall", () => {
 
 	});
 
-	it("should uninstall empty plugin", () => {
+	it("should uninstall inexistant plugin by directory", () => {
+		return pluginsManager.uninstallByDirectory("szofuhzesifguhezifu");
+	});
+
+	it("should uninstall empty plugin by directory", () => {
 		return pluginsManager.uninstallByDirectory(sEmptyPlugin);
+	});
+
+	it("should uninstall plugin by plugin", () => {
+
+		return writeFileProm(
+			join(sEmptyPlugin, "package.json"),
+			JSON.stringify({
+				"name": "test",
+				"main": "TestEmptyPlugin.js"
+			}),
+			"utf8"
+		).then(() => {
+
+			return writeFileProm(
+				join(sEmptyPlugin, "TestEmptyPlugin.js"),
+				"\n\"use strict\";" +
+				"\n\nmodule.exports = class TestEmptyPlugin " +
+				"extends require(require(\"path\").join(\"..\", \"..\", \"..\", \"lib\", \"main.js\")).plugin { };",
+				"utf8"
+			);
+
+		}).then(() => {
+			return pluginsManager.loadByDirectory(sEmptyPlugin);
+		}).then((plugin) => {
+			return pluginsManager.uninstall(plugin);
+		});
+
 	});
 
 });
