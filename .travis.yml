@@ -3,6 +3,5 @@ node_js:
   - "8"
   - "6"
   - "4"
-before_install:
-  - sudo apt-get install git-all
 script: "npm run-script test-travis"
+sudo: false
