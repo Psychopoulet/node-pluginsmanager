@@ -7,7 +7,7 @@ module.exports = class TestGoodPluginWithoutDependencies extends require(require
 
 	load (data) {
 
-		(0, console).log(" => [TestGoodPluginWithoutDependencies] - load TestGoodPluginWithoutDependencies with \"" + data + "\" data");
+		(0, console).log(" => [TestGoodPluginWithoutDependencies] - load TestGoodPluginWithoutDependencies" + (data ? " with \"" + data + "\" data" : ""));
 		return Promise.resolve();
 
 	}
@@ -16,7 +16,7 @@ module.exports = class TestGoodPluginWithoutDependencies extends require(require
 
 		super.unload();
 
-		(0, console).log(" => [TestGoodPluginWithoutDependencies] - unload TestGoodPluginWithoutDependencies with \"" + data + "\" data");
+		(0, console).log(" => [TestGoodPluginWithoutDependencies] - unload TestGoodPluginWithoutDependencies" + (data ? " with \"" + data + "\" data" : ""));
 		return Promise.resolve();
 
 	}
@@ -25,21 +25,21 @@ module.exports = class TestGoodPluginWithoutDependencies extends require(require
 
 	install (data) {
 
-		(0, console).log(" => [TestGoodPluginWithoutDependencies] - install TestGoodPluginWithoutDependencies with \"" + data + "\" data");
+		(0, console).log(" => [TestGoodPluginWithoutDependencies] - install TestGoodPluginWithoutDependencies" + (data ? " with \"" + data + "\" data" : ""));
 		return Promise.resolve();
 
 	}
 
 	update (data) {
 		
-		(0, console).log(" => [TestGoodPluginWithoutDependencies] - update TestGoodPluginWithoutDependencies with \"" + data + "\" data");
+		(0, console).log(" => [TestGoodPluginWithoutDependencies] - update TestGoodPluginWithoutDependencies" + (data ? " with \"" + data + "\" data" : ""));
 		return Promise.resolve();
 
 	}
 
 	uninstall (data) {
 		
-		(0, console).log(" => [TestGoodPluginWithoutDependencies] - install TestGoodPluginWithoutDependencies with \"" + data + "\" data");
+		(0, console).log(" => [TestGoodPluginWithoutDependencies] - install TestGoodPluginWithoutDependencies" + (data ? " with \"" + data + "\" data" : ""));
 		return Promise.resolve();
 
 	}
