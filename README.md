@@ -51,7 +51,6 @@ $ npm install node-pluginsmanager
   -- Attributes -- 
 
   * ``` string directory ``` plugins' directory path
-  * ``` array orderedDirectoriesBaseNames ``` plugins' names order for loading
   * ``` array plugins ``` plugins' data
   * ``` static AbstractPlugin plugin ``` abstract class for plugin creation
 
