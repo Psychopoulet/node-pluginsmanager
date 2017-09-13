@@ -3,7 +3,7 @@
 
 // deps
 
-	const { join } = require("path");
+	const path = require("path");
 
 	// gulp
 	const gulp = require("gulp");
@@ -20,10 +20,10 @@
 
 // consts
 
-	const APP_FILES = [ join(__dirname, "lib", "**", "*.js") ];
-	const UNITTESTS_FILES = [ join(__dirname, "tests", "*.js") ];
+	const APP_FILES = [ path.join(__dirname, "lib", "**", "*.js") ];
+	const UNITTESTS_FILES = [ path.join(__dirname, "tests", "*.js") ];
 
-	const ALL_FILES = [ join(__dirname, "gulpfile.js") ].concat(APP_FILES).concat(UNITTESTS_FILES);
+	const ALL_FILES = [ path.join(__dirname, "gulpfile.js") ].concat(APP_FILES).concat(UNITTESTS_FILES);
 
 // tasks
 
@@ -32,13 +32,13 @@
 		return gulp.src(ALL_FILES)
 			.pipe(plumber())
 			.pipe(eslint({
-				"env": require(join(__dirname, "gulpfile", "eslint", "env.json")),
-				"globals": require(join(__dirname, "gulpfile", "eslint", "globals.json")),
+				"env": require(path.join(__dirname, "gulpfile", "eslint", "env.json")),
+				"globals": require(path.join(__dirname, "gulpfile", "eslint", "globals.json")),
 				"parserOptions": {
 					"ecmaVersion": 6
 				},
 				// http://eslint.org/docs/rules/
-				"rules": require(join(__dirname, "gulpfile", "eslint", "rules.json"))
+				"rules": require(path.join(__dirname, "gulpfile", "eslint", "rules.json"))
 			}))
 			.pipe(eslint.format())
 			.pipe(eslint.failAfterError());
@@ -57,7 +57,7 @@
 	gulp.task("coveralls", [ "istanbul" ], () => {
 
 		return !isCI ? Promise.resolve() :
-			gulp.src(join(__dirname, "coverage", "lcov.info"))
+			gulp.src(path.join(__dirname, "coverage", "lcov.info"))
 				.pipe(plumber())
 				.pipe(coveralls());
 
