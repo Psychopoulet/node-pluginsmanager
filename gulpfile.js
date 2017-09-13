@@ -18,6 +18,9 @@
 	const istanbul = require("gulp-istanbul");
 	const coveralls = require("gulp-coveralls");
 
+	// compilation
+	const babel = require("gulp-babel");
+
 // consts
 
 	const APP_FILES = [ path.join(__dirname, "lib", "**", "*.js") ];
@@ -63,7 +66,17 @@
 
 	});
 
-	gulp.task("mocha", [ "coveralls" ], () => {
+	gulp.task("babel", () => {
+
+		return gulp.src(APP_FILES)
+			.pipe(babel({
+				"presets": [ "es2015" ]
+			}))
+			.pipe(gulp.dest(path.join(__dirname, "dist")));
+
+	});
+
+	gulp.task("mocha", [ "coveralls", "babel" ], () => {
 
 		return gulp.src(UNITTESTS_FILES)
 			.pipe(plumber())
