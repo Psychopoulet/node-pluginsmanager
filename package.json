@@ -1,6 +1,6 @@
 {
   "name": "node-pluginsmanager",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "description": "A plugins manager",
   "main": "lib/main.js",
   "scripts": {
@@ -30,9 +30,11 @@
   "devDependencies": {
     "gulp": "3.9.1",
     "gulp-plumber": "1.1.0",
+    "is-ci": "1.0.10",
     "gulp-eslint": "4.0.0",
     "gulp-mocha": "3.0.1",
     "gulp-istanbul": "1.1.2",
+    "gulp-coveralls": "0.1.4",
     "pre-commit": "1.2.2"
   },
   "homepage": "https://github.com/Psychopoulet/node-pluginsmanager#readme",

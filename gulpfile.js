@@ -8,11 +8,15 @@
 	// gulp
 	const gulp = require("gulp");
 	const plumber = require("gulp-plumber");
+	const isCI = require("is-ci");
 
 	// tests
 	const eslint = require("gulp-eslint");
 	const mocha = require("gulp-mocha");
+
+	// reports
 	const istanbul = require("gulp-istanbul");
+	const coveralls = require("gulp-coveralls");
 
 // consts
 
@@ -50,7 +54,16 @@
 
 	});
 
-	gulp.task("mocha", [ "istanbul" ], () => {
+	gulp.task("coveralls", [ "istanbul" ], () => {
+
+		return !isCI ? Promise.resolve() :
+			gulp.src(path.join(__dirname, "coverage", "lcov.info"))
+				.pipe(plumber())
+				.pipe(coveralls());
+
+	});
+
+	gulp.task("mocha", [ "coveralls" ], () => {
 
 		return gulp.src(UNITTESTS_FILES)
 			.pipe(plumber())
@@ -63,7 +76,7 @@
 // watcher
 
 	gulp.task("watch", () => {
-		gulp.watch(ALL_FILES, [ "mocha" ]);
+		gulp.watch(ALL_FILES, [ "eslint" ]);
 	});
 
 
