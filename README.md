@@ -2,6 +2,8 @@
 A plugins manager
 
 [![Build Status](https://api.travis-ci.org/Psychopoulet/node-pluginsmanager.svg)](https://travis-ci.org/Psychopoulet/node-pluginsmanager)
+[![Coverage Status](https://coveralls.io/repos/Psychopoulet/node-pluginsmanager/badge.svg)](https://coveralls.io/r/Psychopoulet/node-pluginsmanager)
+[![Dependency Status](https://img.shields.io/david/Psychopoulet/node-pluginsmanager/master.svg)](https://github.com/Psychopoulet/node-pluginsmanager)
 
 ## Installation
 
