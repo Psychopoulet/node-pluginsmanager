@@ -7,17 +7,25 @@ module.exports = class TestGoodPluginWithoutDependencies extends require(require
 
 	load (data) {
 
-		(0, console).log(" => [TestGoodPluginWithoutDependencies] - load TestGoodPluginWithoutDependencies" + (data ? " with \"" + data + "\" data" : ""));
-		return Promise.resolve();
+		return super.load().then(() => {
+
+			(0, console).log(" => [TestGoodPluginWithoutDependencies] - load TestGoodPluginWithoutDependencies" + (data ? " with \"" + data + "\" data" : ""));
+
+			return Promise.resolve();
+
+		});
 
 	}
 
 	unload (data) {
 
-		super.unload();
+		return super.unload().then(() => {
 
-		(0, console).log(" => [TestGoodPluginWithoutDependencies] - unload TestGoodPluginWithoutDependencies" + (data ? " with \"" + data + "\" data" : ""));
-		return Promise.resolve();
+			(0, console).log(" => [TestGoodPluginWithoutDependencies] - unload TestGoodPluginWithoutDependencies" + (data ? " with \"" + data + "\" data" : ""));
+
+			return Promise.resolve();
+
+		});
 
 	}
 
@@ -25,22 +33,37 @@ module.exports = class TestGoodPluginWithoutDependencies extends require(require
 
 	install (data) {
 
-		(0, console).log(" => [TestGoodPluginWithoutDependencies] - install TestGoodPluginWithoutDependencies" + (data ? " with \"" + data + "\" data" : ""));
-		return Promise.resolve();
+		return super.install().then(() => {
+
+			(0, console).log(" => [TestGoodPluginWithoutDependencies] - install TestGoodPluginWithoutDependencies" + (data ? " with \"" + data + "\" data" : ""));
+
+			return Promise.resolve();
+
+		});
 
 	}
 
 	update (data) {
 		
-		(0, console).log(" => [TestGoodPluginWithoutDependencies] - update TestGoodPluginWithoutDependencies" + (data ? " with \"" + data + "\" data" : ""));
-		return Promise.resolve();
+		return super.update().then(() => {
+
+			(0, console).log(" => [TestGoodPluginWithoutDependencies] - update TestGoodPluginWithoutDependencies" + (data ? " with \"" + data + "\" data" : ""));
+
+			return Promise.resolve();
+
+		});
 
 	}
 
 	uninstall (data) {
 		
-		(0, console).log(" => [TestGoodPluginWithoutDependencies] - install TestGoodPluginWithoutDependencies" + (data ? " with \"" + data + "\" data" : ""));
-		return Promise.resolve();
+		return super.uninstall().then(() => {
+
+			(0, console).log(" => [TestGoodPluginWithoutDependencies] - install TestGoodPluginWithoutDependencies" + (data ? " with \"" + data + "\" data" : ""));
+
+			return Promise.resolve();
+
+		});
 
 	}
 

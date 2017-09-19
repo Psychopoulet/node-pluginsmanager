@@ -1,9 +1,9 @@
 # node-pluginsmanager
 A plugins manager
 
-[![Build Status](https://api.travis-ci.org/Psychopoulet/node-pluginsmanager.svg)](https://travis-ci.org/Psychopoulet/node-pluginsmanager)
-[![Coverage Status](https://coveralls.io/repos/Psychopoulet/node-pluginsmanager/badge.svg)](https://coveralls.io/r/Psychopoulet/node-pluginsmanager)
-[![Dependency Status](https://img.shields.io/david/Psychopoulet/node-pluginsmanager/master.svg)](https://github.com/Psychopoulet/node-pluginsmanager)
+[![Build Status](https://api.travis-ci.org/Psychopoulet/node-pluginsmanager.svg?branch=develop)](https://travis-ci.org/Psychopoulet/node-pluginsmanager)
+[![Coverage Status](https://coveralls.io/repos/github/Psychopoulet/node-pluginsmanager/badge.svg?branch=develop)](https://coveralls.io/github/Psychopoulet/node-pluginsmanager)
+[![Dependency Status](https://img.shields.io/david/Psychopoulet/node-pluginsmanager/develop.svg)](https://github.com/Psychopoulet/node-pluginsmanager)
 
 ## Installation
 
@@ -45,8 +45,8 @@ $ npm install node-pluginsmanager
   * ``` load([mixed data]) : Promise ``` fired on "load", "update" or "install" plugin event
   * ``` unload([mixed data]) : Promise ``` fired on "update" or "uninstall" plugin event
   * ``` install([mixed data]) : Promise ``` fired on "install" plugin event
-  * ``` update([mixed data]) : Promise ```fired on "update" plugin event
-  * ``` uninstall([mixed data]) : Promise ```fired on "uninstall" plugin event
+  * ``` update([mixed data]) : Promise ``` fired on "update" plugin event
+  * ``` uninstall([mixed data]) : Promise ``` fired on "uninstall" plugin event
 
 ### PluginsManager (extends [asynchronous-eventemitter](https://www.npmjs.com/package/asynchronous-eventemitter))
 
@@ -129,61 +129,79 @@ $ npm install node-pluginsmanager
 
 class MyPlugin extends require('node-pluginsmanager').plugin {
 
-    // load
+  // load
 
-        // 'data' is optionnal, null if not sended by the manager
-        load (data) {
+    // 'data' is optionnal, null if not sended by the manager
+    load (data) {
 
-            return new Promise((resolve) => {
-                // your working place
-                resolve();
-            });
+      return super.load().then(() => {
 
-        }
+        // your working place
+        // used on install & update, create ressources like array, sockets, etc...
 
-        // 'data' is optionnal, null if not sended by the manager
-        unload (data) {
+        return Promise.resolve();
 
-            super.unload(); // must be called
+      });
 
-            return new Promise((resolve) => {
-                // used on delete & update plugin, unload ressources like array, sockets, etc...
-                resolve();
-            });
+    }
 
-        }
+    // 'data' is optionnal, null if not sended by the manager
+    unload (data) {
 
-    // write
+      return super.unload().then(() => {
 
-        // 'data' is optionnal, null if not sended by the manager
-        install (data) {
+        // your working place
+        // used on delete & update, close & remove ressources like array, sockets, etc...
 
-            return new Promise((resolve) => {
-                // on the first use, create ressources like directories, files, etc...
-                resolve();
-            });
+        return Promise.resolve();
 
-        }
+      });
 
-        // 'data' is optionnal, null if not sended by the manager
-        update (data) {
+    }
 
-            return new Promise((resolve) => {
-                // update your ressources like sql database, etc...
-                resolve();
-            });
+  // write
 
-        }
+    // 'data' is optionnal, null if not sended by the manager
+    install (data) {
 
-        // 'data' is optionnal, null if not sended by the manager
-        uninstall (data) {
+      return super.install().then(() => {
 
-            return new Promise((resolve) => {
-                // remove all the created ressources like directories, files, etc...
-                resolve();
-            });
+        // your working place
+        // on the first use, create ressources like directories, files, etc...
 
-        }
+        return Promise.resolve();
+
+      });
+
+    }
+
+    // 'data' is optionnal, null if not sended by the manager
+    update (data) {
+
+      return super.update().then(() => {
+
+        // your working place
+        // update your ressources like sql database, etc...
+
+        return Promise.resolve();
+
+      });
+
+    }
+
+    // 'data' is optionnal, null if not sended by the manager
+    uninstall (data) {
+
+      return super.uninstall().then(() => {
+
+        // your working place
+        // remove all the created ressources like directories, files, etc...
+
+        return Promise.resolve();
+
+      });
+
+    }
 
 }
 ```
@@ -200,33 +218,33 @@ oPluginsManager.directory = path.join(__dirname, 'plugins'); // ... or changed l
 
 oPluginsManager
 
-    .on('error', (msg) => {
-        console.log("--- [event/error] '" + msg + "' ---");
+  .on('error', (msg) => {
+      console.log("--- [event/error] '" + msg + "' ---");
+  })
+
+  // load
+
+    .on('loaded', (plugin) => {
+      console.log("--- [event/loaded] '" + plugin.name + "' (v" + plugin.version + ") loaded ---");
+    })
+    .on('allloaded', () => {
+      console.log("--- [event/loaded] all loaded ---");
+    })
+    .on('unloaded', (plugin) => {
+      console.log("--- [event/unloaded] '" + plugin.name + "' (v" + plugin.version + ") unloaded ---");
     })
 
-    // load
+  // write
 
-        .on('loaded', (plugin) => {
-            console.log("--- [event/loaded] '" + plugin.name + "' (v" + plugin.version + ") loaded ---");
-        })
-        .on('allloaded', () => {
-            console.log("--- [event/loaded] all loaded ---");
-        })
-        .on('unloaded', (plugin) => {
-            console.log("--- [event/unloaded] '" + plugin.name + "' (v" + plugin.version + ") unloaded ---");
-        })
-
-    // write
-
-        .on('installed', (plugin) => {
-            console.log("--- [event/installed] '" + plugin.name + "' (v" + plugin.version + ") installed ---");
-        })
-        .on('updated', (plugin) => {
-            console.log("--- [event/updated] '" + plugin.name + "' (v" + plugin.version + ") updated ---");
-        })
-        .on('uninstalled', (plugin) => {
-            console.log("--- [event/uninstalled] '" + plugin.name + "' uninstalled ---");
-        })
+    .on('installed', (plugin) => {
+      console.log("--- [event/installed] '" + plugin.name + "' (v" + plugin.version + ") installed ---");
+    })
+    .on('updated', (plugin) => {
+      console.log("--- [event/updated] '" + plugin.name + "' (v" + plugin.version + ") updated ---");
+    })
+    .on('uninstalled', (plugin) => {
+      console.log("--- [event/uninstalled] '" + plugin.name + "' uninstalled ---");
+    })
 
 .beforeLoad(() => { // optionnal. MUST return a promise
     return Promise.resolve();
@@ -234,42 +252,42 @@ oPluginsManager
 
 .loadAll(<optional data to pass to the 'load' plugins methods>).then(() => {
 
-    console.log('all plugins loaded');
-    console.log(oPluginsManager.getPluginsNames());
+  console.log('all plugins loaded');
+  console.log(oPluginsManager.getPluginsNames());
 
-    oPluginsManager.installViaGithub(
-        'https://github.com/<account>/<plugin>',
-        <optional data to pass to the 'install' && 'load' plugins methods>
-    ).then((plugin) => {
-        console.log(plugin.name + ' installed & loaded');
-    }).catch((err) => {
-        console.log(err);
-    });
+  oPluginsManager.installViaGithub(
+    'https://github.com/<account>/<plugin>',
+    <optional data to pass to the 'install' && 'load' plugins methods>
+  ).then((plugin) => {
+    console.log(plugin.name + ' installed & loaded');
+  }).catch((err) => {
+    console.log(err);
+  });
 
-    oPluginsManager.update( // use "github"'s plugin data if exists
-        <plugin>,
-        <optional data to pass to the 'unload', 'update', && 'load' plugins methods>
-    ).then((plugin) => {
-        console.log(plugin.name + ' updated & loaded');
-    }).catch((err) => {
-        console.log(err);
-    });
+  oPluginsManager.update( // use "github"'s plugin data if exists
+    <plugin>,
+    <optional data to pass to the 'unload', 'update', && 'load' plugins methods>
+  ).then((plugin) => {
+    console.log(plugin.name + ' updated & loaded');
+  }).catch((err) => {
+    console.log(err);
+  });
 
-    // works also with updateByDirectory(<pluginDirectory>, <optional data>)
+  // works also with updateByDirectory(<pluginDirectory>, <optional data>)
 
-    oPluginsManager.uninstall(
-        <plugin>,
-        <optional data to pass to the 'unload' && 'uninstall' plugins methods>
-    ).then((pluginName) => {
-        console.log(pluginName + ' removed');
-    }).catch((err) => {
-        console.log(err);
-    });
+  oPluginsManager.uninstall(
+    <plugin>,
+    <optional data to pass to the 'unload' && 'uninstall' plugins methods>
+  ).then((pluginName) => {
+    console.log(pluginName + ' removed');
+  }).catch((err) => {
+    console.log(err);
+  });
 
-    // works also with uninstallByDirectory(<pluginDirectory>, <optional data>)
+  // works also with uninstallByDirectory(<pluginDirectory>, <optional data>)
 
 }).catch((err) => {
-    console.log(err);
+  console.log(err);
 });
 ```
 

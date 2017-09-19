@@ -7,17 +7,25 @@ module.exports = class TestGoodPlugin extends require(require("path").join("..",
 
 	load (data) {
 
-		(0, console).log(" => [TestGoodPlugin] - load TestGoodPlugin" + (data ? " with \"" + data + "\" data" : ""));
-		return Promise.resolve();
+		return super.load().then(() => {
+
+			(0, console).log(" => [TestGoodPlugin] - load TestGoodPlugin" + (data ? " with \"" + data + "\" data" : ""));
+
+			return Promise.resolve();
+
+		});
 
 	}
 
 	unload (data) {
 
-		super.unload();
+		return super.unload().then(() => {
 
-		(0, console).log(" => [TestGoodPlugin] - unload TestGoodPlugin" + (data ? " with \"" + data + "\" data" : ""));
-		return Promise.resolve();
+			(0, console).log(" => [TestGoodPlugin] - unload TestGoodPlugin" + (data ? " with \"" + data + "\" data" : ""));
+
+			return Promise.resolve();
+
+		});
 
 	}
 
@@ -25,22 +33,37 @@ module.exports = class TestGoodPlugin extends require(require("path").join("..",
 
 	install (data) {
 
-		(0, console).log(" => [TestGoodPlugin] - install TestGoodPlugin" + (data ? " with \"" + data + "\" data" : ""));
-		return Promise.resolve();
+		return super.install().then(() => {
+
+			(0, console).log(" => [TestGoodPlugin] - install TestGoodPlugin" + (data ? " with \"" + data + "\" data" : ""));
+
+			return Promise.resolve();
+
+		});
 
 	}
 
 	update (data) {
-		
-		(0, console).log(" => [TestGoodPlugin] - update TestGoodPlugin" + (data ? " with \"" + data + "\" data" : ""));
-		return Promise.resolve();
+
+		return super.update().then(() => {
+
+			(0, console).log(" => [TestGoodPlugin] - update TestGoodPlugin" + (data ? " with \"" + data + "\" data" : ""));
+
+			return Promise.resolve();
+
+		});
 
 	}
 
 	uninstall (data) {
-		
-		(0, console).log(" => [TestGoodPlugin] - install TestGoodPlugin" + (data ? " with \"" + data + "\" data" : ""));
-		return Promise.resolve();
+
+		return super.uninstall().then(() => {
+
+			(0, console).log(" => [TestGoodPlugin] - install TestGoodPlugin" + (data ? " with \"" + data + "\" data" : ""));
+
+			return Promise.resolve();
+
+		});
 
 	}
 
