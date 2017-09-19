@@ -11,5 +11,6 @@
   "main": "TestGoodPluginWithoutDependencies.js",
   "name": "TestGoodPluginWithoutDependencies",
   "version": "0.0.2",
-  "templates": [ "template.html" ]
+  "templates": [ "template.html" ],
+  "github": "https://github.com/Psychopoulet/node-pluginsmanager"
 }

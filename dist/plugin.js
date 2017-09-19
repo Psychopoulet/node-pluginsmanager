@@ -42,17 +42,13 @@ module.exports = function () {
 
 			return isDirectoryProm(this.directory).then(function (exists) {
 
-				if (!exists) {
-					return Promise.reject(new Error("\"" + _this.directory + "\" does not exist."));
-				} else {
+				return !exists ? Promise.reject(new Error("\"" + _this.directory + "\" does not exist.")) : Promise.resolve().then(function () {
 
 					var file = join(_this.directory, "package.json");
 
 					return isFileProm(file).then(function (_exists) {
 
-						if (!_exists) {
-							return Promise.reject(new Error("\"" + file + "\" does not exist."));
-						} else {
+						return !_exists ? Promise.reject(new Error("\"" + file + "\" does not exist.")) : Promise.resolve().then(function () {
 
 							var data = require(file);
 
@@ -91,9 +87,9 @@ module.exports = function () {
 							}
 
 							return Promise.resolve(_this);
-						}
+						});
 					});
-				}
+				});
 			});
 		}
 
