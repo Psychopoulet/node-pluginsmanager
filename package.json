@@ -1,10 +1,10 @@
 {
   "name": "node-pluginsmanager",
-  "version": "0.8.2",
+  "version": "0.9.0",
   "description": "A plugins manager",
-  "main": "dist/main.js",
+  "main": "lib/main.js",
   "scripts": {
-    "test": "gulp mocha"
+    "tests": "gulp tests"
   },
   "pre-commit": [
     "test"
@@ -23,8 +23,8 @@
     "url": "https://github.com/Psychopoulet/node-pluginsmanager/issues"
   },
   "dependencies": {
-    "asynchronous-eventemitter": "0.2.2",
-    "node-promfs": "2.1.3"
+    "asynchronous-eventemitter": "0.3.0",
+    "node-promfs": "3.3.1"
   },
   "devDependencies": {
     "gulp": "3.9.1",
@@ -33,12 +33,10 @@
     "gulp-mocha": "3.0.1",
     "gulp-istanbul": "1.1.2",
     "gulp-coveralls": "0.1.4",
-    "gulp-babel": "6.1.2",
-    "babel-preset-es2015": "6.18.0",
     "pre-commit": "1.2.2"
   },
   "homepage": "https://github.com/Psychopoulet/node-pluginsmanager#readme",
   "engines": {
-    "node": ">=0.11.15"
+    "node": ">=6.0.0"
   }
 }
