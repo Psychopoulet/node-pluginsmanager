@@ -49,7 +49,7 @@ declare module "node-pluginsmanager" {
 
 		public beforeLoadAll(callback: () => Promise<any>): Promise<void>;
 		public loadByDirectory(directory: string, data?: any): Promise<void>;
-		public loadAll(data?: any): Promise<void>;
+		public loadAll(data?: any): Promise<Plugin>;
 
 		public unload(plugin: Plugin, data?: any): Promise<void>;
 		public unloadByDirectory(directory: string, data?: any): Promise<void>;
@@ -62,9 +62,9 @@ declare module "node-pluginsmanager" {
 		public updateByDirectory(directory: string, data?: any): Promise<void>;
 		public updateByKey(url: string, data?: any): Promise<void>;
 
-		public uninstall(plugin: Plugin, data?: any): Promise<void>;
-		public uninstallByDirectory(directory: string, data?: any): Promise<void>;
-		public uninstallByKey(url: string, data?: any): Promise<void>;
+		public uninstall(plugin: Plugin, data?: any): Promise<string>;
+		public uninstallByDirectory(directory: string, data?: any): Promise<string>;
+		public uninstallByKey(url: string, data?: any): Promise<string>;
 
 	}
 
