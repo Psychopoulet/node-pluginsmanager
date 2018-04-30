@@ -1,9 +1,10 @@
 # node-pluginsmanager
 A plugins manager
 
-[![Build Status](https://api.travis-ci.org/Psychopoulet/node-pluginsmanager.svg?branch=develop)](https://travis-ci.org/Psychopoulet/node-pluginsmanager)
-[![Coverage Status](https://coveralls.io/repos/github/Psychopoulet/node-pluginsmanager/badge.svg?branch=develop)](https://coveralls.io/github/Psychopoulet/node-pluginsmanager)
-[![Dependency Status](https://img.shields.io/david/Psychopoulet/node-pluginsmanager/develop.svg)](https://github.com/Psychopoulet/node-pluginsmanager)
+[![Build Status](https://api.travis-ci.org/Psychopoulet/node-pluginsmanager.svg?branch=master)](https://travis-ci.org/Psychopoulet/node-pluginsmanager)
+[![Coverage Status](https://coveralls.io/repos/github/Psychopoulet/node-pluginsmanager/badge.svg?branch=master)](https://coveralls.io/github/Psychopoulet/node-pluginsmanager)
+[![Dependency Status](https://david-dm.org/Psychopoulet/node-pluginsmanager/status.svg)](https://david-dm.org/Psychopoulet/node-pluginsmanager)
+[![Dev dependency Status](https://david-dm.org/Psychopoulet/node-pluginsmanager/dev-status.svg)](https://david-dm.org/Psychopoulet/node-pluginsmanager?type=dev)
 
 ## Installation
 
@@ -24,16 +25,17 @@ $ npm install node-pluginsmanager
 
   -- Attributes --
 
-  * ``` array authors ``` plugin's author
-  * ``` string description ``` plugin's description
-  * ``` array designs ``` plugin's designs (CSS)
-  * ``` string directory ``` plugin's directory path
-  * ``` string github ``` plugin's github
-  * ``` array javascripts ``` plugin's scripts (javascript)
-  * ``` string license ``` plugin's license
-  * ``` string name ``` plugin's name
-  * ``` array templates ``` plugin's templates (HTML)
-  * ``` string version ``` plugin's version
+  * ``` authors: Array<string> ``` plugin's author
+  * ``` description: string ``` plugin's description
+  * ``` designs: Array<string> ``` plugin's designs (CSS)
+  * ``` dependencies: Array<string> ``` plugin's dependencies
+  * ``` directory: string ``` plugin's directory path
+  * ``` github: string ``` plugin's github
+  * ``` javascripts: Array<string> ``` plugin's scripts (javascript)
+  * ``` license: string ``` plugin's license
+  * ``` name: string ``` plugin's name
+  * ``` templates: Array<string> ``` plugin's templates (HTML)
+  * ``` version: string ``` plugin's version
 
   -- Constructor --
 
@@ -42,19 +44,20 @@ $ npm install node-pluginsmanager
   -- Methods --
 
   * ``` loadDataFromPackageFile() : Promise ``` used in PluginsManager
-  * ``` load([mixed data]) : Promise ``` fired on "load", "update" or "install" plugin event
-  * ``` unload([mixed data]) : Promise ``` fired on "update" or "uninstall" plugin event
-  * ``` install([mixed data]) : Promise ``` fired on "install" plugin event
-  * ``` update([mixed data]) : Promise ``` fired on "update" plugin event
-  * ``` uninstall([mixed data]) : Promise ``` fired on "uninstall" plugin event
+  * ``` load(data?: any) : Promise ``` fired on "load", "update" or "install" plugin event
+  * ``` unload(data?: any) : Promise ``` fired on "update" or "uninstall" plugin event
+  * ``` install(data?: any) : Promise ``` fired on "install" plugin event
+  * ``` update(data?: any) : Promise ``` fired on "update" plugin event
+  * ``` uninstall(data?: any) : Promise ``` fired on "uninstall" plugin event
 
 ### PluginsManager (extends [asynchronous-eventemitter](https://www.npmjs.com/package/asynchronous-eventemitter))
 
   -- Attributes -- 
 
-  * ``` string directory ``` plugins' directory path
-  * ``` array plugins ``` plugins' data
-  * ``` static AbstractPlugin plugin ``` abstract class for plugin creation
+  * ``` directory: string ``` plugins' directory path
+  * ``` array plugins: Array<Plugin> ``` plugins' data
+
+  * ``` static plugin: AbstractPlugin ``` abstract class for plugin creation
 
   -- Constructor --
 
@@ -62,42 +65,41 @@ $ npm install node-pluginsmanager
 
   -- Methods --
 
-  * ``` setOrder(array pluginsDirectoriesBaseNames) : this ``` create a forced order to synchronously load plugins. not ordered plugins are asynchronously loaded after.
-  
-  * ``` getPluginsNames() : array ``` return plugins' names
-  * ``` beforeLoadAll(function callback) : Promise ``` add a function executed before loading all plugins ("callback" must return a Promise instance)
+  * ``` setOrder(pluginsDirectoriesBaseNames: Array<string>): Promise<void> ``` create a forced order to synchronously load plugins. not ordered plugins are asynchronously loaded after.
+  * ``` getPluginsNames(): Array<string> ``` return plugins' names
 
-  * ``` loadAll([mixed data]) : Promise ``` load all plugins asynchronously, using "data" in arguments for "load" plugin's method
-  * ``` loadByDirectory(string directory [, mixed data ]) : array ``` load a plugin by its directory, using "data" in arguments for "load" plugin's method
+  * ``` beforeLoadAll(callback: () => Promise<any>): Promise<void> ``` add a function executed before loading all plugins ("callback" must return a Promise instance)
+  * ``` loadAll(data?: any): Promise<void> ``` load all plugins asynchronously, using "data" in arguments for "load" plugin's method
+  * ``` loadAll(data?: any): Promise<Plugin> ``` load a plugin by its directory, using "data" in arguments for "load" plugin's method
 
-  * ``` unload(object plugin [, mixed data]) : Promise ``` unload a plugin, using "data" in arguments for "unload" plugin's method
-  * ``` unloadByDirectory(string directory [, mixed data]) : Promise ``` unload a plugin by its directory, using "data" in arguments for "unload" plugin's method
-  * ``` updateByKey(string directory [, mixed data]) : Promise ``` unload a plugin by its key (in "plugins" placement), using "data" in arguments for "unload" plugin's method
-  * ``` unloadAll([mixed data]) : Promise ``` unload all plugins, using "data" in arguments for "unload" plugin's method
+  * ``` unload(plugin: Plugin, data?: any): Promise<void> ``` unload a plugin, using "data" in arguments for "unload" plugin's method
+  * ``` unloadByDirectory(directory: string, data?: any): Promise<void> ``` unload a plugin by its directory, using "data" in arguments for "unload" plugin's method
+  * ``` unloadByKey(directory: string, data?: any): Promise<void> ``` unload a plugin by its key (in "plugins" placement), using "data" in arguments for "unload" plugin's method
+  * ``` unloadAll(data?: any): Promise<void> ``` unload all plugins, using "data" in arguments for "unload" plugin's method
 
-  * ``` installViaGithub(string url [, mixed data]) : Promise ``` install a plugin via github, using "data" in arguments for "install" and "load" plugin's methods
+  * ``` installViaGithub(url: string, data?: any): Promise<void> ``` install a plugin via github, using "data" in arguments for "install" and "load" plugin's methods
 
-  * ``` update(object plugin [, mixed data]) : Promise ``` update a plugin, using "data" in arguments for "unload", "update" and "load" plugin's methods
-  * ``` updateByDirectory(string directory [, mixed data]) : Promise ``` update a plugin by its directory, using "data" in arguments for "unload", "update" and "load" plugin's methods
-  * ``` updateByKey(integer key, [mixed data]) : Promise ``` update a plugin by its key (in "plugins" placement), using "data" in arguments for "unload", "update" and "load" plugin's method
+  * ``` update(plugin: Plugin, data?: any): Promise<void> ``` update a plugin, using "data" in arguments for "unload", "update" and "load" plugin's methods
+  * ``` updateByDirectory(directory: string, data?: any): Promise<void> ``` update a plugin by its directory, using "data" in arguments for "unload", "update" and "load" plugin's methods
+  * ``` updateByKey(url: string, data?: any): Promise<void> ``` update a plugin by its key (in "plugins" placement), using "data" in arguments for "unload", "update" and "load" plugin's method
 
-  * ``` uninstall(object plugin [, mixed data]) : Promise ``` uninstall a plugin, using "data" in arguments for "unload" and "uninstall" plugin's methods
-  * ``` uninstallByDirectory(string directory [, mixed data]) : Promise ``` uninstall a plugin by its directory, using "data" in arguments for "unload" and "uninstall" plugin's methods
-  * ``` uninstallByKey(integer key, [mixed data]) : Promise ``` uninstall a plugin by its key (in "plugins" placement), using "data" in arguments for "unload" and "uninstall" plugin's methods
+  * ``` uninstall(plugin: Plugin, data?: any): Promise<string> ``` uninstall a plugin, using "data" in arguments for "unload" and "uninstall" plugin's methods
+  * ``` uninstallByDirectory(directory: string, data?: any): Promise<string> ``` uninstall a plugin by its directory, using "data" in arguments for "unload" and "uninstall" plugin's methods
+  * ``` uninstallByKey(url: string, data?: any): Promise<string> ``` uninstall a plugin by its key (in "plugins" placement), using "data" in arguments for "unload" and "uninstall" plugin's methods
 
   -- Events --
 
-  * ``` on("error", (string err) => {}) : this ``` fires if an error occurs
+  * ``` on("error", (err: Error) => void) : this ``` fires if an error occurs
 
-  * ``` on("loaded", (AbstractPlugin plugin) => {}) : this ``` fires if a plugin is loaded
-  * ``` on("allloaded", () => {}) : this ``` fires if all the plugins are loaded
+  * ``` on("loaded", (plugin: AbstractPlugin) => void) : this ``` fires if a plugin is loaded
+  * ``` on("allloaded", () => void) : this ``` fires if all the plugins are loaded
   
-  * ``` on("unloaded", (AbstractPlugin plugin) => {}) : this ``` fires if a plugin is unloaded
-  * ``` on("allunloaded", (AbstractPlugin plugin) => {}) : this ``` fires if all the plugins are unloaded
+  * ``` on("unloaded", (plugin: AbstractPlugin) => void) : this ``` fires if a plugin is unloaded
+  * ``` on("allunloaded", (plugin: AbstractPlugin) => void) : this ``` fires if all the plugins are unloaded
 
-  * ``` on("installed", (AbstractPlugin plugin) => {}) : this ``` fires if a plugin is installed
-  * ``` on("updated", (AbstractPlugin plugin) => {}) : this ``` fires if a plugin is updated
-  * ``` on("uninstalled", (AbstractPlugin plugin) => {}) : this ``` fires if a plugin is uninstalled
+  * ``` on("installed", (plugin: AbstractPlugin) => void) : this ``` fires if a plugin is installed
+  * ``` on("updated", (plugin: AbstractPlugin) => void) : this ``` fires if a plugin is updated
+  * ``` on("uninstalled", (plugin: AbstractPlugin) => void) : this ``` fires if a plugin is uninstalled
 
 ## Examples
 
@@ -105,7 +107,7 @@ $ npm install node-pluginsmanager
 
  * package.json sample
 
-```js
+```json
 {
   "authors": [ "Sébastien VIDAL" ],
   "dependencies": {
@@ -122,9 +124,11 @@ $ npm install node-pluginsmanager
 }
 ```
 
+### Native
+
  * main.js sample
 
-```js
+```javascript
 "use strict";
 
 class MyPlugin extends require('node-pluginsmanager').plugin {
@@ -208,18 +212,19 @@ class MyPlugin extends require('node-pluginsmanager').plugin {
 
 ### Use PluginsManager
 
-```js
+```javascript
 "use strict";
 
-const path = require('path');
+const { join } = require('path');
+const PluginManager = require('node-pluginsmanager');
 
-var oPluginsManager = (new require('node-pluginsmanager'))(path.join(__dirname, 'plugins')); // param optional : automatically setted to this value if not given...
-oPluginsManager.directory = path.join(__dirname, 'plugins'); // ... or changed like this
+const manager = new PluginManager(join(__dirname, 'plugins')); // param optional : automatically setted to this value if not given...
+manager.directory = join(__dirname, 'plugins'); // ... or changed like this
 
-oPluginsManager
+manager
 
   .on('error', (msg) => {
-      console.log("--- [event/error] '" + msg + "' ---");
+      console.log("--- [event/error] '" + msg.error + "' ---");
   })
 
   // load
@@ -253,9 +258,9 @@ oPluginsManager
 .loadAll(<optional data to pass to the 'load' plugins methods>).then(() => {
 
   console.log('all plugins loaded');
-  console.log(oPluginsManager.getPluginsNames());
+  console.log(manager.getPluginsNames());
 
-  oPluginsManager.installViaGithub(
+  manager.installViaGithub(
     'https://github.com/<account>/<plugin>',
     <optional data to pass to the 'install' && 'load' plugins methods>
   ).then((plugin) => {
@@ -264,7 +269,7 @@ oPluginsManager
     console.log(err);
   });
 
-  oPluginsManager.update( // use "github"'s plugin data if exists
+  manager.update( // use "github"'s plugin data if exists
     <plugin>,
     <optional data to pass to the 'unload', 'update', && 'load' plugins methods>
   ).then((plugin) => {
@@ -275,7 +280,7 @@ oPluginsManager
 
   // works also with updateByDirectory(<pluginDirectory>, <optional data>)
 
-  oPluginsManager.uninstall(
+  manager.uninstall(
     <plugin>,
     <optional data to pass to the 'unload' && 'uninstall' plugins methods>
   ).then((pluginName) => {
@@ -289,6 +294,17 @@ oPluginsManager
 }).catch((err) => {
   console.log(err);
 });
+```
+
+### Typescript
+
+```typescript
+"use strict";
+
+import PluginManager = require('node-pluginsmanager');
+
+const manager = new PluginManager();
+// then, use it like before
 ```
 
 ## Tests
