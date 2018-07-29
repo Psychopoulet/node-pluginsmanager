@@ -19,6 +19,19 @@ describe("Plugin", () => {
 		plugin = new Plugin();
 	});
 
+	it("should test event", () => {
+
+		return new Promise((resolve, reject) => {
+
+			plugin
+				.once("error", reject)
+				.once("test", resolve)
+				.emit("test");
+
+		});
+
+	});
+
 	it("should load data from inexistant directory", (done) => {
 
 		plugin.directory = join(__dirname, "zsgfzeojrfnoaziendfzoe");
