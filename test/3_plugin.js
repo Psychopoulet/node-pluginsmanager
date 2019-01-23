@@ -2,11 +2,11 @@
 
 // deps
 
+	// natives
 	const { join } = require("path");
 	const assert = require("assert");
 
-// private
-
+	// locals
 	const Plugin = require(join(__dirname, "..", "lib", "plugin.js"));
 
 // tests
@@ -76,12 +76,24 @@ describe("Plugin", () => {
 				assert.strictEqual("string", typeof plugin.authors[0], "first author does have the right value");
 				assert.strictEqual("Sébastien VIDAL", plugin.authors[0], "first author does have the right value");
 
+			return Promise.resolve();
+
+		}).then(() => {
+
 			assert.strictEqual("string", typeof plugin.description, "description does have the right value");
 			assert.strictEqual("A test for node-pluginsmanager", plugin.description, "description does have the right value");
+
+			return Promise.resolve();
+
+		}).then(() => {
 
 			assert.strictEqual("object", typeof plugin.dependencies, "dependencies are not an object");
 				assert.strictEqual("string", typeof plugin.dependencies.simpletts, "first dependency does have the right value");
 				assert.strictEqual("^1.4.1", plugin.dependencies.simpletts, "first dependency does have the right value");
+
+			return Promise.resolve();
+
+		}).then(() => {
 
 			assert.strictEqual("object", typeof plugin.designs, "designs are not an object");
 			assert.strictEqual(true, plugin.designs instanceof Array, "designs are not an Array");
@@ -93,6 +105,10 @@ describe("Plugin", () => {
 					plugin.designs[0],
 					"first design does have the right value"
 				);
+
+			return Promise.resolve();
+
+		}).then(() => {
 
 			assert.strictEqual("string", typeof plugin.directory, "directory does have the right value");
 			assert.strictEqual(join(__dirname, "plugins", "TestGoodPlugin"), plugin.directory, "directory does have the right value");
@@ -111,6 +127,10 @@ describe("Plugin", () => {
 					"first javascript does have the right value"
 				);
 
+			return Promise.resolve();
+
+		}).then(() => {
+
 			assert.strictEqual("string", typeof plugin.license, "license does have the right value");
 			assert.strictEqual("ISC", plugin.license, "license does have the right value");
 
@@ -127,6 +147,10 @@ describe("Plugin", () => {
 					plugin.templates[0],
 					"first template does have the right value"
 				);
+
+			return Promise.resolve();
+
+		}).then(() => {
 
 			assert.strictEqual("string", typeof plugin.version, "license version have the right value");
 			assert.strictEqual("0.0.2", plugin.version, "version does have the right value");

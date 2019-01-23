@@ -2,11 +2,14 @@
 
 // deps
 
+	// natives
 	const { join } = require("path");
 	const assert = require("assert");
 
+	// externals
 	const { mkdirpProm, rmdirpProm, writeFileProm } = require("node-promfs");
 
+	// locals
 	const Plugin = require(join(__dirname, "..", "lib", "plugin.js"));
 	const createPluginByDirectory = require(join(__dirname, "..", "lib", "createPluginByDirectory.js"));
 
