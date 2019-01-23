@@ -79,7 +79,7 @@ $ npm install node-pluginsmanager
   * ``` unloadByKey(directory: string, data?: any): Promise<void> ``` unload a plugin by its key (in "plugins" placement), using "data" in arguments for "unload" plugin's method
   * ``` unloadAll(data?: any): Promise<void> ``` unload all plugins, using "data" in arguments for "unload" plugin's method
 
-  * ``` installViaGithub(url: string, data?: any): Promise<void> ``` install a plugin via github, using "data" in arguments for "install" and "load" plugin's methods
+  * ``` installViaGithub(user: string, repo: string, data?: any): Promise<void> ``` install a plugin via github, using "data" in arguments for "install" and "load" plugin's methods
 
   * ``` update(plugin: Plugin, data?: any): Promise<void> ``` update a plugin, using "data" in arguments for "unload", "update" and "load" plugin's methods
   * ``` updateByDirectory(directory: string, data?: any): Promise<void> ``` update a plugin by its directory, using "data" in arguments for "unload", "update" and "load" plugin's methods
@@ -263,7 +263,8 @@ manager
   console.log(manager.getPluginsNames());
 
   manager.installViaGithub(
-    'https://github.com/<account>/<plugin>',
+    <account>,
+    <plugin>,
     <optional data to pass to the 'install' && 'load' plugins methods>
   ).then((plugin) => {
     console.log(plugin.name + ' installed & loaded');
