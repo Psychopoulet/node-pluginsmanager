@@ -56,7 +56,7 @@ declare module "node-pluginsmanager" {
 		public unloadByKey(directory: string, data?: any): Promise<void>;
 		public unloadAll(data?: any): Promise<void>;
 
-		public installViaGithub(url: string, data?: any): Promise<void>;
+		public installViaGithub(user: string, repo: string, data?: any): Promise<void>;
 
 		public update(plugin: Plugin, data?: any): Promise<void>;
 		public updateByDirectory(directory: string, data?: any): Promise<void>;

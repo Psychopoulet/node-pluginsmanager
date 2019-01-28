@@ -1,6 +1,6 @@
 {
   "name": "node-pluginsmanager",
-  "version": "0.13.0",
+  "version": "0.13.1",
   "description": "A plugins manager",
   "main": "lib/main.js",
   "typings": "lib/index.d.ts",
