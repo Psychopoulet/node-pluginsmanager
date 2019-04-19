@@ -67,6 +67,7 @@ describe("Plugin", () => {
 	it("should load data from package file", () => {
 
 		plugin.directory = join(__dirname, "plugins", "TestGoodPlugin");
+
 		return plugin.loadDataFromPackageFile().then(() => {
 
 			assert.strictEqual("object", typeof plugin.authors, "authors are not an object");
