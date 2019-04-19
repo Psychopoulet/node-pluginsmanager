@@ -198,7 +198,12 @@ describe("pluginsmanager / loadAll & setOrder", () => {
 				// TestGoodPluginWithoutDependencies
 
 				assert.strictEqual("object" === typeof pluginsManager.plugins[1], true, "loaded plugins are incorrects");
-					assert.deepStrictEqual(pluginsManager.plugins[1].authors, [ "Sébastien VIDAL", "test" ], "loaded plugins are incorrects");
+
+					assert.deepStrictEqual(
+						pluginsManager.plugins[1].authors, [ "Sébastien VIDAL", "test" ],
+						"Loaded plugins' authors are not correct"
+					);
+
 					assert.deepStrictEqual(pluginsManager.plugins[1].dependencies, { }, "loaded plugins are incorrects");
 					assert.deepStrictEqual(
 						pluginsManager.plugins[1].description, "A test for node-pluginsmanager", "loaded plugins are incorrects"

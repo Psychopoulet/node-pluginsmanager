@@ -38,6 +38,7 @@ $ npm install node-pluginsmanager
   * ``` name: string ``` plugin's name
   * ``` templates: Array<string> ``` plugin's templates (HTML)
   * ``` version: string ``` plugin's version
+  * ``` ...more ``` depends of your package.json
 
   -- Constructor --
 
@@ -122,7 +123,9 @@ $ npm install node-pluginsmanager
   "main": "main.js",
   "name": "MyPlugin",
   "version": "0.0.2",
-  "templates": [ "template.html" ]
+  "templates": [ "template.html" ],
+  "core": false,
+  "linuxOnly": true
 }
 ```
 
