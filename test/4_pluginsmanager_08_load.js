@@ -41,10 +41,12 @@ describe("pluginsmanager / load", () => {
 
 			return pluginsManager.loadByDirectory(GOOD_PLUGIN_DIRECTORY).then((plugin) => {
 
+				assert.strictEqual(plugin.core, true, "Loaded plugin core is no correct");
+
 				assert.strictEqual(plugin.name, "TestGoodPlugin", "Loaded plugin name is no correct");
 				assert.strictEqual(pluginsManager.plugins.length, 1, "Loaded plugins length is no correct");
 
-				assert.deepStrictEqual(plugin.authors, [ "Sébastien VIDAL" ], "Loaded plugin's authors is not correct");
+				assert.deepStrictEqual(plugin.authors, [ "Sébastien VIDAL" ], "Loaded plugin's authors are not correct");
 				assert.strictEqual(plugin.description, "A test for node-pluginsmanager", "Loaded plugin's description is not correct");
 
 				assert.deepStrictEqual(
