@@ -19,7 +19,6 @@ module.exports = {
         "clearInterval": true,
         "clearTimeout": true,
         "describe": true,
-        "EventEmitter": true,
         "it": true,
         "jQuery": true,
         "Promise": true,
