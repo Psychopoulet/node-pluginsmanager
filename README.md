@@ -23,37 +23,9 @@ $ npm install node-pluginsmanager
 
 ## Doc
 
-### AbstractPlugin
+### Plugin ([node-pluginsmanager-plugin](https://www.npmjs.com/package/node-pluginsmanager-plugin))
 
-  -- Attributes --
-
-  * ``` authors: Array<string> ``` plugin's author
-  * ``` description: string ``` plugin's description
-  * ``` designs: Array<string> ``` plugin's designs (CSS)
-  * ``` dependencies: Array<string> ``` plugin's dependencies
-  * ``` directory: string ``` plugin's directory path
-  * ``` github: string ``` plugin's github
-  * ``` javascripts: Array<string> ``` plugin's scripts (javascript)
-  * ``` license: string ``` plugin's license
-  * ``` name: string ``` plugin's name
-  * ``` templates: Array<string> ``` plugin's templates (HTML)
-  * ``` version: string ``` plugin's version
-  * ``` ...more ``` depends of your package.json
-
-  -- Constructor --
-
-  * ``` constructor() ```
-
-  -- Methods --
-
-  * ``` loadDataFromPackageFile() : Promise ``` used in PluginsManager
-  * ``` load(data?: any) : Promise ``` fired on "load", "update" or "install" plugin event
-  * ``` unload(data?: any) : Promise ``` fired on "update" or "uninstall" plugin event
-  * ``` install(data?: any) : Promise ``` fired on "install" plugin event
-  * ``` update(data?: any) : Promise ``` fired on "update" plugin event
-  * ``` uninstall(data?: any) : Promise ``` fired on "uninstall" plugin event
-
-### PluginsManager (extends [asynchronous-eventemitter](https://www.npmjs.com/package/asynchronous-eventemitter))
+### PluginsManager (extends "events")
 
   -- Attributes -- 
 
@@ -105,115 +77,6 @@ $ npm install node-pluginsmanager
   * ``` on("uninstalled", (plugin: AbstractPlugin) => void) : this ``` fires if a plugin is uninstalled
 
 ## Examples
-
-### Create your plugin with "plugin" extend and add a package.json file to the plugin's directory
-
- * package.json sample
-
-```json
-{
-  "authors": [ "Sébastien VIDAL" ],
-  "dependencies": {
-    "simpletts": "^1.3.0"
-  },
-  "designs": [ "design.css"],
-  "description": "A test for simpleplugin",
-  "javascripts": [ "javascript.js"],
-  "license": "ISC",
-  "main": "main.js",
-  "name": "MyPlugin",
-  "version": "0.0.2",
-  "templates": [ "template.html" ],
-  "core": false,
-  "linuxOnly": true
-}
-```
-
-### Native
-
- * main.js sample
-
-```javascript
-"use strict";
-
-class MyPlugin extends require('node-pluginsmanager').plugin {
-
-  // load
-
-    // 'data' is optionnal, null if not sended by the manager
-    load (data) {
-
-      return super.load().then(() => {
-
-        // your working place
-        // used on install & update, create ressources like array, sockets, etc...
-
-        return Promise.resolve();
-
-      });
-
-    }
-
-    // 'data' is optionnal, null if not sended by the manager
-    unload (data) {
-
-      return super.unload().then(() => {
-
-        // your working place
-        // used on delete & update, close & remove ressources like array, sockets, etc...
-
-        return Promise.resolve();
-
-      });
-
-    }
-
-  // write
-
-    // 'data' is optionnal, null if not sended by the manager
-    install (data) {
-
-      return super.install().then(() => {
-
-        // your working place
-        // on the first use, create ressources like directories, files, etc...
-
-        return Promise.resolve();
-
-      });
-
-    }
-
-    // 'data' is optionnal, null if not sended by the manager
-    update (data) {
-
-      return super.update().then(() => {
-
-        // your working place
-        // update your ressources like sql database, etc...
-
-        return Promise.resolve();
-
-      });
-
-    }
-
-    // 'data' is optionnal, null if not sended by the manager
-    uninstall (data) {
-
-      return super.uninstall().then(() => {
-
-        // your working place
-        // remove all the created ressources like directories, files, etc...
-
-        return Promise.resolve();
-
-      });
-
-    }
-
-}
-```
 
 ### Use PluginsManager
 
