@@ -59,8 +59,6 @@ describe("pluginsmanager / load", () => {
 					plugin.directory, GOOD_PLUGIN_DIRECTORY, "Loaded plugin's directory is not correct"
 				);
 
-				assert.strictEqual(plugin.github, "", "Loaded plugin's github is not correct");
-
 				assert.deepStrictEqual(
 					plugin.javascripts,
 					[ join(GOOD_PLUGIN_DIRECTORY, "javascript.js") ],

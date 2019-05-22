@@ -1,31 +1,8 @@
 /// <reference types="node" />
 
+import Plugin = require("node-pluginsmanager-plugin");
+
 declare module "node-pluginsmanager" {
-
-	class Plugin {
-
-		public authors: Array<string>;
-		public description: string;
-		public dependencies: Array<string>;
-		public designs: Array<string>;
-		public directory: string;
-		public github: string;
-		public javascripts: Array<string>;
-		public license: string;
-		public name: string;
-		public templates: Array<string>;
-		public version: string;
-
-		constructor ();
-
-		public loadDataFromPackageFile(): Promise<Plugin>;
-		public load(): Promise<void>;
-		public unload(): Promise<void>;
-		public install(): Promise<void>;
-		public update(): Promise<void>;
-		public uninstall(): Promise<void>;
-
-	}
 
 	class PluginManager extends require("asynchronous-eventemitter") {
 
