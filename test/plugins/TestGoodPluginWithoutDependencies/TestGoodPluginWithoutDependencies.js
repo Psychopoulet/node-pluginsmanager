@@ -1,7 +1,7 @@
 
 "use strict";
 
-module.exports = class TestGoodPluginWithoutDependencies extends require(require("path").join("..", "..", "..", "lib", "main.js")).plugin {
+module.exports = class TestGoodPluginWithoutDependencies extends require("node-pluginsmanager-plugin") {
 
 	// load
 

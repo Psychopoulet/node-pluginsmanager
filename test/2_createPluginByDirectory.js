@@ -7,10 +7,10 @@
 	const assert = require("assert");
 
 	// externals
+	const Plugin = require("node-pluginsmanager-plugin");
 	const { mkdirpProm, rmdirpProm, writeFileProm } = require("node-promfs");
 
 	// locals
-	const Plugin = require(join(__dirname, "..", "lib", "plugin.js"));
 	const createPluginByDirectory = require(join(__dirname, "..", "lib", "createPluginByDirectory.js"));
 
 // private
