@@ -1,37 +1,42 @@
 /// <reference types="node" />
-
-import Plugin = require("node-pluginsmanager-plugin");
+/// <reference types="node-pluginsmanager-plugin" />
 
 declare module "node-pluginsmanager" {
 
-	class PluginManager extends require("asynchronous-eventemitter") {
+	import * as Events from "events";
+	import { Orchestrator as Plugin } from "node-pluginsmanager-plugin";
 
-		protected _beforeLoadAll: null|Function;
+	class PluginManagerOptions extends Object {
+		directory: string
+	}
+
+	class PluginManager extends Events {
+
+		protected _beforeInitAll: Function | null;
 		protected _orderedDirectoriesBaseNames: Array<string>;
 		protected _maxListeners: number;
 
 		protected directory: string;
 		protected plugins: Array<Plugin>;
 
-		constructor (directory?: string);
+		constructor (options?: PluginManagerOptions);
 
 		protected _directoryToKey(directory: string);
-		protected _error(fnName: string, err: Error);
-		protected _loadOrderedNext(i: number, data?: any);
-		protected _unloadNext(data?: any);
+		protected _initOrderedPlugins(data?: any, i?: number);
+		protected _releaseNext(data?: any);
 
 		public static plugin(): Plugin;
 		public getPluginsNames(): Array<string>;
 		public setOrder(pluginsDirectoriesBaseNames: Array<string>): Promise<void>;
 
-		public beforeLoadAll(callback: () => Promise<any>): Promise<void>;
-		public loadByDirectory(directory: string, data?: any): Promise<void>;
-		public loadAll(data?: any): Promise<Plugin>;
+		public beforeInitAll(callback: () => Promise<any>): Promise<void>;
+		public initByDirectory(directory: string, data?: any): Promise<void>;
+		public initAll(data?: any): Promise<Plugin>;
 
-		public unload(plugin: Plugin, data?: any): Promise<void>;
-		public unloadByDirectory(directory: string, data?: any): Promise<void>;
-		public unloadByKey(directory: string, data?: any): Promise<void>;
-		public unloadAll(data?: any): Promise<void>;
+		public release(plugin: Plugin, data?: any): Promise<void>;
+		public releaseByDirectory(directory: string, data?: any): Promise<void>;
+		public releaseByKey(directory: string, data?: any): Promise<void>;
+		public releaseAll(data?: any): Promise<void>;
 
 		public installViaGithub(user: string, repo: string, data?: any): Promise<void>;
 

@@ -4,18 +4,9 @@
   "dependencies": {
     "simpletts": "^1.4.1"
   },
-  "designs": [
-    "design.css"
-  ],
   "description": "A test for node-pluginsmanager",
-  "javascripts": [
-    "javascript.js"
-  ],
   "license": "ISC",
-  "main": "TestGoodPlugin.js",
+  "main": "Orchestrator.js",
   "name": "TestGoodPlugin",
-  "version": "0.0.2",
-  "templates": [
-    "template.html"
-  ]
+  "version": "0.0.2"
 }

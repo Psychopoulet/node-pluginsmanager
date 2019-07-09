@@ -4,10 +4,10 @@
 
 	// natives
 	const { join } = require("path");
-	const assert = require("assert");
+	const { strictEqual } = require("assert");
 
 	// externals
-	const Plugin = require("node-pluginsmanager-plugin");
+	const { Orchestrator } = require("node-pluginsmanager-plugin");
 	const { mkdirpProm, rmdirpProm, writeFileProm } = require("node-promfs");
 
 	// locals
@@ -38,8 +38,8 @@ describe("createPluginByDirectory", () => {
 			done(new Error("Inexistant directory used"));
 		}).catch((err) => {
 
-			assert.strictEqual(typeof err, "object", "Generated error is not an object");
-			assert.strictEqual(err instanceof Error, true, "Generated error is not an Error");
+			strictEqual(typeof err, "object", "Generated error is not an object");
+			strictEqual(err instanceof Error, true, "Generated error is not an Error");
 
 			done();
 
@@ -53,8 +53,8 @@ describe("createPluginByDirectory", () => {
 			done(new Error("Relative directory used"));
 		}).catch((err) => {
 
-			assert.strictEqual(typeof err, "object", "Generated error is not an object");
-			assert.strictEqual(err instanceof Error, true, "Generated error is not an Error");
+			strictEqual(typeof err, "object", "Generated error is not an object");
+			strictEqual(err instanceof Error, true, "Generated error is not an Error");
 
 			done();
 
@@ -85,8 +85,8 @@ describe("createPluginByDirectory", () => {
 			done(new Error("Relative directory used"));
 		}).catch((err) => {
 
-			assert.strictEqual(typeof err, "object", "Generated error is not an object");
-			assert.strictEqual(err instanceof Error, true, "Generated error is not an Error");
+			strictEqual(typeof err, "object", "Generated error is not an object");
+			strictEqual(err instanceof Error, true, "Generated error is not an Error");
 
 			done();
 
@@ -98,8 +98,8 @@ describe("createPluginByDirectory", () => {
 
 		return createPluginByDirectory(goodPlugin).then((plugin) => {
 
-			assert.strictEqual(typeof plugin, "object", "Generated plugin is not an object");
-			assert.strictEqual(plugin instanceof Plugin, true, "Generated plugin is not an Error");
+			strictEqual(typeof plugin, "object", "Generated plugin is not an object");
+			strictEqual(plugin instanceof Orchestrator, true, "Generated plugin is not an Orchestrator");
 
 			return Promise.resolve();
 
