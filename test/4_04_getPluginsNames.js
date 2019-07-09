@@ -15,20 +15,20 @@
 
 // tests
 
-describe("pluginsmanager / loadByDirectory", () => {
+describe("pluginsmanager / getPluginsNames", () => {
 
 	const pluginsManager = new PluginsManager();
 
 	before(() => {
 		pluginsManager.directory = PLUGINS_DIRECTORY;
-		return pluginsManager.unloadAll();
+		return pluginsManager.releaseAll();
 	});
 
 	after(() => {
-		return pluginsManager.unloadAll();
+		return pluginsManager.releaseAll();
 	});
 
-	it("should check plugins names before loading", () => {
+	it("should check plugins names before initializing", () => {
 
 		const pluginsNames = pluginsManager.getPluginsNames();
 
@@ -38,24 +38,24 @@ describe("pluginsmanager / loadByDirectory", () => {
 
 	});
 
-	it("should test normal loading", () => {
+	it("should test normal initializing", () => {
 
-		return pluginsManager.loadAll().then(() => {
+		return pluginsManager.initAll().then(() => {
 
-			assert.strictEqual(pluginsManager.plugins instanceof Array, true, "loaded plugins are incorrects");
-			assert.strictEqual(pluginsManager.plugins.length, 2, "loaded plugins are incorrects");
+			assert.strictEqual(pluginsManager.plugins instanceof Array, true, "inited plugins are incorrects");
+			assert.strictEqual(pluginsManager.plugins.length, 2, "inited plugins are incorrects");
 
-			assert.strictEqual(pluginsManager.plugins.length, 2, "loaded plugins are incorrects");
+			assert.strictEqual(pluginsManager.plugins.length, 2, "inited plugins are incorrects");
 
 			return Promise.resolve();
 
 		}).then(() => {
-			return pluginsManager.unloadAll();
+			return pluginsManager.releaseAll();
 		});
 
 	});
 
-	it("should check plugins names after loading", () => {
+	it("should check plugins names after initializing", () => {
 
 		const pluginsNames = pluginsManager.getPluginsNames();
 
