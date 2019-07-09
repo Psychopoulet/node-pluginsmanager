@@ -7,7 +7,7 @@
 	const assert = require("assert");
 
 	// externals
-	const { mkdirpProm } = require("node-promfs");
+	const { mkdirpProm, rmdirpProm } = require("node-promfs");
 	const { Orchestrator } = require("node-pluginsmanager-plugin");
 
 	// locals
@@ -21,9 +21,13 @@ describe("pluginsmanager / initByDirectory", () => {
 		"directory": join(__dirname, "plugins")
 	});
 
+	const EMPTY_PLUGIN_DIRECTORY = join(pluginsManager.directory, "TestEmptyPlugin");
+
 	afterEach(() => {
 
-		return pluginsManager.releaseAll();
+		return rmdirpProm(EMPTY_PLUGIN_DIRECTORY).then(() => {
+			return pluginsManager.releaseAll();
+		});
 
 	});
 
@@ -88,8 +92,6 @@ describe("pluginsmanager / initByDirectory", () => {
 	});
 
 	it("should test empty plugin", () => {
-
-		const EMPTY_PLUGIN_DIRECTORY = join(pluginsManager.directory, "TestEmptyPlugin");
 
 		return mkdirpProm(EMPTY_PLUGIN_DIRECTORY).then(() => {
 			return pluginsManager.initByDirectory(EMPTY_PLUGIN_DIRECTORY);
