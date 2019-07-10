@@ -11,7 +11,7 @@
 
 // module
 
-module.exports = class TestGoodPluginWithoutDependencies extends Orchestrator {
+module.exports = class OrchestratorGoodPluginWithoutDependencies extends Orchestrator {
 
 	constructor (options) {
 

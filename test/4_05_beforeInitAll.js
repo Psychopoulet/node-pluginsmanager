@@ -55,23 +55,12 @@ describe("pluginsmanager / beforeInitAll", () => {
 
 	});
 
-	it("should fail on beforeInitAll call", () => {
+	it("should success on beforeInitAll call", () => {
 
 		return pluginsManager.beforeInitAll(() => {
 			// nothing to do here
 		}).then(() => {
 			return pluginsManager.initAll();
-		}).then(() => {
-			return Promise.reject(new Error("tests does not generate error"));
-		}).catch((err) => {
-
-			return new Promise((resolve) => {
-
-				strictEqual(err instanceof Error, true, "generated error is not an instance of Error");
-				resolve();
-
-			});
-
 		});
 
 	});
