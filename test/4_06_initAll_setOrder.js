@@ -4,7 +4,7 @@
 
 	// natives
 	const { join } = require("path");
-	const assert = require("assert");
+	const { deepStrictEqual, strictEqual } = require("assert");
 
 	// locals
 	const PluginsManager = require(join(__dirname, "..", "lib", "main.js"));
@@ -31,7 +31,7 @@ describe("pluginsmanager / initAll & setOrder", () => {
 		return pluginsManager.releaseAll();
 	});
 
-	it("should load without directory", (done) => {
+	it("should init without directory", (done) => {
 
 		const saveDirectory = PLUGINS_DIRECTORY;
 		pluginsManager.directory = "";
@@ -40,8 +40,8 @@ describe("pluginsmanager / initAll & setOrder", () => {
 			done(new Error("Inexistant directory used"));
 		}).catch((err) => {
 
-			assert.strictEqual(typeof err, "object", "Generated error is not an object");
-			assert.strictEqual(err instanceof Error, true, "Generated error is not an Error");
+			strictEqual(typeof err, "object", "Generated error is not an object");
+			strictEqual(err instanceof Error, true, "Generated error is not an Error");
 
 			pluginsManager.directory = saveDirectory;
 
@@ -57,8 +57,8 @@ describe("pluginsmanager / initAll & setOrder", () => {
 			return Promise.reject(new Error("tests does not generate error"));
 		}).catch((err) => {
 
-			assert.strictEqual(typeof err, "object", "Generated error is not an instance of Error");
-			assert.strictEqual(err instanceof ReferenceError, true, "Generated error is not an instance of Error");
+			strictEqual(typeof err, "object", "Generated error is not an instance of Error");
+			strictEqual(err instanceof ReferenceError, true, "Generated error is not an instance of Error");
 
 			return Promise.resolve();
 
@@ -72,8 +72,8 @@ describe("pluginsmanager / initAll & setOrder", () => {
 			return Promise.reject(new Error("tests does not generate error"));
 		}).catch((err) => {
 
-			assert.strictEqual(typeof err, "object", "Generated error is not an instance of Error");
-			assert.strictEqual(err instanceof TypeError, true, "Generated error is not an instance of Error");
+			strictEqual(typeof err, "object", "Generated error is not an instance of Error");
+			strictEqual(err instanceof TypeError, true, "Generated error is not an instance of Error");
 
 			return Promise.resolve();
 
@@ -87,8 +87,8 @@ describe("pluginsmanager / initAll & setOrder", () => {
 			return Promise.reject(new Error("tests does not generate error"));
 		}).catch((err) => {
 
-			assert.strictEqual(typeof err, "object", "Generated error is not an instance of Error");
-			assert.strictEqual(err instanceof Error, true, "Generated error is not an instance of Error");
+			strictEqual(typeof err, "object", "Generated error is not an instance of Error");
+			strictEqual(err instanceof Error, true, "Generated error is not an instance of Error");
 
 			return Promise.resolve();
 
@@ -102,8 +102,8 @@ describe("pluginsmanager / initAll & setOrder", () => {
 			return Promise.reject(new Error("tests does not generate error"));
 		}).catch((err) => {
 
-			assert.strictEqual(typeof err, "object", "Generated error is not an instance of Error");
-			assert.strictEqual(err instanceof Error, true, "Generated error is not an instance of Error");
+			strictEqual(typeof err, "object", "Generated error is not an instance of Error");
+			strictEqual(err instanceof Error, true, "Generated error is not an instance of Error");
 
 			return Promise.resolve();
 
@@ -115,14 +115,14 @@ describe("pluginsmanager / initAll & setOrder", () => {
 		return pluginsManager.setOrder([ "TestGoodPlugin" ]);
 	});
 
-	it("should test normal loading with order and twice the same plugin", (done) => {
+	it("should test normal init with order and twice the same plugin", (done) => {
 
 		pluginsManager.setOrder([ "TestGoodPlugin", "TestGoodPlugin" ]).then(() => {
 			done(new Error("Inexistant directory used"));
 		}).catch((err) => {
 
-			assert.strictEqual(typeof err, "object", "Generated error is not an object");
-			assert.strictEqual(err instanceof Error, true, "Generated error is not an Error");
+			strictEqual(typeof err, "object", "Generated error is not an object");
+			strictEqual(err instanceof Error, true, "Generated error is not an Error");
 
 			done();
 
@@ -130,66 +130,85 @@ describe("pluginsmanager / initAll & setOrder", () => {
 
 	});
 
-	/*
-
-	it("should test normal loading with order", () => {
+	it("should test normal init with order", () => {
 
 		return pluginsManager.setOrder([ "TestGoodPluginWithoutDependencies", "TestGoodPlugin" ]).then(() => {
 
-			let i = 0;
-			pluginsManager.on("load", (plugin) => {
+			return new Promise((resolve, reject) => {
 
-				if (0 === i) {
-					assert.strictEqual(plugin.name, "TestGoodPluginWithoutDependencies", "loaded plugins are incorrects");
-				}
-				else if (1 === i) {
-					assert.strictEqual(plugin.name, "TestGoodPlugin", "loaded plugins are incorrects");
-				}
+				let i = 0;
+				pluginsManager.on("initialiazed", (plugin) => {
 
-				++i;
+					try {
+
+						if (0 === i) {
+							strictEqual(plugin.name, "TestGoodPluginWithoutDependencies", "initialiazed plugins are incorrects");
+							++i;
+						}
+						else if (1 === i) {
+							strictEqual(plugin.name, "TestGoodPlugin", "initialiazed plugins are incorrects");
+						}
+
+					}
+					catch (e) {
+						reject(e);
+					}
+
+				}).on("allinitialiazed", resolve);
+
+				pluginsManager.initAll().catch((err) => {
+					reject(err);
+				});
 
 			});
 
-			return Promise.resolve();
-
-		}).then(() => {
-			return pluginsManager.initAll();
 		}).then(() => {
 
-			assert.strictEqual(pluginsManager.plugins instanceof Array, true, "loaded plugins are incorrects");
-			assert.strictEqual(pluginsManager.plugins.length, 2, "loaded plugins are incorrects");
+			strictEqual(pluginsManager.plugins instanceof Array, true, "initialiazed plugins are incorrects");
+			strictEqual(pluginsManager.plugins.length, 2, "initialiazed plugins are incorrects");
 
 			// TestGoodPlugin
 
-			assert.strictEqual("object" === typeof pluginsManager.plugins[0], true, "loaded plugins are incorrects");
-				assert.deepStrictEqual(pluginsManager.plugins[0].authors, [ "Sébastien VIDAL" ], "loaded plugins are incorrects");
+			strictEqual("object" === typeof pluginsManager.plugins[0], true, "initialiazed plugins are incorrects");
 
-				assert.deepStrictEqual(
-					pluginsManager.plugins[0].dependencies, { "simpletts": "^1.4.1" }, "loaded plugins are incorrects"
+				strictEqual(
+					pluginsManager.plugins[0].name, "TestGoodPlugin",
+					"Loaded plugins' name are not correct"
 				);
 
-				assert.deepStrictEqual(
-					pluginsManager.plugins[0].description, "A test for node-pluginsmanager", "loaded plugins are incorrects"
+				deepStrictEqual(pluginsManager.plugins[0].authors, [ "Sébastien VIDAL" ], "initialiazed plugins are incorrects");
+
+				deepStrictEqual(
+					pluginsManager.plugins[0].dependencies, { "simpletts": "^1.4.1" }, "initialiazed plugins are incorrects"
 				);
 
-				assert.deepStrictEqual(pluginsManager.plugins[0].name, "TestGoodPlugin", "loaded plugins are incorrects");
+				deepStrictEqual(
+					pluginsManager.plugins[0].description, "A test for node-pluginsmanager", "initialiazed plugins are incorrects"
+				);
+
+				deepStrictEqual(pluginsManager.plugins[0].name, "TestGoodPlugin", "initialiazed plugins are incorrects");
 
 			// TestGoodPluginWithoutDependencies
 
-			assert.strictEqual("object" === typeof pluginsManager.plugins[1], true, "loaded plugins are incorrects");
+			strictEqual("object" === typeof pluginsManager.plugins[1], true, "initialiazed plugins are incorrects");
 
-				assert.deepStrictEqual(
+				strictEqual(
+					pluginsManager.plugins[1].name, "TestGoodPluginWithoutDependencies",
+					"Loaded plugins' name are not correct"
+				);
+
+				deepStrictEqual(
 					pluginsManager.plugins[1].authors, [ "Sébastien VIDAL", "test" ],
 					"Loaded plugins' authors are not correct"
 				);
 
-				assert.deepStrictEqual(pluginsManager.plugins[1].dependencies, { }, "loaded plugins are incorrects");
-				assert.deepStrictEqual(
-					pluginsManager.plugins[1].description, "A test for node-pluginsmanager", "loaded plugins are incorrects"
+				deepStrictEqual(pluginsManager.plugins[1].dependencies, { }, "initialiazed plugins are incorrects");
+				deepStrictEqual(
+					pluginsManager.plugins[1].description, "A test for node-pluginsmanager", "initialiazed plugins are incorrects"
 				);
 
-				assert.deepStrictEqual(
-					pluginsManager.plugins[1].name, "TestGoodPluginWithoutDependencies", "loaded plugins are incorrects"
+				deepStrictEqual(
+					pluginsManager.plugins[1].name, "TestGoodPluginWithoutDependencies", "initialiazed plugins are incorrects"
 				);
 
 			return Promise.resolve();
@@ -197,7 +216,5 @@ describe("pluginsmanager / initAll & setOrder", () => {
 		});
 
 	});
-
-	*/
 
 });
