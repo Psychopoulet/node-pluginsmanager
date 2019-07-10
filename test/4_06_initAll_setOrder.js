@@ -115,21 +115,22 @@ describe("pluginsmanager / initAll & setOrder", () => {
 		return pluginsManager.setOrder([ "TestGoodPlugin" ]);
 	});
 
-	/*
+	it("should test normal loading with order and twice the same plugin", (done) => {
 
-	it("should test normal loading with order and twice the same plugin", () => {
+		pluginsManager.setOrder([ "TestGoodPlugin", "TestGoodPlugin" ]).then(() => {
+			done(new Error("Inexistant directory used"));
+		}).catch((err) => {
 
-		return pluginsManager.setOrder([ "TestGoodPlugin", "TestGoodPlugin" ]).then(() => {
-			return pluginsManager.initAll();
-		}).then(() => {
+			assert.strictEqual(typeof err, "object", "Generated error is not an object");
+			assert.strictEqual(err instanceof Error, true, "Generated error is not an Error");
 
-			assert.strictEqual(pluginsManager.plugins.length, 2, "too much plugins loaded");
-
-			return Promise.resolve();
+			done();
 
 		});
 
 	});
+
+	/*
 
 	it("should test normal loading with order", () => {
 
