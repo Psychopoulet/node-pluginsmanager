@@ -4,7 +4,7 @@
 declare module "node-pluginsmanager" {
 
 	import * as Events from "events";
-	import { Orchestrator as Plugin } from "node-pluginsmanager-plugin";
+	import { Orchestrator } from "node-pluginsmanager-plugin";
 
 	class PluginManagerOptions extends Object {
 		directory: string
@@ -17,36 +17,31 @@ declare module "node-pluginsmanager" {
 		protected _maxListeners: number;
 
 		protected directory: string;
-		protected plugins: Array<Plugin>;
+		protected plugins: Array<Orchestrator>;
 
 		constructor (options?: PluginManagerOptions);
 
-		protected _directoryToKey(directory: string);
-		protected _initOrderedPlugins(data?: any, i?: number);
-		protected _releaseNext(data?: any);
+		protected _initOrderedPlugins(data?: any);
+		protected _releaseLast(data?: any);
 
-		public static plugin(): Plugin;
 		public getPluginsNames(): Array<string>;
 		public setOrder(pluginsDirectoriesBaseNames: Array<string>): Promise<void>;
 
 		public beforeInitAll(callback: () => Promise<any>): Promise<void>;
 		public initByDirectory(directory: string, data?: any): Promise<void>;
-		public initAll(data?: any): Promise<Plugin>;
+		public initAll(data?: any): Promise<void>;
 
-		public release(plugin: Plugin, data?: any): Promise<void>;
-		public releaseByDirectory(directory: string, data?: any): Promise<void>;
-		public releaseByKey(directory: string, data?: any): Promise<void>;
+		public release(plugin: Orchestrator, data?: any): Promise<void>;
+		public releaseByKey(key: number, data?: any): Promise<void>;
 		public releaseAll(data?: any): Promise<void>;
 
-		public installViaGithub(user: string, repo: string, data?: any): Promise<void>;
+		public installViaGithub(user: string, repo: string, data?: any): Promise<Orchestrator>;
 
-		public update(plugin: Plugin, data?: any): Promise<void>;
-		public updateByDirectory(directory: string, data?: any): Promise<void>;
-		public updateByKey(url: string, data?: any): Promise<void>;
+		public updateViaGithub(plugin: Orchestrator, data?: any): Promise<Orchestrator>;
+		public updateByKey(key: number, data?: any): Promise<Orchestrator>;
 
-		public uninstall(plugin: Plugin, data?: any): Promise<string>;
-		public uninstallByDirectory(directory: string, data?: any): Promise<string>;
-		public uninstallByKey(url: string, data?: any): Promise<string>;
+		public uninstall(plugin: Orchestrator, data?: any): Promise<string>;
+		public uninstallByKey(key: number, data?: any): Promise<string>;
 
 	}
 
