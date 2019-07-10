@@ -25,19 +25,16 @@
 
 describe("pluginsmanager / update", () => {
 
-	const pluginsManager = new PluginsManager();
+	const pluginsManager = new PluginsManager({
+		"directory": PLUGINS_DIRECTORY
+	});
 
 	describe("update via github", () => {
 
-		before(() => {
-			pluginsManager.directory = PLUGINS_DIRECTORY;
-			return pluginsManager.unloadAll();
-		});
-
 		after(() => {
 
-			return rmdirpProm(GOOD_PLUGIN_MODULES_DIRECTORY).then(() => {
-				return pluginsManager.unloadAll();
+			return pluginsManager.releaseAll().then(() => {
+				return rmdirpProm(GOOD_PLUGIN_MODULES_DIRECTORY);
 			});
 
 		});
@@ -61,7 +58,7 @@ describe("pluginsmanager / update", () => {
 
 		it("should test update plugins and dependances", () => {
 
-			return pluginsManager.loadAll().then(() => {
+			return pluginsManager.initAll().then(() => {
 				return pluginsManager.updateByDirectory(GOOD_PLUGIN_DIRECTORY);
 			}).then(() => {
 
@@ -79,8 +76,8 @@ describe("pluginsmanager / update", () => {
 
 		after(() => {
 
-			return rmdirpProm(GOOD_PLUGIN_MODULES_DIRECTORY).then(() => {
-				return pluginsManager.unloadAll();
+			return pluginsManager.releaseAll().then(() => {
+				return rmdirpProm(GOOD_PLUGIN_MODULES_DIRECTORY);
 			});
 
 		});
@@ -121,8 +118,8 @@ describe("pluginsmanager / update", () => {
 
 		after(() => {
 
-			return rmdirpProm(GOOD_PLUGIN_MODULES_DIRECTORY).then(() => {
-				return pluginsManager.unloadAll();
+			return pluginsManager.releaseAll().then(() => {
+				return rmdirpProm(GOOD_PLUGIN_MODULES_DIRECTORY);
 			});
 
 		});
@@ -148,8 +145,8 @@ describe("pluginsmanager / update", () => {
 
 		after(() => {
 
-			return rmdirpProm(GOOD_PLUGIN_MODULES_DIRECTORY).then(() => {
-				return pluginsManager.unloadAll();
+			return pluginsManager.releaseAll().then(() => {
+				return rmdirpProm(GOOD_PLUGIN_MODULES_DIRECTORY);
 			});
 
 		});
@@ -171,7 +168,7 @@ describe("pluginsmanager / update", () => {
 
 		it("should update plugin", () => {
 
-			return pluginsManager.loadByDirectory(GOOD_PLUGIN_DIRECTORY).then((plugin) => {
+			return pluginsManager.initByDirectory(GOOD_PLUGIN_DIRECTORY).then((plugin) => {
 				return pluginsManager.update(plugin);
 			});
 

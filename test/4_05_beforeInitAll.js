@@ -17,10 +17,6 @@ describe("pluginsmanager / beforeInitAll", () => {
 		"directory": join(__dirname, "plugins")
 	});
 
-	before(() => {
-		return pluginsManager.releaseAll();
-	});
-
 	after(() => {
 		return pluginsManager.releaseAll();
 	});

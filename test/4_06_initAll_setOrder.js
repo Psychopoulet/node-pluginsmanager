@@ -21,19 +21,17 @@ describe("pluginsmanager / initAll & setOrder", () => {
 		"directory": PLUGINS_DIRECTORY
 	});
 
-	beforeEach(() => {
-		pluginsManager.directory = PLUGINS_DIRECTORY;
-		return pluginsManager.releaseAll();
-	});
-
 	afterEach(() => {
-		pluginsManager._orderedDirectoriesBaseNames = [];
+
+		pluginsManager.directory = PLUGINS_DIRECTORY;
+		pluginsManager._orderedPluginsNames = [];
+
 		return pluginsManager.releaseAll();
+
 	});
 
 	it("should init without directory", (done) => {
 
-		const saveDirectory = PLUGINS_DIRECTORY;
 		pluginsManager.directory = "";
 
 		pluginsManager.initAll().then(() => {
@@ -42,8 +40,6 @@ describe("pluginsmanager / initAll & setOrder", () => {
 
 			strictEqual(typeof err, "object", "Generated error is not an object");
 			strictEqual(err instanceof Error, true, "Generated error is not an Error");
-
-			pluginsManager.directory = saveDirectory;
 
 			done();
 

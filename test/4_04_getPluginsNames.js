@@ -9,18 +9,12 @@
 	// locals
 	const PluginsManager = require(join(__dirname, "..", "lib", "main.js"));
 
-// const
-
-	const PLUGINS_DIRECTORY = join(__dirname, "plugins");
-
 // tests
 
 describe("pluginsmanager / getPluginsNames", () => {
 
-	const pluginsManager = new PluginsManager();
-
-	before(() => {
-		pluginsManager.directory = PLUGINS_DIRECTORY;
+	const pluginsManager = new PluginsManager({
+		"directory": join(__dirname, "plugins")
 	});
 
 	afterEach(() => {
