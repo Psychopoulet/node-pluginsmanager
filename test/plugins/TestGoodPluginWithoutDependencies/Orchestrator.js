@@ -11,7 +11,7 @@
 
 // module
 
-module.exports = class OrchestratorGoodPluginWithoutDependencies extends Orchestrator {
+module.exports = class TestGoodPluginWithoutDependencies extends Orchestrator {
 
 	constructor (options) {
 
@@ -32,7 +32,7 @@ module.exports = class OrchestratorGoodPluginWithoutDependencies extends Orchest
 		return super.loadDataFromPackageFile().then(() => {
 
 			(0, console).log(
-				" => [OrchestratorGoodPluginWithoutDependencies] - loadDataFromPackageFile"
+				" => [TestGoodPluginWithoutDependencies|Orchestrator] - loadDataFromPackageFile"
 			);
 
 			return Promise.resolve();
@@ -46,7 +46,7 @@ module.exports = class OrchestratorGoodPluginWithoutDependencies extends Orchest
 		return super.init(data).then(() => {
 
 			(0, console).log(
-				" => [OrchestratorGoodPluginWithoutDependencies] - init TestGoodPlugin" + (data ? " with \"" + data + "\" data" : "")
+				" => [TestGoodPluginWithoutDependencies|Orchestrator] - init" + (data ? " with \"" + data + "\" data" : "")
 			);
 
 			return Promise.resolve();
@@ -60,7 +60,7 @@ module.exports = class OrchestratorGoodPluginWithoutDependencies extends Orchest
 		return super.release().then(() => {
 
 			(0, console).log(
-				" => [OrchestratorGoodPluginWithoutDependencies] - release" + (data ? " with \"" + data + "\" data" : "")
+				" => [TestGoodPluginWithoutDependencies|Orchestrator] - release" + (data ? " with \"" + data + "\" data" : "")
 			);
 
 			return Promise.resolve();
@@ -76,7 +76,7 @@ module.exports = class OrchestratorGoodPluginWithoutDependencies extends Orchest
 		return super.install().then(() => {
 
 			(0, console).log(
-				" => [OrchestratorGoodPluginWithoutDependencies] - install" + (data ? " with \"" + data + "\" data" : "")
+				" => [TestGoodPluginWithoutDependencies|Orchestrator] - install" + (data ? " with \"" + data + "\" data" : "")
 			);
 
 			return Promise.resolve();
@@ -90,7 +90,7 @@ module.exports = class OrchestratorGoodPluginWithoutDependencies extends Orchest
 		return super.update().then(() => {
 
 			(0, console).log(
-				" => [OrchestratorGoodPluginWithoutDependencies] - update" + (data ? " with \"" + data + "\" data" : "")
+				" => [TestGoodPluginWithoutDependencies|Orchestrator] - update" + (data ? " with \"" + data + "\" data" : "")
 			);
 
 			return Promise.resolve();
@@ -104,7 +104,7 @@ module.exports = class OrchestratorGoodPluginWithoutDependencies extends Orchest
 		return super.uninstall().then(() => {
 
 			(0, console).log(
-				" => [OrchestratorGoodPluginWithoutDependencies] - install" + (data ? " with \"" + data + "\" data" : "")
+				" => [TestGoodPluginWithoutDependencies|Orchestrator] - install" + (data ? " with \"" + data + "\" data" : "")
 			);
 
 			return Promise.resolve();

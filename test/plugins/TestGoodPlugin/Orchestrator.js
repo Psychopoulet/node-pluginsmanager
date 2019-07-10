@@ -31,7 +31,7 @@ module.exports = class OrchestratorGoodPlugin extends Orchestrator {
 
 		return super.loadDataFromPackageFile().then(() => {
 
-			(0, console).log(" => [TestGoodPlugin] - loadDataFromPackageFile");
+			(0, console).log(" => [TestGoodPlugin|Orchestrator] - loadDataFromPackageFile");
 
 			return Promise.resolve();
 
@@ -43,7 +43,7 @@ module.exports = class OrchestratorGoodPlugin extends Orchestrator {
 
 		return super.init(data).then(() => {
 
-			(0, console).log(" => [TestGoodPlugin] - init" + (data ? " with \"" + data + "\" data" : ""));
+			(0, console).log(" => [TestGoodPlugin|Orchestrator] - init" + (data ? " with \"" + data + "\" data" : ""));
 
 			return Promise.resolve();
 
@@ -55,7 +55,7 @@ module.exports = class OrchestratorGoodPlugin extends Orchestrator {
 
 		return super.release().then(() => {
 
-			(0, console).log(" => [TestGoodPlugin] - release" + (data ? " with \"" + data + "\" data" : ""));
+			(0, console).log(" => [TestGoodPlugin|Orchestrator] - release" + (data ? " with \"" + data + "\" data" : ""));
 
 			return Promise.resolve();
 
@@ -69,7 +69,7 @@ module.exports = class OrchestratorGoodPlugin extends Orchestrator {
 
 		return super.install().then(() => {
 
-			(0, console).log(" => [TestGoodPlugin] - install" + (data ? " with \"" + data + "\" data" : ""));
+			(0, console).log(" => [TestGoodPlugin|Orchestrator] - install" + (data ? " with \"" + data + "\" data" : ""));
 
 			return Promise.resolve();
 
@@ -81,7 +81,7 @@ module.exports = class OrchestratorGoodPlugin extends Orchestrator {
 
 		return super.update().then(() => {
 
-			(0, console).log(" => [TestGoodPlugin] - update TestGoodPlugin" + (data ? " with \"" + data + "\" data" : ""));
+			(0, console).log(" => [TestGoodPlugin|Orchestrator] - update TestGoodPlugin" + (data ? " with \"" + data + "\" data" : ""));
 
 			return Promise.resolve();
 
@@ -93,7 +93,7 @@ module.exports = class OrchestratorGoodPlugin extends Orchestrator {
 
 		return super.uninstall().then(() => {
 
-			(0, console).log(" => [TestGoodPlugin] - install TestGoodPlugin" + (data ? " with \"" + data + "\" data" : ""));
+			(0, console).log(" => [TestGoodPlugin|Orchestrator] - install TestGoodPlugin" + (data ? " with \"" + data + "\" data" : ""));
 
 			return Promise.resolve();
 

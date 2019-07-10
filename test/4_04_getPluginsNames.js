@@ -21,10 +21,9 @@ describe("pluginsmanager / getPluginsNames", () => {
 
 	before(() => {
 		pluginsManager.directory = PLUGINS_DIRECTORY;
-		return pluginsManager.releaseAll();
 	});
 
-	after(() => {
+	afterEach(() => {
 		return pluginsManager.releaseAll();
 	});
 
@@ -47,22 +46,15 @@ describe("pluginsmanager / getPluginsNames", () => {
 
 			assert.strictEqual(pluginsManager.plugins.length, 2, "inited plugins are incorrects");
 
+			const pluginsNames = pluginsManager.getPluginsNames();
+
+			assert.strictEqual(typeof pluginsNames, "object", "plugins names is not an object");
+			assert.strictEqual(pluginsNames instanceof Array, true, "plugins names is not an Array");
+			assert.strictEqual(pluginsNames.length, 2, "plugins names length is incorrect");
+
 			return Promise.resolve();
 
-		}).then(() => {
-			return pluginsManager.releaseAll();
 		});
-
-	});
-
-	it("should check plugins names after initializing", () => {
-
-		const pluginsNames = pluginsManager.getPluginsNames();
-
-		assert.strictEqual(typeof pluginsNames, "object", "plugins names is not an object");
-		assert.strictEqual(pluginsNames instanceof Array, true, "plugins names is not an Array");
-		assert.strictEqual(pluginsNames.length, 1, "plugins names length is incorrect");
-		assert.strictEqual(pluginsNames[0], "TestGoodPlugin", "first plugin name is incorrect");
 
 	});
 
