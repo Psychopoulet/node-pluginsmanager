@@ -19,7 +19,7 @@ describe("pluginsmanager / constructor", () => {
 
 		// private
 		assert.strictEqual(pluginsManager._beforeInitAll, null, "Generated plugin is not as expected");
-		assert.deepStrictEqual(pluginsManager._orderedDirectoriesBaseNames, [], "Generated plugin is not as expected");
+		assert.deepStrictEqual(pluginsManager._orderedPluginsNames, [], "Generated plugin is not as expected");
 		assert.strictEqual(pluginsManager._maxListeners, 0, "Generated plugin is not as expected");
 
 		// public
@@ -36,7 +36,7 @@ describe("pluginsmanager / constructor", () => {
 
 		// private
 		assert.strictEqual(pluginsManager._beforeInitAll, null, "Generated plugin is not as expected");
-		assert.deepStrictEqual(pluginsManager._orderedDirectoriesBaseNames, [], "Generated plugin is not as expected");
+		assert.deepStrictEqual(pluginsManager._orderedPluginsNames, [], "Generated plugin is not as expected");
 		assert.strictEqual(pluginsManager._maxListeners, 0, "Generated plugin is not as expected");
 
 		// public

@@ -13,7 +13,7 @@ declare module "node-pluginsmanager" {
 	class PluginManager extends Events {
 
 		protected _beforeInitAll: Function | null;
-		protected _orderedDirectoriesBaseNames: Array<string>;
+		protected _orderedPluginsNames: Array<string>;
 		protected _maxListeners: number;
 
 		protected directory: string;
