@@ -21,27 +21,23 @@ declare module "node-pluginsmanager" {
 
 		constructor (options?: PluginManagerOptions);
 
-		protected _initOrderedPlugins(data?: any);
-		protected _releaseLast(data?: any);
+		protected _initOrderedPlugins(data?: any): Promise<void>;
+		protected _initByDirectory(directory: string, data?: any): Promise<Orchestrator>;
+		protected _releaseLast(data?: any): Promise<void>;
+		protected _destroyLast(data?: any): Promise<void>;
 
 		public getPluginsNames(): Array<string>;
 		public setOrder(pluginsDirectoriesBaseNames: Array<string>): Promise<void>;
 
 		public beforeInitAll(callback: () => Promise<any>): Promise<void>;
-		public initByDirectory(directory: string, data?: any): Promise<void>;
 		public initAll(data?: any): Promise<void>;
 
-		public release(plugin: Orchestrator, data?: any): Promise<void>;
-		public releaseByKey(key: number, data?: any): Promise<void>;
 		public releaseAll(data?: any): Promise<void>;
+		public destroyAll(data?: any): Promise<void>;
 
 		public installViaGithub(user: string, repo: string, data?: any): Promise<Orchestrator>;
-
 		public updateViaGithub(plugin: Orchestrator, data?: any): Promise<Orchestrator>;
-		public updateByKey(key: number, data?: any): Promise<Orchestrator>;
-
 		public uninstall(plugin: Orchestrator, data?: any): Promise<string>;
-		public uninstallByKey(key: number, data?: any): Promise<string>;
 
 	}
 

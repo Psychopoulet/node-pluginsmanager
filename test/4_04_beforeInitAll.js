@@ -18,7 +18,11 @@ describe("pluginsmanager / beforeInitAll", () => {
 	});
 
 	after(() => {
-		return pluginsManager.releaseAll();
+
+		return pluginsManager.releaseAll().then(() => {
+			return pluginsManager.destroyAll();
+		});
+
 	});
 
 	it("should test empty data", (done) => {

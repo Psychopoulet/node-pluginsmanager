@@ -23,6 +23,8 @@ describe("pluginsmanager / events", () => {
 
 		return mkdirpProm(pluginsManager.directory).then(() => {
 			return pluginsManager.releaseAll();
+		}).then(() => {
+			return pluginsManager.destroyAll();
 		});
 
 	});

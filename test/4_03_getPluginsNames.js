@@ -18,7 +18,11 @@ describe("pluginsmanager / getPluginsNames", () => {
 	});
 
 	afterEach(() => {
-		return pluginsManager.releaseAll();
+
+		return pluginsManager.releaseAll().then(() => {
+			return pluginsManager.destroyAll();
+		});
+
 	});
 
 	it("should check plugins names before initializing", () => {

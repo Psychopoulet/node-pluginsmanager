@@ -26,7 +26,9 @@ describe("pluginsmanager / initAll & setOrder", () => {
 		pluginsManager.directory = PLUGINS_DIRECTORY;
 		pluginsManager._orderedPluginsNames = [];
 
-		return pluginsManager.releaseAll();
+		return pluginsManager.releaseAll().then(() => {
+			return pluginsManager.destroyAll();
+		});
 
 	});
 
