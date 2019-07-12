@@ -20,7 +20,7 @@
 
 	const GITHUB_USER = "Psychopoulet";
 	const GITHUB_CONTAINER_PACKAGE = "node-container";
-	const GITHUB_PLUGIN_PACKAGE = "node-pluginsmanager-plugin";
+	const GITHUB_PLUGIN_PACKAGE = "node-pluginsmanager-plugin-test";
 
 // tests
 
@@ -33,6 +33,8 @@ describe("pluginsmanager / install via github", () => {
 	afterEach(() => {
 
 		return pluginsManager.releaseAll().then(() => {
+			return pluginsManager.destroyAll();
+		}).then(() => {
 			return rmdirpProm(join(PLUGINS_DIRECTORY, GITHUB_CONTAINER_PACKAGE));
 		}).then(() => {
 			return rmdirpProm(join(PLUGINS_DIRECTORY, GITHUB_PLUGIN_PACKAGE));
@@ -55,19 +57,9 @@ describe("pluginsmanager / install via github", () => {
 
 	}).timeout(MAX_TIMOUT);
 
-	it("should test download with valid directory", (done) => {
+	it("should test download with valid directory", () => {
 
-		pluginsManager.installViaGithub(GITHUB_USER, GITHUB_PLUGIN_PACKAGE).then(() => {
-			done(new Error("tests does not generate error"));
-		}).catch((err) => {
-
-			strictEqual(typeof err, "object", "Generated error is not as expected");
-			strictEqual(err instanceof Error, true, "Generated error is not as expected");
-			strictEqual(err.message, "\"file\" argument is empty", "Generated error is not as expected");
-
-			done();
-
-		});
+		return pluginsManager.installViaGithub(GITHUB_USER, GITHUB_PLUGIN_PACKAGE);
 
 	}).timeout(MAX_TIMOUT);
 
