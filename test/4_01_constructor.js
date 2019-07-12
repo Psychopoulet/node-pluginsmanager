@@ -4,7 +4,7 @@
 
 	// natives
 	const { join } = require("path");
-	const assert = require("assert");
+	const { deepStrictEqual, strictEqual } = require("assert");
 
 	// locals
 	const PluginsManager = require(join(__dirname, "..", "lib", "main.js"));
@@ -18,13 +18,13 @@ describe("pluginsmanager / constructor", () => {
 		const pluginsManager = new PluginsManager();
 
 		// private
-		assert.strictEqual(pluginsManager._beforeInitAll, null, "Generated plugin is not as expected");
-		assert.deepStrictEqual(pluginsManager._orderedPluginsNames, [], "Generated plugin is not as expected");
-		assert.strictEqual(pluginsManager._maxListeners, 0, "Generated plugin is not as expected");
+		strictEqual(pluginsManager._beforeInitAll, null, "Generated plugin is not as expected");
+		deepStrictEqual(pluginsManager._orderedPluginsNames, [], "Generated plugin is not as expected");
+		strictEqual(pluginsManager._maxListeners, 0, "Generated plugin is not as expected");
 
 		// public
-		assert.strictEqual(pluginsManager.directory, "", "Generated plugin is not as expected");
-		assert.deepStrictEqual(pluginsManager.plugins, [], "Generated plugin is not as expected");
+		strictEqual(pluginsManager.directory, "", "Generated plugin is not as expected");
+		deepStrictEqual(pluginsManager.plugins, [], "Generated plugin is not as expected");
 
 	});
 
@@ -35,13 +35,13 @@ describe("pluginsmanager / constructor", () => {
 		});
 
 		// private
-		assert.strictEqual(pluginsManager._beforeInitAll, null, "Generated plugin is not as expected");
-		assert.deepStrictEqual(pluginsManager._orderedPluginsNames, [], "Generated plugin is not as expected");
-		assert.strictEqual(pluginsManager._maxListeners, 0, "Generated plugin is not as expected");
+		strictEqual(pluginsManager._beforeInitAll, null, "Generated plugin is not as expected");
+		deepStrictEqual(pluginsManager._orderedPluginsNames, [], "Generated plugin is not as expected");
+		strictEqual(pluginsManager._maxListeners, 0, "Generated plugin is not as expected");
 
 		// public
-		assert.strictEqual(pluginsManager.directory, join(__dirname, "plugins2"), "Generated plugin is not as expected");
-		assert.deepStrictEqual(pluginsManager.plugins, [], "Generated plugin is not as expected");
+		strictEqual(pluginsManager.directory, join(__dirname, "plugins2"), "Generated plugin is not as expected");
+		deepStrictEqual(pluginsManager.plugins, [], "Generated plugin is not as expected");
 
 	});
 
