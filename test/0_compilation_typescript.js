@@ -26,7 +26,7 @@ describe("compilation typescript", () => {
 
 	it("should compile typescript file", (done) => {
 
-		exec("tsc " + join(__dirname, "typescript", "compilation.ts"), {
+		exec("tsc " + join(__dirname, "typescript", "compilation.ts") + " --target ES2015", {
 			"cwd": join(__dirname, ".."),
 			"windowsHide": true
 		}, (err) => {

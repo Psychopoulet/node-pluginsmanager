@@ -4,13 +4,9 @@
     "test"
   ],
   "dependencies": { },
-  "designs": [ "design.css"],
   "description": "A test for node-pluginsmanager",
-  "javascripts": [ "javascript.js"],
   "license": "ISC",
-  "main": "TestGoodPluginWithoutDependencies.js",
+  "main": "Orchestrator.js",
   "name": "TestGoodPluginWithoutDependencies",
-  "version": "0.0.2",
-  "templates": [ "template.html" ],
-  "github": "https://github.com/Psychopoulet/node-pluginsmanager"
+  "version": "0.0.2"
 }
