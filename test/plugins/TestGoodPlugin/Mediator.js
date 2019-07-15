@@ -3,6 +3,7 @@
 
 // deps
 
+	// externals
 	const { Mediator } = require("node-pluginsmanager-plugin");
 
 // module

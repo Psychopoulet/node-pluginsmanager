@@ -27,7 +27,7 @@ describe("pluginsmanager / uninstall", () => {
 	it("should uninstall with empty key", (done) => {
 
 		pluginsManager.uninstall().then(() => {
-			done(new Error("Empty key used"));
+			done(new Error("tests does not generate error"));
 		}).catch((err) => {
 
 			strictEqual(typeof err, "object", "Generated error is not an object");
