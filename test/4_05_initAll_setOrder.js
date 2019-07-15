@@ -177,7 +177,7 @@ describe("pluginsmanager / initAll & setOrder", () => {
 				deepStrictEqual(pluginsManager.plugins[0].authors, [ "Sébastien VIDAL" ], "initialiazed plugins are incorrects");
 
 				deepStrictEqual(
-					pluginsManager.plugins[0].dependencies, { "simpletts": "^1.4.1" }, "initialiazed plugins are incorrects"
+					pluginsManager.plugins[0].dependencies, { "simpletts": "2.4.0" }, "initialiazed plugins are incorrects"
 				);
 
 				deepStrictEqual(

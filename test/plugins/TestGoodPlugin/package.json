@@ -2,7 +2,7 @@
   "author": "Sébastien VIDAL",
   "core": true,
   "dependencies": {
-    "simpletts": "^1.4.1"
+    "simpletts": "2.4.0"
   },
   "description": "A test for node-pluginsmanager",
   "license": "ISC",

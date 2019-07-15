@@ -10,7 +10,7 @@
 
 // tests
 
-describe("isNonEmptyString", () => {
+describe("checkers / isNonEmptyString", () => {
 
 	it("should test with empty data", (done) => {
 

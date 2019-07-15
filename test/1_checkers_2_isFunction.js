@@ -10,7 +10,7 @@
 
 // tests
 
-describe("isFunction", () => {
+describe("checkers / isFunction", () => {
 
 	it("should test with empty data", (done) => {
 

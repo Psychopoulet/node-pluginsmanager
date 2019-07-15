@@ -13,7 +13,7 @@
 
 // tests
 
-describe("isOrchestrator", () => {
+describe("checkers / isOrchestrator", () => {
 
 	it("should test with empty data", (done) => {
 

@@ -10,7 +10,7 @@
 
 // tests
 
-describe("isAbsoluteDirectory", () => {
+describe("checkers / isAbsoluteDirectory", () => {
 
 	it("should test with empty data", (done) => {
 

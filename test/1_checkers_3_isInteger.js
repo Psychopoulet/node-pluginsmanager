@@ -10,7 +10,7 @@
 
 // tests
 
-describe("isInteger", () => {
+describe("checkers / isInteger", () => {
 
 	it("should test with empty data", (done) => {
 

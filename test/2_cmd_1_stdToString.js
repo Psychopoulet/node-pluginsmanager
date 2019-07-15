@@ -10,7 +10,7 @@
 
 // tests
 
-describe("stdToString", () => {
+describe("cmd / stdToString", () => {
 
 	it("should test with number", () => {
 		strictEqual(stdToString(3.14), "3.14", "It does not generate the wanted string");
