@@ -37,9 +37,10 @@
     "node-promfs": "3.6.3"
   },
   "devDependencies": {
-    "@types/node": "12.6.2",
+    "@types/node": "12.6.3",
     "coveralls": "3.0.5",
     "eslint": "6.0.1",
+    "express": "4.17.1",
     "husky": "3.0.0",
     "mocha": "6.1.4",
     "nyc": "14.1.1"

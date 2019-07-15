@@ -12,32 +12,67 @@ declare module "node-pluginsmanager" {
 
 	class PluginManager extends Events {
 
-		protected _beforeInitAll: Function | null;
-		protected _orderedPluginsNames: Array<string>;
-		protected _maxListeners: number;
+		// attributes
 
-		protected directory: string;
-		protected plugins: Array<Orchestrator>;
+			// protected
 
-		constructor (options?: PluginManagerOptions);
+				protected _beforeInitAll: Function | null;
+				protected _orderedPluginsNames: Array<string>;
 
-		protected _initOrderedPlugins(data?: any): Promise<void>;
-		protected _initByDirectory(directory: string, data?: any): Promise<Orchestrator>;
-		protected _releaseLast(data?: any): Promise<void>;
-		protected _destroyLast(data?: any): Promise<void>;
+			// public
 
-		public getPluginsNames(): Array<string>;
-		public setOrder(pluginsDirectoriesBaseNames: Array<string>): Promise<void>;
+				public directory: string;
+				public plugins: Array<Orchestrator>;
 
-		public beforeInitAll(callback: () => Promise<any>): Promise<void>;
-		public initAll(data?: any): Promise<void>;
+		// constructor
 
-		public releaseAll(data?: any): Promise<void>;
-		public destroyAll(data?: any): Promise<void>;
+			constructor (options?: PluginManagerOptions);
 
-		public installViaGithub(user: string, repo: string, data?: any): Promise<Orchestrator>;
-		public updateViaGithub(plugin: Orchestrator, data?: any): Promise<Orchestrator>;
-		public uninstall(plugin: Orchestrator, data?: any): Promise<string>;
+		// methods
+
+			// protected
+
+				protected _checkPluginsModules(): Promise<void>;
+				protected _initOrderedPlugins(data?: any): Promise<void>;
+				protected _initByDirectory(directory: string, data?: any): Promise<Orchestrator>;
+				protected _releaseLast(data?: any): Promise<void>;
+				protected _destroyLast(data?: any): Promise<void>;
+
+			// public
+
+				// getters
+
+				public getPluginsNames(): Array<string>;
+
+				// setters
+
+				public setOrder(pluginsDirectoriesBaseNames: Array<string>): Promise<void>;
+
+				// checkers
+
+				public checkAllModules(): Promise<void>;
+				public checkModules(plugin: Orchestrator): Promise<void>;
+
+				// network
+
+				public appMiddleware(req: Request, res: Response, next: Function): void;
+				public httpMiddleware(req: Request, res: Response): boolean;
+
+				// init
+
+				public beforeInitAll(callback: () => Promise<any>): Promise<void>;
+				public initAll(data?: any): Promise<void>;
+
+				// release
+
+				public releaseAll(data?: any): Promise<void>;
+				public destroyAll(data?: any): Promise<void>;
+
+				// write
+
+				public installViaGithub(user: string, repo: string, data?: any): Promise<Orchestrator>;
+				public updateViaGithub(plugin: Orchestrator, data?: any): Promise<Orchestrator>;
+				public uninstall(plugin: Orchestrator, data?: any): Promise<string>;
 
 	}
 
