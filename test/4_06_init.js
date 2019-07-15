@@ -98,7 +98,7 @@ describe("pluginsmanager / init", () => {
 
 		});
 
-		it("should test with empty directory", (done) => {
+		it("should test with relative directory", (done) => {
 
 			pluginsManager._initByDirectory("./").then(() => {
 				done(new Error("Wrong file plugin used"));
@@ -141,6 +141,34 @@ describe("pluginsmanager / init", () => {
 		it("should test good plugin", () => {
 
 			return pluginsManager._initByDirectory(GOOD_PLUGIN_DIRECTORY).then((plugin) => {
+
+				strictEqual(typeof plugin, "object", "Generated plugin is not an object");
+				strictEqual(plugin instanceof Orchestrator, true, "Generated plugin is not an Error");
+
+				strictEqual(typeof pluginsManager.plugins, "object", "plugins is not an object");
+				strictEqual(pluginsManager.plugins instanceof Array, true, "plugins is not an Array");
+				strictEqual(pluginsManager.plugins.length, 1, "plugins length is not valid");
+
+				return Promise.resolve();
+
+			});
+
+		});
+
+		it("should test twice same directory", () => {
+
+			return pluginsManager._initByDirectory(GOOD_PLUGIN_DIRECTORY).then((plugin) => {
+
+				strictEqual(typeof plugin, "object", "Generated plugin is not an object");
+				strictEqual(plugin instanceof Orchestrator, true, "Generated plugin is not an Error");
+
+				strictEqual(typeof pluginsManager.plugins, "object", "plugins is not an object");
+				strictEqual(pluginsManager.plugins instanceof Array, true, "plugins is not an Array");
+				strictEqual(pluginsManager.plugins.length, 1, "plugins length is not valid");
+
+				return pluginsManager._initByDirectory(GOOD_PLUGIN_DIRECTORY);
+
+			}).then((plugin) => {
 
 				strictEqual(typeof plugin, "object", "Generated plugin is not an object");
 				strictEqual(plugin instanceof Orchestrator, true, "Generated plugin is not an Error");

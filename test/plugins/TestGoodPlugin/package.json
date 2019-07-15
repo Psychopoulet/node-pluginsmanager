@@ -6,7 +6,7 @@
   },
   "description": "A test for node-pluginsmanager",
   "license": "ISC",
-  "main": "Orchestrator.js",
+  "main": "main.js",
   "name": "TestGoodPlugin",
   "version": "0.0.2"
 }
