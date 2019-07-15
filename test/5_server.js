@@ -103,9 +103,13 @@ describe("Server test", () => {
 
 			res.status(RESPONSE_CODE).send(RESPONSE_CONTENT);
 
-		}).use(function (err, req, res, next) {
+		}).use((err, req, res, next) => {
+
+			(0, console).log(err.message ? err.message : err);
 
 			res.status(500).send("Something broke !");
+
+			next();
 
 		});
 

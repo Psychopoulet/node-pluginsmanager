@@ -20,7 +20,6 @@ describe("pluginsmanager / constructor", () => {
 		// private
 		strictEqual(pluginsManager._beforeInitAll, null, "Generated plugin is not as expected");
 		deepStrictEqual(pluginsManager._orderedPluginsNames, [], "Generated plugin is not as expected");
-		strictEqual(pluginsManager._maxListeners, 0, "Generated plugin is not as expected");
 
 		// public
 		strictEqual(pluginsManager.directory, "", "Generated plugin is not as expected");
@@ -37,7 +36,6 @@ describe("pluginsmanager / constructor", () => {
 		// private
 		strictEqual(pluginsManager._beforeInitAll, null, "Generated plugin is not as expected");
 		deepStrictEqual(pluginsManager._orderedPluginsNames, [], "Generated plugin is not as expected");
-		strictEqual(pluginsManager._maxListeners, 0, "Generated plugin is not as expected");
 
 		// public
 		strictEqual(pluginsManager.directory, join(__dirname, "plugins2"), "Generated plugin is not as expected");
