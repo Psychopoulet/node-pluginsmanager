@@ -1,9 +1,8 @@
 /// <reference path="../../lib/index.d.ts" />
 
-import PluginManager = require("../../lib/main.js");
+import * as PluginManager from '../../lib/main.js';
 
 console.log(PluginManager);
-console.log(PluginManager.plugin);
 
 const manager = new PluginManager();
 
@@ -13,10 +12,10 @@ console.log(manager.getPluginsNames());
 
 manager.setOrder([ "1", "2" ]).then(() => {
 
-	return manager.beforeLoadAll(() => {
-		return manager.unloadAll();
+	return manager.beforeInitAll(() => {
+		return manager.releaseAll();
 	});
 
 }).then(() => {
-	return manager.loadAll();
+	return manager.initAll();
 });

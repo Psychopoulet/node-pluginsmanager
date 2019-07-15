@@ -11,7 +11,7 @@
 
 // tests
 
-describe("cmd", () => {
+describe("cmd / cmd", () => {
 
 	describe("missing data", () => {
 
