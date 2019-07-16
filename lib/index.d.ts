@@ -46,7 +46,7 @@ declare module "node-pluginsmanager" {
 
 				// setters
 
-				public setOrder(pluginsDirectoriesBaseNames: Array<string>): Promise<void>;
+				public setOrder(pluginsNames: Array<string>): Promise<void>;
 
 				// checkers
 
