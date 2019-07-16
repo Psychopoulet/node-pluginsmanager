@@ -51,14 +51,18 @@ describe("pluginsmanager / events", () => {
 
 		// init
 
-		.on("initialiazed", (plugin) => {
-			(0, console).log("--- [PluginsManager/events/initialiazed] \"" + plugin.name + "\" (v" + plugin.version + ") initialiazed ---");
-		}).on("allinitialiazed", () => {
-			(0, console).log("--- [PluginsManager/events/allinitialiazed] ---");
-		}).on("released", (plugin) => {
-			(0, console).log("--- [PluginsManager/events/released] \"" + plugin.name + "\" (v" + plugin.version + ") released ---");
+		.on("initialized", (plugin) => {
+			(0, console).log("--- [PluginsManager/events/initialized] \"" + plugin.name + "\" (v" + plugin.version + ") initialized ---");
+		}).on("allinitialized", () => {
+			(0, console).log("--- [PluginsManager/events/allinitialized] ---");
+		}).on("released", (pluginName) => {
+			(0, console).log("--- [PluginsManager/events/released] \"" + pluginName + "\" released ---");
 		}).on("allreleased", () => {
 			(0, console).log("--- [PluginsManager/events/allreleased] ---");
+		}).on("destroyed", (pluginName) => {
+			(0, console).log("--- [PluginsManager/events/destroyed] \"" + pluginName + "\" destroyed ---");
+		}).on("alldestroyed", () => {
+			(0, console).log("--- [PluginsManager/events/alldestroyed] ---");
 		})
 
 		// write
@@ -67,8 +71,8 @@ describe("pluginsmanager / events", () => {
 			(0, console).log("--- [PluginsManager/events/installed] \"" + plugin.name + "\" (v" + plugin.version + ") installed ---");
 		}).on("updated", (plugin) => {
 			(0, console).log("--- [PluginsManager/events/updated] \"" + plugin.name + "\" (v" + plugin.version + ") updated ---");
-		}).on("uninstalled", (plugin) => {
-			(0, console).log("--- [PluginsManager/events/uninstalled] \"" + plugin.name + "\" uninstalled ---");
+		}).on("uninstalled", (pluginName) => {
+			(0, console).log("--- [PluginsManager/events/uninstalled] \"" + pluginName + "\" uninstalled ---");
 		}).initAll();
 
 	});

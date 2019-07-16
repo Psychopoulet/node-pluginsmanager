@@ -16,65 +16,80 @@ $ npm install node-pluginsmanager
 
 ## Features
 
-  * simply manage plugins (on plugin model)
-  * install plugins manually or via github & load them
+  * simply manage plugins (extended from [node-pluginsmanager-plugin](https://github.com/Psychopoulet/node-pluginsmanager-plugin)) to interact with specifics hardwares / API / whatever
+  * install plugins manually or via github & initialize them
   * update plugins via github
-  * uninstall plugins and unload there ressources
+  * uninstall plugins and release there ressources
+  * run plugins' middlewares for server, to create specifics rules 
+  * check plugins' modules' versions
 
-## Doc
+## Architecture
 
-### Plugin ([node-pluginsmanager-plugin](https://www.npmjs.com/package/node-pluginsmanager-plugin))
+### Plugin
+
+![Plugin](https://raw.githubusercontent.com/Psychopoulet/node-pluginsmanager-plugin/master/documentation/functional.jpg)
+
+### Routes
+
+![Routes](./documentation/routes.jpg)
+
+## Classes
+
+### PluginManagerOptions (extends "Object")
+
+  > can set optionnal options for "events" constructor
+
+  -- Attributes -- 
+
+  * ``` directory: string ``` used to set PluginsManager directory value
 
 ### PluginsManager (extends "events")
 
   -- Attributes -- 
 
-  * ``` directory: string ``` plugins' directory path
-  * ``` array plugins: Array<Plugin> ``` plugins' data
-
-  * ``` static plugin: AbstractPlugin ``` abstract class for plugin creation
+  * ``` directory: string ``` plugins' directory path (must be writable, you can use [homedir](https://nodejs.org/api/os.html#os_os_homedir) for create specific directory)
+  * ``` Array plugins: Array<[Orchestrator](https://github.com/Psychopoulet/node-pluginsmanager-plugin#orchestrator-extends-mediatoruser)> ``` plugins' orchestrators
 
   -- Constructor --
 
-  * ``` constructor([string directory = "<PluginsManager>/plugins"]) ```
+  * ``` constructor(options? : PluginManagerOptions) ```
 
   -- Methods --
 
-  * ``` setOrder(pluginsDirectoriesBaseNames: Array<string>): Promise<void> ``` create a forced order to synchronously load plugins. not ordered plugins are asynchronously loaded after.
   * ``` getPluginsNames(): Array<string> ``` return plugins' names
+  * ``` setOrder(pluginsNames: Array<string>): Promise<void> ``` create a forced order to synchronously initialize plugins. not ordered plugins are asynchronously initialized after.
 
-  * ``` beforeLoadAll(callback: () => Promise<any>): Promise<void> ``` add a function executed before loading all plugins ("callback" must return a Promise instance)
-  * ``` loadAll(data?: any): Promise<void> ``` load all plugins asynchronously, using "data" in arguments for "load" plugin's method
-  * ``` loadAll(data?: any): Promise<Plugin> ``` load a plugin by its directory, using "data" in arguments for "load" plugin's method
+  * ``` checkAllModules(): Promise<void> ``` check all modules' versions for all plugins
+  * ``` checkModules(plugin: [Orchestrator](https://github.com/Psychopoulet/node-pluginsmanager-plugin#orchestrator-extends-mediatoruser)): Promise<void> ``` check all modules' versions for a specific plugin
 
-  * ``` unload(plugin: Plugin, data?: any): Promise<void> ``` unload a plugin, using "data" in arguments for "unload" plugin's method
-  * ``` unloadByDirectory(directory: string, data?: any): Promise<void> ``` unload a plugin by its directory, using "data" in arguments for "unload" plugin's method
-  * ``` unloadByKey(directory: string, data?: any): Promise<void> ``` unload a plugin by its key (in "plugins" placement), using "data" in arguments for "unload" plugin's method
-  * ``` unloadAll(data?: any): Promise<void> ``` unload all plugins, using "data" in arguments for "unload" plugin's method
+  * ``` appMiddleware(req: Request, res: Response, next: Function): void ``` use for implements all plugins' middlewares in app (express or other)
+  * ``` httpMiddleware(req: Request, res: Response): boolean ``` use for implements all plugins' middlewares in native http/https server
 
-  * ``` installViaGithub(user: string, repo: string, data?: any): Promise<void> ``` install a plugin via github, using "data" in arguments for "install" and "load" plugin's methods
+  * ``` beforeInitAll(callback: () => Promise<any>): Promise<void> ``` add a function executed before initializing all plugins
+  * ``` initAll(data?: any): Promise<void> ``` initialize all plugins asynchronously, using "data" in arguments for "init" plugin's Orchestrator method
 
-  * ``` update(plugin: Plugin, data?: any): Promise<void> ``` update a plugin, using "data" in arguments for "unload", "update" and "load" plugin's methods
-  * ``` updateByDirectory(directory: string, data?: any): Promise<void> ``` update a plugin by its directory, using "data" in arguments for "unload", "update" and "load" plugin's methods
-  * ``` updateByKey(url: string, data?: any): Promise<void> ``` update a plugin by its key (in "plugins" placement), using "data" in arguments for "unload", "update" and "load" plugin's method
+  * ``` releaseAll(data?: any): Promise<void> ``` release a plugin (keep package but destroy [Mediator](https://github.com/Psychopoulet/node-pluginsmanager-plugin#mediator-extends-bootable) & [Server](https://github.com/Psychopoulet/node-pluginsmanager-plugin#server-extends-mediatoruser)), using "data" in arguments for "release" plugin's [Orchestrator](https://github.com/Psychopoulet/node-pluginsmanager-plugin#orchestrator-extends-mediatoruser) method
+  * ``` destroyAll(data?: any): Promise<void> ``` after releasing, destroy packages data & free "plugins" list, using "data" in arguments for "destroy" plugin's [Orchestrator](https://github.com/Psychopoulet/node-pluginsmanager-plugin#orchestrator-extends-mediatoruser) method
 
-  * ``` uninstall(plugin: Plugin, data?: any): Promise<string> ``` uninstall a plugin, using "data" in arguments for "unload" and "uninstall" plugin's methods
-  * ``` uninstallByDirectory(directory: string, data?: any): Promise<string> ``` uninstall a plugin by its directory, using "data" in arguments for "unload" and "uninstall" plugin's methods
-  * ``` uninstallByKey(url: string, data?: any): Promise<string> ``` uninstall a plugin by its key (in "plugins" placement), using "data" in arguments for "unload" and "uninstall" plugin's methods
+  * ``` installViaGithub(user: string, repo: string, data?: any): Promise<void> ``` install a plugin via github repo, using "data" in arguments for "install" and "init" plugin's [Orchestrator](https://github.com/Psychopoulet/node-pluginsmanager-plugin#orchestrator-extends-mediatoruser) methods
+  * ``` updateViaGithub(plugin: [Orchestrator](https://github.com/Psychopoulet/node-pluginsmanager-plugin#orchestrator-extends-mediatoruser), data?: any): Promise<void> ``` update a plugin via its github repo, using "data" in arguments for "release", "update" and "init" plugin's methods
+  * ``` uninstall(plugin: [Orchestrator](https://github.com/Psychopoulet/node-pluginsmanager-plugin#orchestrator-extends-mediatoruser), data?: any): Promise<string> ``` uninstall a plugin, using "data" in arguments for "release" and "uninstall" plugin's methods
 
   -- Events --
 
   * ``` on("error", (err: Error) => void) : this ``` fires if an error occurs
 
-  * ``` on("loaded", (plugin: AbstractPlugin) => void) : this ``` fires if a plugin is loaded
-  * ``` on("allloaded", () => void) : this ``` fires if all the plugins are loaded
+  * ``` on("initialized", (plugin: [Orchestrator](https://github.com/Psychopoulet/node-pluginsmanager-plugin#orchestrator-extends-mediatoruser)) => void) : this ``` fires if a plugin is initialized
+  * ``` on("allinitialized", () => void) : this ``` fires if all the plugins are initialized
   
-  * ``` on("unloaded", (plugin: AbstractPlugin) => void) : this ``` fires if a plugin is unloaded
-  * ``` on("allunloaded", (plugin: AbstractPlugin) => void) : this ``` fires if all the plugins are unloaded
+  * ``` on("released", (pluginName: string) => void) : this ``` fires if a plugin is released
+  * ``` on("allreleased", (plugin: [Orchestrator](https://github.com/Psychopoulet/node-pluginsmanager-plugin#orchestrator-extends-mediatoruser)) => void) : this ``` fires if all the plugins are released
+  * ``` on("destroyed", (pluginName: string) => void) : this ``` fires if a plugin is destroyed
+  * ``` on("alldestroyed", (plugin: [Orchestrator](https://github.com/Psychopoulet/node-pluginsmanager-plugin#orchestrator-extends-mediatoruser)) => void) : this ``` fires if all the plugins are destroyed
 
-  * ``` on("installed", (plugin: AbstractPlugin) => void) : this ``` fires if a plugin is installed
-  * ``` on("updated", (plugin: AbstractPlugin) => void) : this ``` fires if a plugin is updated
-  * ``` on("uninstalled", (plugin: AbstractPlugin) => void) : this ``` fires if a plugin is uninstalled
+  * ``` on("installed", (plugin: [Orchestrator](https://github.com/Psychopoulet/node-pluginsmanager-plugin#orchestrator-extends-mediatoruser)) => void) : this ``` fires if a plugin is installed
+  * ``` on("updated", (plugin: [Orchestrator](https://github.com/Psychopoulet/node-pluginsmanager-plugin#orchestrator-extends-mediatoruser)) => void) : this ``` fires if a plugin is updated
+  * ``` on("uninstalled", (pluginName: string) => void) : this ``` fires if a plugin is uninstalled
 
 ## Examples
 
@@ -83,82 +98,92 @@ $ npm install node-pluginsmanager
 ```javascript
 "use strict";
 
-const { join } = require('path');
-const PluginManager = require('node-pluginsmanager');
+const { join } = require("path");
+const { homedir } = require("os");
+const PluginManager = require("node-pluginsmanager");
 
-const manager = new PluginManager(join(__dirname, 'plugins')); // param optional : automatically setted to this value if not given...
-manager.directory = join(__dirname, 'plugins'); // ... or changed like this
+const manager = new PluginManager({
+  "directory": join(homedir(), "MySoftware", "plugins")
+});
 
 manager
 
-  .on('error', (msg) => {
+  .on("error", (msg) => {
       console.log("--- [event/error] '" + msg.error + "' ---");
   })
 
-  // load
+  // init
 
-    .on('loaded', (plugin) => {
-      console.log("--- [event/loaded] '" + plugin.name + "' (v" + plugin.version + ") loaded ---");
+    .on("initialized", (plugin) => {
+      console.log("--- [event/initialized] '" + plugin.name + "' (v" + plugin.version + ") initialized ---");
     })
-    .on('allloaded', () => {
-      console.log("--- [event/loaded] all loaded ---");
+    .on("allinitialized", () => {
+      console.log("--- [event/initialized] all plugins initialized ---");
     })
-    .on('unloaded', (plugin) => {
-      console.log("--- [event/unloaded] '" + plugin.name + "' (v" + plugin.version + ") unloaded ---");
+
+  // release
+
+    .on("released", (pluginName) => {
+      console.log("--- [event/released] '" + pluginName + " released ---");
+    })
+    .on("allreleased", () => {
+      console.log("--- [event/released] all plugins released ---");
+    })
+    .on("destroyed", (pluginName) => {
+      console.log("--- [event/destroyed] '" + pluginName + " destroyed ---");
+    })
+    .on("alldestroyed", () => {
+      console.log("--- [event/destroyed] all plugins destroyed ---");
     })
 
   // write
 
-    .on('installed', (plugin) => {
+    .on("installed", (plugin) => {
       console.log("--- [event/installed] '" + plugin.name + "' (v" + plugin.version + ") installed ---");
     })
-    .on('updated', (plugin) => {
+    .on("updated", (plugin) => {
       console.log("--- [event/updated] '" + plugin.name + "' (v" + plugin.version + ") updated ---");
     })
-    .on('uninstalled', (plugin) => {
-      console.log("--- [event/uninstalled] '" + plugin.name + "' uninstalled ---");
+    .on("uninstalled", (pluginName) => {
+      console.log("--- [event/uninstalled] '" + pluginName + "' uninstalled ---");
     })
 
-.beforeLoad(() => { // optionnal. MUST return a promise
+.beforeInitAll(() => { // optionnal
     return Promise.resolve();
 })
 
-.loadAll(<optional data to pass to the 'load' plugins methods>).then(() => {
+.initAll(<optional data to pass to the 'init' plugins methods>).then(() => {
 
-  console.log('all plugins loaded');
+  console.log('all plugins initialized');
   console.log(manager.getPluginsNames());
 
   manager.installViaGithub(
     <account>,
     <plugin>,
-    <optional data to pass to the 'install' && 'load' plugins methods>
+    <optional data to pass to the 'install' && 'init' plugins methods>
   ).then((plugin) => {
-    console.log(plugin.name + ' installed & loaded');
+    console.log(plugin.name + ' installed & initialized');
   }).catch((err) => {
     console.log(err);
   });
 
-  manager.update( // use "github"'s plugin data if exists
+  manager.updateViaGithub( // use "github"'s plugin data if exists
     <plugin>,
-    <optional data to pass to the 'unload', 'update', && 'load' plugins methods>
+    <optional data to pass to the 'release', 'update', && 'init' plugins methods>
   ).then((plugin) => {
-    console.log(plugin.name + ' updated & loaded');
+    console.log(plugin.name + ' updated & initialized');
   }).catch((err) => {
     console.log(err);
   });
-
-  // works also with updateByDirectory(<pluginDirectory>, <optional data>)
 
   manager.uninstall(
     <plugin>,
-    <optional data to pass to the 'unload' && 'uninstall' plugins methods>
+    <optional data to pass to the 'release' && 'uninstall' plugins methods>
   ).then((pluginName) => {
     console.log(pluginName + ' removed');
   }).catch((err) => {
     console.log(err);
   });
-
-  // works also with uninstallByDirectory(<pluginDirectory>, <optional data>)
 
 }).catch((err) => {
   console.log(err);
@@ -170,9 +195,13 @@ manager
 ```typescript
 "use strict";
 
+import join from "path";
+import homedir from "os";
 import PluginManager = require('node-pluginsmanager');
 
-const manager = new PluginManager();
+const manager = new PluginManager({
+  "directory": join(homedir(), "MySoftware", "plugins")
+});
 // then, use it like before
 ```
 
