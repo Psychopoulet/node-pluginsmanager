@@ -135,16 +135,16 @@ describe("pluginsmanager / initAll & setOrder", () => {
 			return new Promise((resolve, reject) => {
 
 				let i = 0;
-				pluginsManager.on("initialiazed", (plugin) => {
+				pluginsManager.on("initialized", (plugin) => {
 
 					try {
 
 						if (0 === i) {
-							strictEqual(plugin.name, "TestGoodPluginWithoutDependencies", "initialiazed plugins are incorrects");
+							strictEqual(plugin.name, "TestGoodPluginWithoutDependencies", "initialized plugins are incorrects");
 							++i;
 						}
 						else if (1 === i) {
-							strictEqual(plugin.name, "TestGoodPlugin", "initialiazed plugins are incorrects");
+							strictEqual(plugin.name, "TestGoodPlugin", "initialized plugins are incorrects");
 						}
 
 					}
@@ -152,7 +152,7 @@ describe("pluginsmanager / initAll & setOrder", () => {
 						reject(e);
 					}
 
-				}).on("allinitialiazed", resolve);
+				}).on("allinitialized", resolve);
 
 				pluginsManager.initAll().catch((err) => {
 					reject(err);
@@ -162,33 +162,33 @@ describe("pluginsmanager / initAll & setOrder", () => {
 
 		}).then(() => {
 
-			strictEqual(pluginsManager.plugins instanceof Array, true, "initialiazed plugins are incorrects");
-			strictEqual(pluginsManager.plugins.length, 2, "initialiazed plugins are incorrects");
+			strictEqual(pluginsManager.plugins instanceof Array, true, "initialized plugins are incorrects");
+			strictEqual(pluginsManager.plugins.length, 2, "initialized plugins are incorrects");
 
 			// TestGoodPlugin
 
-			strictEqual("object" === typeof pluginsManager.plugins[0], true, "initialiazed plugins are incorrects");
+			strictEqual("object" === typeof pluginsManager.plugins[0], true, "initialized plugins are incorrects");
 
 				strictEqual(
 					pluginsManager.plugins[0].name, "TestGoodPlugin",
 					"Loaded plugins' name are not correct"
 				);
 
-				deepStrictEqual(pluginsManager.plugins[0].authors, [ "Sébastien VIDAL" ], "initialiazed plugins are incorrects");
+				deepStrictEqual(pluginsManager.plugins[0].authors, [ "Sébastien VIDAL" ], "initialized plugins are incorrects");
 
 				deepStrictEqual(
-					pluginsManager.plugins[0].dependencies, { "simpletts": "2.4.0" }, "initialiazed plugins are incorrects"
+					pluginsManager.plugins[0].dependencies, { "simpletts": "2.4.0" }, "initialized plugins are incorrects"
 				);
 
 				deepStrictEqual(
-					pluginsManager.plugins[0].description, "A test for node-pluginsmanager", "initialiazed plugins are incorrects"
+					pluginsManager.plugins[0].description, "A test for node-pluginsmanager", "initialized plugins are incorrects"
 				);
 
-				deepStrictEqual(pluginsManager.plugins[0].name, "TestGoodPlugin", "initialiazed plugins are incorrects");
+				deepStrictEqual(pluginsManager.plugins[0].name, "TestGoodPlugin", "initialized plugins are incorrects");
 
 			// TestGoodPluginWithoutDependencies
 
-			strictEqual("object" === typeof pluginsManager.plugins[1], true, "initialiazed plugins are incorrects");
+			strictEqual("object" === typeof pluginsManager.plugins[1], true, "initialized plugins are incorrects");
 
 				strictEqual(
 					pluginsManager.plugins[1].name, "TestGoodPluginWithoutDependencies",
@@ -200,13 +200,13 @@ describe("pluginsmanager / initAll & setOrder", () => {
 					"Loaded plugins' authors are not correct"
 				);
 
-				deepStrictEqual(pluginsManager.plugins[1].dependencies, { }, "initialiazed plugins are incorrects");
+				deepStrictEqual(pluginsManager.plugins[1].dependencies, { }, "initialized plugins are incorrects");
 				deepStrictEqual(
-					pluginsManager.plugins[1].description, "A test for node-pluginsmanager", "initialiazed plugins are incorrects"
+					pluginsManager.plugins[1].description, "A test for node-pluginsmanager", "initialized plugins are incorrects"
 				);
 
 				deepStrictEqual(
-					pluginsManager.plugins[1].name, "TestGoodPluginWithoutDependencies", "initialiazed plugins are incorrects"
+					pluginsManager.plugins[1].name, "TestGoodPluginWithoutDependencies", "initialized plugins are incorrects"
 				);
 
 			return Promise.resolve();
