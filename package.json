@@ -32,8 +32,8 @@
     "url": "https://github.com/Psychopoulet/node-pluginsmanager/issues"
   },
   "dependencies": {
-    "check-version-modules": "1.2.0",
-    "node-pluginsmanager-plugin": "1.0.1",
+    "check-version-modules": "1.2.1",
+    "node-pluginsmanager-plugin": "1.0.2",
     "node-promfs": "3.6.3"
   },
   "devDependencies": {
