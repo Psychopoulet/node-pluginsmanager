@@ -16,7 +16,7 @@ $ npm install node-pluginsmanager
 
 ## Features
 
-  * simply manage plugins (extended from [node-pluginsmanager-plugin](https://www.npmjs.com/package/node-pluginsmanager-plugin)) to interact with specifics hardwares / API / whatever
+  * simply manage plugins (extended from [node-pluginsmanager-plugin](https://github.com/Psychopoulet/node-pluginsmanager-plugin)) to interact with specifics hardwares / API / whatever
   * install plugins manually or via github & initialize them
   * update plugins via github
   * uninstall plugins and release there ressources
@@ -24,6 +24,14 @@ $ npm install node-pluginsmanager
   * check plugins' modules' versions
 
 ## Architecture
+
+### Plugin
+
+![Plugin](https://raw.githubusercontent.com/Psychopoulet/node-pluginsmanager-plugin/master/documentation/functional.jpg)
+
+### Routes
+
+![Routes](./documentation/routes.jpg)
 
 ## Classes
 
@@ -40,7 +48,7 @@ $ npm install node-pluginsmanager
   -- Attributes -- 
 
   * ``` directory: string ``` plugins' directory path (must be writable, you can use [homedir](https://nodejs.org/api/os.html#os_os_homedir) for create specific directory)
-  * ``` Array plugins: Array<[Orchestrator](https://www.npmjs.com/package/node-pluginsmanager-plugin#orchestrator-extends-mediatoruser)> ``` plugins' orchestrators
+  * ``` Array plugins: Array<[Orchestrator](https://github.com/Psychopoulet/node-pluginsmanager-plugin#orchestrator-extends-mediatoruser)> ``` plugins' orchestrators
 
   -- Constructor --
 
@@ -52,7 +60,7 @@ $ npm install node-pluginsmanager
   * ``` setOrder(pluginsNames: Array<string>): Promise<void> ``` create a forced order to synchronously initialize plugins. not ordered plugins are asynchronously initialized after.
 
   * ``` checkAllModules(): Promise<void> ``` check all modules' versions for all plugins
-  * ``` checkModules(plugin: [Orchestrator](https://www.npmjs.com/package/node-pluginsmanager-plugin#orchestrator-extends-mediatoruser)): Promise<void> ``` check all modules' versions for a specific plugin
+  * ``` checkModules(plugin: [Orchestrator](https://github.com/Psychopoulet/node-pluginsmanager-plugin#orchestrator-extends-mediatoruser)): Promise<void> ``` check all modules' versions for a specific plugin
 
   * ``` appMiddleware(req: Request, res: Response, next: Function): void ``` use for implements all plugins' middlewares in app (express or other)
   * ``` httpMiddleware(req: Request, res: Response): boolean ``` use for implements all plugins' middlewares in native http/https server
@@ -60,27 +68,27 @@ $ npm install node-pluginsmanager
   * ``` beforeInitAll(callback: () => Promise<any>): Promise<void> ``` add a function executed before initializing all plugins
   * ``` initAll(data?: any): Promise<void> ``` initialize all plugins asynchronously, using "data" in arguments for "init" plugin's Orchestrator method
 
-  * ``` releaseAll(data?: any): Promise<void> ``` release a plugin (keep package but destroy [Mediator](https://www.npmjs.com/package/node-pluginsmanager-plugin#mediator-extends-bootable) & [Server](https://www.npmjs.com/package/node-pluginsmanager-plugin#server-extends-mediatoruser)), using "data" in arguments for "release" plugin's [Orchestrator](https://www.npmjs.com/package/node-pluginsmanager-plugin#orchestrator-extends-mediatoruser) method
-  * ``` destroyAll(data?: any): Promise<void> ``` after releasing, destroy packages data & free "plugins" list, using "data" in arguments for "destroy" plugin's [Orchestrator](https://www.npmjs.com/package/node-pluginsmanager-plugin#orchestrator-extends-mediatoruser) method
+  * ``` releaseAll(data?: any): Promise<void> ``` release a plugin (keep package but destroy [Mediator](https://github.com/Psychopoulet/node-pluginsmanager-plugin#mediator-extends-bootable) & [Server](https://github.com/Psychopoulet/node-pluginsmanager-plugin#server-extends-mediatoruser)), using "data" in arguments for "release" plugin's [Orchestrator](https://github.com/Psychopoulet/node-pluginsmanager-plugin#orchestrator-extends-mediatoruser) method
+  * ``` destroyAll(data?: any): Promise<void> ``` after releasing, destroy packages data & free "plugins" list, using "data" in arguments for "destroy" plugin's [Orchestrator](https://github.com/Psychopoulet/node-pluginsmanager-plugin#orchestrator-extends-mediatoruser) method
 
-  * ``` installViaGithub(user: string, repo: string, data?: any): Promise<void> ``` install a plugin via github repo, using "data" in arguments for "install" and "init" plugin's [Orchestrator](https://www.npmjs.com/package/node-pluginsmanager-plugin#orchestrator-extends-mediatoruser) methods
-  * ``` updateViaGithub(plugin: [Orchestrator](https://www.npmjs.com/package/node-pluginsmanager-plugin#orchestrator-extends-mediatoruser), data?: any): Promise<void> ``` update a plugin via its github repo, using "data" in arguments for "release", "update" and "init" plugin's methods
-  * ``` uninstall(plugin: [Orchestrator](https://www.npmjs.com/package/node-pluginsmanager-plugin#orchestrator-extends-mediatoruser), data?: any): Promise<string> ``` uninstall a plugin, using "data" in arguments for "release" and "uninstall" plugin's methods
+  * ``` installViaGithub(user: string, repo: string, data?: any): Promise<void> ``` install a plugin via github repo, using "data" in arguments for "install" and "init" plugin's [Orchestrator](https://github.com/Psychopoulet/node-pluginsmanager-plugin#orchestrator-extends-mediatoruser) methods
+  * ``` updateViaGithub(plugin: [Orchestrator](https://github.com/Psychopoulet/node-pluginsmanager-plugin#orchestrator-extends-mediatoruser), data?: any): Promise<void> ``` update a plugin via its github repo, using "data" in arguments for "release", "update" and "init" plugin's methods
+  * ``` uninstall(plugin: [Orchestrator](https://github.com/Psychopoulet/node-pluginsmanager-plugin#orchestrator-extends-mediatoruser), data?: any): Promise<string> ``` uninstall a plugin, using "data" in arguments for "release" and "uninstall" plugin's methods
 
   -- Events --
 
   * ``` on("error", (err: Error) => void) : this ``` fires if an error occurs
 
-  * ``` on("initialized", (plugin: [Orchestrator](https://www.npmjs.com/package/node-pluginsmanager-plugin#orchestrator-extends-mediatoruser)) => void) : this ``` fires if a plugin is initialized
+  * ``` on("initialized", (plugin: [Orchestrator](https://github.com/Psychopoulet/node-pluginsmanager-plugin#orchestrator-extends-mediatoruser)) => void) : this ``` fires if a plugin is initialized
   * ``` on("allinitialized", () => void) : this ``` fires if all the plugins are initialized
   
   * ``` on("released", (pluginName: string) => void) : this ``` fires if a plugin is released
-  * ``` on("allreleased", (plugin: [Orchestrator](https://www.npmjs.com/package/node-pluginsmanager-plugin#orchestrator-extends-mediatoruser)) => void) : this ``` fires if all the plugins are released
+  * ``` on("allreleased", (plugin: [Orchestrator](https://github.com/Psychopoulet/node-pluginsmanager-plugin#orchestrator-extends-mediatoruser)) => void) : this ``` fires if all the plugins are released
   * ``` on("destroyed", (pluginName: string) => void) : this ``` fires if a plugin is destroyed
-  * ``` on("alldestroyed", (plugin: [Orchestrator](https://www.npmjs.com/package/node-pluginsmanager-plugin#orchestrator-extends-mediatoruser)) => void) : this ``` fires if all the plugins are destroyed
+  * ``` on("alldestroyed", (plugin: [Orchestrator](https://github.com/Psychopoulet/node-pluginsmanager-plugin#orchestrator-extends-mediatoruser)) => void) : this ``` fires if all the plugins are destroyed
 
-  * ``` on("installed", (plugin: [Orchestrator](https://www.npmjs.com/package/node-pluginsmanager-plugin#orchestrator-extends-mediatoruser)) => void) : this ``` fires if a plugin is installed
-  * ``` on("updated", (plugin: [Orchestrator](https://www.npmjs.com/package/node-pluginsmanager-plugin#orchestrator-extends-mediatoruser)) => void) : this ``` fires if a plugin is updated
+  * ``` on("installed", (plugin: [Orchestrator](https://github.com/Psychopoulet/node-pluginsmanager-plugin#orchestrator-extends-mediatoruser)) => void) : this ``` fires if a plugin is installed
+  * ``` on("updated", (plugin: [Orchestrator](https://github.com/Psychopoulet/node-pluginsmanager-plugin#orchestrator-extends-mediatoruser)) => void) : this ``` fires if a plugin is updated
   * ``` on("uninstalled", (pluginName: string) => void) : this ``` fires if a plugin is uninstalled
 
 ## Examples
