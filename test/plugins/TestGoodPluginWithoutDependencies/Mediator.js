@@ -10,31 +10,23 @@
 
 module.exports = class MediatorGoodPluginWithoutDependencies extends Mediator {
 
-	init (data) {
+	_initWorkSpace (data) {
 
-		return super.init(data).then(() => {
+		(0, console).log(
+			" => [TestGoodPluginWithoutDependencies|Mediator] - init" + (data ? " with \"" + data + "\" data" : "")
+		);
 
-			(0, console).log(
-				" => [TestGoodPluginWithoutDependencies|Mediator] - init" + (data ? " with \"" + data + "\" data" : "")
-			);
-
-			return Promise.resolve();
-
-		});
+		return Promise.resolve();
 
 	}
 
-	release (data) {
+	_releaseWorkSpace (data) {
 
-		return super.release().then(() => {
+		(0, console).log(
+			" => [TestGoodPluginWithoutDependencies|Mediator] - release" + (data ? " with \"" + data + "\" data" : "")
+		);
 
-			(0, console).log(
-				" => [TestGoodPluginWithoutDependencies|Mediator] - release" + (data ? " with \"" + data + "\" data" : "")
-			);
-
-			return Promise.resolve();
-
-		});
+		return Promise.resolve();
 
 	}
 

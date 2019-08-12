@@ -16,7 +16,9 @@ declare module "node-pluginsmanager" {
 
 			// protected
 
+				protected _beforeLoadAll: Function | null;
 				protected _beforeInitAll: Function | null;
+
 				protected _orderedPluginsNames: Array<string>;
 
 			// public
@@ -29,14 +31,6 @@ declare module "node-pluginsmanager" {
 			constructor (options?: PluginManagerOptions);
 
 		// methods
-
-			// protected
-
-				protected _checkPluginsModules(): Promise<void>;
-				protected _initOrderedPlugins(data?: any): Promise<void>;
-				protected _initByDirectory(directory: string, data?: any): Promise<Orchestrator>;
-				protected _releaseLast(data?: any): Promise<void>;
-				protected _destroyLast(data?: any): Promise<void>;
 
 			// public
 
@@ -58,15 +52,17 @@ declare module "node-pluginsmanager" {
 				public appMiddleware(req: Request, res: Response, next: Function): void;
 				public httpMiddleware(req: Request, res: Response): boolean;
 
-				// init
+				// load / destroy
+
+				public beforeLoadAll(callback: () => Promise<any>): Promise<void>;
+				public loadAll(data?: any): Promise<void>;
+				public destroyAll(data?: any): Promise<void>;
+
+				// init / release
 
 				public beforeInitAll(callback: () => Promise<any>): Promise<void>;
 				public initAll(data?: any): Promise<void>;
-
-				// release
-
 				public releaseAll(data?: any): Promise<void>;
-				public destroyAll(data?: any): Promise<void>;
 
 				// write
 
