@@ -210,6 +210,9 @@ const manager = new PluginManager({
 ## Tests
 
 ```bash
+$ git clone git://github.com/Psychopoulet/node-pluginsmanager.git
+$ cd ./node-pluginsmanager
+$ npm install
 $ npm run-script tests
 ```
 
