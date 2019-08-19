@@ -35,6 +35,15 @@ $ npm install node-pluginsmanager
 
 ![Routes](./documentation/routes.jpg)
 
+## Interfaces
+
+```typescript
+interface iPluginManagerOptions {
+  "directory": string; // plugins location. default : join(homedir(), "node-pluginsmanager-plugins")
+  "externalRessourcesDirectory": string; // external ressources locations (sqlite, files, cache, etc...). default : join(homedir(), "node-pluginsmanager-plugins-ressources")
+}
+```
+
 ## Classes
 
 ### PluginManagerOptions (extends "Object")
@@ -50,11 +59,12 @@ $ npm install node-pluginsmanager
   -- Attributes -- 
 
   * ``` directory: string ``` plugins' directory path (must be writable, you can use [homedir](https://nodejs.org/api/os.html#os_os_homedir) for create specific directory)
+  * ``` externalRessourcesDirectory: string ``` external ressources locations (sqlite, files, cache, etc...) (must be writable, you can use [homedir](https://nodejs.org/api/os.html#os_os_homedir) for create specific directory)
   * ``` Array plugins: Array<[Orchestrator](https://github.com/Psychopoulet/node-pluginsmanager-plugin#orchestrator-extends-mediatoruser)> ``` plugins' orchestrators
 
   -- Constructor --
 
-  * ``` constructor(options? : PluginManagerOptions) ```
+  * ``` constructor(options? : iPluginManagerOptions) ```
 
   -- Methods --
 

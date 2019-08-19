@@ -6,8 +6,9 @@ declare module "node-pluginsmanager" {
 	import * as Events from "events";
 	import { Orchestrator } from "node-pluginsmanager-plugin";
 
-	class PluginManagerOptions extends Object {
-		directory: string
+	interface iPluginManagerOptions {
+		"directory": string; // plugins location. default : join(homedir(), "node-pluginsmanager-plugins")
+		"externalRessourcesDirectory": string; // external ressources locations (sqlite, files, cache, etc...). default : join(homedir(), "node-pluginsmanager-plugins-ressources")
 	}
 
 	class PluginManager extends Events {
@@ -24,11 +25,12 @@ declare module "node-pluginsmanager" {
 			// public
 
 				public directory: string;
+				public externalRessourcesDirectory: string;
 				public plugins: Array<Orchestrator>;
 
 		// constructor
 
-			constructor (options?: PluginManagerOptions);
+			constructor (options?: iPluginManagerOptions);
 
 		// methods
 
