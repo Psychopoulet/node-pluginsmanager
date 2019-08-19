@@ -18,6 +18,7 @@ module.exports = class OrchestratorGoodPluginWithoutDependencies extends Orchest
 		const opt = options || {};
 
 		opt.packageFile = join(__dirname, "package.json");
+		opt.descriptorFile = join(__dirname, "Descriptor.json");
 		opt.mediatorFile = join(__dirname, "Mediator.js");
 		opt.serverFile = join(__dirname, "Server.js");
 

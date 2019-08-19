@@ -8,5 +8,5 @@
   "license": "ISC",
   "main": "Orchestrator.js",
   "name": "TestGoodPluginWithoutDependencies",
-  "version": "0.0.2"
+  "version": "0.0.3"
 }

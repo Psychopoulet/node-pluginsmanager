@@ -13,29 +13,29 @@
 	// locals
 	const createPluginByDirectory = require(join(__dirname, "..", "lib", "createPluginByDirectory.js"));
 
-// private
+// consts
 
-	const testsPluginsDirectory = join(__dirname, "plugins");
+	const TESTS_PLUGINS_DIRECTORY = join(__dirname, "plugins");
 
-		const notPlugin = join(testsPluginsDirectory, "TestNotPlugin");
-		const goodPlugin = join(testsPluginsDirectory, "TestGoodPlugin");
+		const NOT_PLUGIN = join(TESTS_PLUGINS_DIRECTORY, "TestNotPlugin");
+		const GOOD_PLUGIN = join(TESTS_PLUGINS_DIRECTORY, "TestGoodPlugin");
 
 // tests
 
 describe("createPluginByDirectory", () => {
 
-	beforeEach(() => {
-		return mkdirpProm(notPlugin);
+	before(() => {
+		return mkdirpProm(NOT_PLUGIN);
 	});
 
-	afterEach(() => {
-		return rmdirpProm(notPlugin);
+	after(() => {
+		return rmdirpProm(NOT_PLUGIN);
 	});
 
 	it("should test wrong directory", (done) => {
 
 		createPluginByDirectory(join(__dirname, "oqnzoefnzeofn")).then(() => {
-			done(new Error("Inexistant directory used"));
+			done(new Error("There is no generated error"));
 		}).catch((err) => {
 
 			strictEqual(typeof err, "object", "Generated error is not an object");
@@ -50,7 +50,7 @@ describe("createPluginByDirectory", () => {
 	it("should test relative directory", (done) => {
 
 		createPluginByDirectory(".").then(() => {
-			done(new Error("Relative directory used"));
+			done(new Error("There is no generated error"));
 		}).catch((err) => {
 
 			strictEqual(typeof err, "object", "Generated error is not an object");
@@ -65,7 +65,7 @@ describe("createPluginByDirectory", () => {
 	it("should test not plugin directory", (done) => {
 
 		writeFileProm(
-			join(notPlugin, "package.json"),
+			join(NOT_PLUGIN, "package.json"),
 			JSON.stringify({
 				"name": "test",
 				"main": "TestNotPlugin.js"
@@ -74,15 +74,15 @@ describe("createPluginByDirectory", () => {
 		).then(() => {
 
 			return writeFileProm(
-				join(notPlugin, "TestNotPlugin.js"),
+				join(NOT_PLUGIN, "TestNotPlugin.js"),
 				"// nothing to do here",
 				"utf8"
 			);
 
 		}).then(() => {
-			return createPluginByDirectory(notPlugin);
+			return createPluginByDirectory(NOT_PLUGIN);
 		}).then(() => {
-			done(new Error("Relative directory used"));
+			done(new Error("There is no generated error"));
 		}).catch((err) => {
 
 			strictEqual(typeof err, "object", "Generated error is not an object");
@@ -96,7 +96,7 @@ describe("createPluginByDirectory", () => {
 
 	it("should test plugin directory", () => {
 
-		return createPluginByDirectory(goodPlugin).then((plugin) => {
+		return createPluginByDirectory(GOOD_PLUGIN).then((plugin) => {
 
 			strictEqual(typeof plugin, "object", "Generated plugin is not an object");
 			strictEqual(plugin instanceof Orchestrator, true, "Generated plugin is not an Orchestrator");
