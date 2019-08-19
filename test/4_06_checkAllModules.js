@@ -10,13 +10,21 @@
 
 // tests
 
-describe("pluginsmanager / initAll & setOrder", () => {
+describe("pluginsmanager / checkAllModules", () => {
 
 	const pluginsManager = new PluginsManager({
 		"directory": join(__dirname, "plugins")
 	});
 
-	afterEach(() => {
+	before(() => {
+
+		return pluginsManager.loadAll().then(() => {
+			return pluginsManager.initAll();
+		});
+
+	});
+
+	after(() => {
 
 		return pluginsManager.releaseAll().then(() => {
 			return pluginsManager.destroyAll();
@@ -26,9 +34,7 @@ describe("pluginsmanager / initAll & setOrder", () => {
 
 	it("should test normal check", () => {
 
-		return pluginsManager.initAll().then(() => {
-			return pluginsManager.checkAllModules();
-		});
+		return pluginsManager.checkAllModules();
 
 	});
 
