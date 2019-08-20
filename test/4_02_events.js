@@ -39,11 +39,11 @@ describe("pluginsmanager / events", () => {
 		// load / destroy
 
 		pluginsManager.on("loaded", (plugin) => {
-			(0, console).log("--- [PluginsManager/events/loaded] \"" + plugin.name + "\" (v" + plugin.version + ") loaded ---");
+			(0, console).log("--- [PluginsManager/events/loaded] \"" + plugin.name + "\" (v" + plugin.version + ") ---");
 		}).on("allloaded", () => {
 			(0, console).log("--- [PluginsManager/events/allloaded] ---");
 		}).on("destroyed", (pluginName) => {
-			(0, console).log("--- [PluginsManager/events/destroyed] \"" + pluginName + "\" destroyed ---");
+			(0, console).log("--- [PluginsManager/events/destroyed] \"" + pluginName + "\" ---");
 		}).on("alldestroyed", () => {
 			(0, console).log("--- [PluginsManager/events/alldestroyed] ---");
 		});
@@ -51,11 +51,11 @@ describe("pluginsmanager / events", () => {
 		// init
 
 		pluginsManager.on("initialized", (plugin) => {
-			(0, console).log("--- [PluginsManager/events/initialized] \"" + plugin.name + "\" (v" + plugin.version + ") initialized ---");
+			(0, console).log("--- [PluginsManager/events/initialized] \"" + plugin.name + "\" (v" + plugin.version + ") ---");
 		}).on("allinitialized", () => {
 			(0, console).log("--- [PluginsManager/events/allinitialized] ---");
 		}).on("released", (plugin) => {
-			(0, console).log("--- [PluginsManager/events/released] \"" + plugin.name + "\" (v" + plugin.version + ") released ---");
+			(0, console).log("--- [PluginsManager/events/released] \"" + plugin.name + "\" (v" + plugin.version + ") ---");
 		}).on("allreleased", () => {
 			(0, console).log("--- [PluginsManager/events/allreleased] ---");
 		});
@@ -63,11 +63,11 @@ describe("pluginsmanager / events", () => {
 		// write
 
 		pluginsManager.on("installed", (plugin) => {
-			(0, console).log("--- [PluginsManager/events/installed] \"" + plugin.name + "\" (v" + plugin.version + ") installed ---");
+			(0, console).log("--- [PluginsManager/events/installed] \"" + plugin.name + "\" (v" + plugin.version + ") ---");
 		}).on("updated", (plugin) => {
-			(0, console).log("--- [PluginsManager/events/updated] \"" + plugin.name + "\" (v" + plugin.version + ") updated ---");
+			(0, console).log("--- [PluginsManager/events/updated] \"" + plugin.name + "\" (v" + plugin.version + ") ---");
 		}).on("uninstalled", (pluginName) => {
-			(0, console).log("--- [PluginsManager/events/uninstalled] \"" + pluginName + "\" uninstalled ---");
+			(0, console).log("--- [PluginsManager/events/uninstalled] \"" + pluginName + "\" ---");
 		});
 
 		// execute

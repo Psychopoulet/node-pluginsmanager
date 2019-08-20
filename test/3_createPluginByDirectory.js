@@ -246,8 +246,6 @@ describe("createPluginByDirectory", () => {
 				strictEqual(typeof plugin, "object", "Generated plugin is not an object");
 				strictEqual(plugin instanceof Orchestrator, true, "Generated plugin is not an Orchestrator");
 
-				return Promise.resolve();
-
 			});
 
 		});

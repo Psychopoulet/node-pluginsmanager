@@ -62,8 +62,6 @@ describe("pluginsmanager / initAll & setOrder", () => {
 			strictEqual(typeof err, "object", "Generated error is not an instance of Error");
 			strictEqual(err instanceof ReferenceError, true, "Generated error is not an instance of Error");
 
-			return Promise.resolve();
-
 		});
 
 	});
@@ -76,8 +74,6 @@ describe("pluginsmanager / initAll & setOrder", () => {
 
 			strictEqual(typeof err, "object", "Generated error is not an instance of Error");
 			strictEqual(err instanceof TypeError, true, "Generated error is not an instance of Error");
-
-			return Promise.resolve();
 
 		});
 
@@ -92,8 +88,6 @@ describe("pluginsmanager / initAll & setOrder", () => {
 			strictEqual(typeof err, "object", "Generated error is not an instance of Error");
 			strictEqual(err instanceof Error, true, "Generated error is not an instance of Error");
 
-			return Promise.resolve();
-
 		});
 
 	});
@@ -106,8 +100,6 @@ describe("pluginsmanager / initAll & setOrder", () => {
 
 			strictEqual(typeof err, "object", "Generated error is not an instance of Error");
 			strictEqual(err instanceof Error, true, "Generated error is not an instance of Error");
-
-			return Promise.resolve();
 
 		});
 
@@ -216,8 +208,6 @@ describe("pluginsmanager / initAll & setOrder", () => {
 				deepStrictEqual(
 					pluginsManager.plugins[1].name, "TestGoodPluginWithoutDependencies", "loaded plugins are incorrects"
 				);
-
-			return Promise.resolve();
 
 		});
 

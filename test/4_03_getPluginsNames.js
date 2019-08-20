@@ -48,8 +48,6 @@ describe("pluginsmanager / getPluginsNames", () => {
 			assert.strictEqual(pluginsNames instanceof Array, true, "plugins names is not an Array");
 			assert.strictEqual(pluginsNames.length, 2, "plugins names length is incorrect");
 
-			return Promise.resolve();
-
 		});
 
 	});
