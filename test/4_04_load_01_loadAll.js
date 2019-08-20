@@ -20,79 +20,127 @@ describe("pluginsmanager / loadAll", () => {
 
 	describe("params", () => {
 
-		it("should test with wrong directory", (done) => {
+		describe("directory", () => {
 
-			const pluginsManager = new PluginsManager({
-				"directory": false
+			it("should test without directory", (done) => {
+
+				const pluginsManager = new PluginsManager();
+
+					delete pluginsManager.directory;
+
+				pluginsManager.loadAll().then(() => {
+					done(new Error("Does not generate Error"));
+				}).catch((err) => {
+
+					strictEqual(typeof err, "object", "Generated error is not as expected");
+					strictEqual(err instanceof ReferenceError, true, "Generated error is not as expected");
+
+					done();
+
+				});
+
 			});
 
-			pluginsManager.loadAll().then(() => {
-				done(new Error("Does not generate Error"));
-			}).catch((err) => {
+			it("should test with wrong directory", (done) => {
 
-				strictEqual(typeof err, "object", "Generated error is not as expected");
-				strictEqual(err instanceof TypeError, true, "Generated error is not as expected");
+				const pluginsManager = new PluginsManager({
+					"directory": false
+				});
 
-				done();
+				pluginsManager.loadAll().then(() => {
+					done(new Error("Does not generate Error"));
+				}).catch((err) => {
+
+					strictEqual(typeof err, "object", "Generated error is not as expected");
+					strictEqual(err instanceof TypeError, true, "Generated error is not as expected");
+
+					done();
+
+				});
+
+			});
+
+			it("should test with empty directory", (done) => {
+
+				const pluginsManager = new PluginsManager({
+					"directory": ""
+				});
+
+				pluginsManager.loadAll().then(() => {
+					done(new Error("Does not generate Error"));
+				}).catch((err) => {
+
+					strictEqual(typeof err, "object", "Generated error is not as expected");
+					strictEqual(err instanceof Error, true, "Generated error is not as expected");
+
+					done();
+
+				});
 
 			});
 
 		});
 
-		it("should test with empty directory", (done) => {
+		describe("externalRessourcesDirectory", () => {
 
-			const pluginsManager = new PluginsManager({
-				"directory": ""
-			});
+			it("should test without externalRessourcesDirectory", (done) => {
 
-			pluginsManager.loadAll().then(() => {
-				done(new Error("Does not generate Error"));
-			}).catch((err) => {
+				const pluginsManager = new PluginsManager({
+					"directory": PLUGINS_DIRECTORY
+				});
 
-				strictEqual(typeof err, "object", "Generated error is not as expected");
-				strictEqual(err instanceof Error, true, "Generated error is not as expected");
+					delete pluginsManager.externalRessourcesDirectory;
 
-				done();
+				pluginsManager.loadAll().then(() => {
+					done(new Error("Does not generate Error"));
+				}).catch((err) => {
 
-			});
+					strictEqual(typeof err, "object", "Generated error is not as expected");
+					strictEqual(err instanceof ReferenceError, true, "Generated error is not as expected");
 
-		});
+					done();
 
-		it("should test with wrong externalRessourcesDirectory", (done) => {
-
-			const pluginsManager = new PluginsManager({
-				"directory": PLUGINS_DIRECTORY,
-				"externalRessourcesDirectory": false
-			});
-
-			pluginsManager.loadAll().then(() => {
-				done(new Error("Does not generate Error"));
-			}).catch((err) => {
-
-				strictEqual(typeof err, "object", "Generated error is not as expected");
-				strictEqual(err instanceof TypeError, true, "Generated error is not as expected");
-
-				done();
+				});
 
 			});
 
-		});
+			it("should test with wrong externalRessourcesDirectory", (done) => {
 
-		it("should test with empty externalRessourcesDirectory", (done) => {
+				const pluginsManager = new PluginsManager({
+					"directory": PLUGINS_DIRECTORY,
+					"externalRessourcesDirectory": false
+				});
 
-			const pluginsManager = new PluginsManager({
-				"directory": PLUGINS_DIRECTORY,
-				"externalRessourcesDirectory": ""
+				pluginsManager.loadAll().then(() => {
+					done(new Error("Does not generate Error"));
+				}).catch((err) => {
+
+					strictEqual(typeof err, "object", "Generated error is not as expected");
+					strictEqual(err instanceof TypeError, true, "Generated error is not as expected");
+
+					done();
+
+				});
+
 			});
 
-			pluginsManager.loadAll().then(() => {
-				done(new Error("Does not generate Error"));
-			}).catch((err) => {
+			it("should test with empty externalRessourcesDirectory", (done) => {
 
-				strictEqual(typeof err, "object", "Generated error is not as expected");
-				strictEqual(err instanceof Error, true, "Generated error is not as expected");
+				const pluginsManager = new PluginsManager({
+					"directory": PLUGINS_DIRECTORY,
+					"externalRessourcesDirectory": ""
+				});
 
-				done();
+				pluginsManager.loadAll().then(() => {
+					done(new Error("Does not generate Error"));
+				}).catch((err) => {
+
+					strictEqual(typeof err, "object", "Generated error is not as expected");
+					strictEqual(err instanceof Error, true, "Generated error is not as expected");
+
+					done();
+
+				});
 
 			});
 
@@ -104,6 +152,10 @@ describe("pluginsmanager / loadAll", () => {
 
 		const pluginsManager = new PluginsManager({
 			"directory": PLUGINS_DIRECTORY
+		});
+
+		afterEach(() => {
+			return pluginsManager.destroyAll();
 		});
 
 		it("should load all", () => {
@@ -118,8 +170,6 @@ describe("pluginsmanager / loadAll", () => {
 				strictEqual(pluginsManager.plugins instanceof Array, true, "plugins is not an Array");
 				strictEqual(pluginsManager.plugins.length, 2, "plugins length is not valid");
 
-			}).then(() => {
-				return pluginsManager.destroyAll();
 			});
 
 		});
@@ -153,8 +203,6 @@ describe("pluginsmanager / loadAll", () => {
 
 				pluginsManager.loadAll(EVENTS_DATA).catch(reject);
 
-			}).then(() => {
-				return pluginsManager.destroyAll();
 			});
 
 		});
