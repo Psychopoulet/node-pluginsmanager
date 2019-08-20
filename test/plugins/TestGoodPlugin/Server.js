@@ -33,7 +33,9 @@ module.exports = class ServerGoodPlugin extends Server {
 
 	appMiddleware (req, res, next) {
 
-		switch (req.url) {
+		const { pathname } = parse(req.url);
+
+		switch (pathname) {
 
 			case REQUEST_PATHNAME:
 

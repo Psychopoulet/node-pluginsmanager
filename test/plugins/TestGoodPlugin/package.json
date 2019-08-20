@@ -1,12 +1,12 @@
 {
+  "name": "TestGoodPlugin",
+  "version": "0.0.3",
+  "description": "A test for node-pluginsmanager",
+  "main": "main.js",
   "author": "Sébastien VIDAL",
   "core": true,
   "dependencies": {
     "simpletts": "2.4.0"
   },
-  "description": "A test for node-pluginsmanager",
-  "license": "ISC",
-  "main": "main.js",
-  "name": "TestGoodPlugin",
-  "version": "0.0.3"
+  "license": "ISC"
 }
