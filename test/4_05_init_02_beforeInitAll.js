@@ -18,9 +18,7 @@ describe("pluginsmanager / beforeInitAll", () => {
 	});
 
 	before(() => {
-
 		return pluginsManager.loadAll();
-
 	});
 
 	after(() => {
