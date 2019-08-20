@@ -12,7 +12,9 @@
 
 describe("pluginsmanager / events", () => {
 
-	const pluginsManager = new PluginsManager();
+	const pluginsManager = new PluginsManager({
+		"directory": join(__dirname, "plugins")
+	});
 
 	it("should test not existing directory without event", () => {
 
@@ -52,8 +54,8 @@ describe("pluginsmanager / events", () => {
 			(0, console).log("--- [PluginsManager/events/initialized] \"" + plugin.name + "\" (v" + plugin.version + ") initialized ---");
 		}).on("allinitialized", () => {
 			(0, console).log("--- [PluginsManager/events/allinitialized] ---");
-		}).on("released", (pluginName) => {
-			(0, console).log("--- [PluginsManager/events/released] \"" + pluginName + "\" released ---");
+		}).on("released", (plugin) => {
+			(0, console).log("--- [PluginsManager/events/released] \"" + plugin.name + "\" (v" + plugin.version + ") released ---");
 		}).on("allreleased", () => {
 			(0, console).log("--- [PluginsManager/events/allreleased] ---");
 		});
