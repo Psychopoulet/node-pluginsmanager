@@ -11,7 +11,7 @@
 
 // tests
 
-describe("pluginsmanager / destroy", () => {
+describe("pluginsmanager / destroyAll", () => {
 
 	const pluginsManager = new PluginsManager({
 		"directory": join(__dirname, "plugins")

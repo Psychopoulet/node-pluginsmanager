@@ -19,21 +19,13 @@
 
 module.exports = class ServerGoodPlugin extends Server {
 
-	_initWorkSpace (data) {
-
-		(0, console).log(
-			" => [TestGoodPlugin|Server] - init" + (data ? " with \"" + data + "\" data" : "")
-		);
+	_initWorkSpace () {
 
 		return Promise.resolve();
 
 	}
 
-	_releaseWorkSpace (data) {
-
-		(0, console).log(
-			" => [TestGoodPlugin|Server] - release" + (data ? " with \"" + data + "\" data" : "")
-		);
+	_releaseWorkSpace () {
 
 		return Promise.resolve();
 

@@ -15,7 +15,7 @@
 
 // tests
 
-describe("pluginsmanager / load", () => {
+describe("pluginsmanager / loadAll", () => {
 
 	const pluginsManager = new PluginsManager({
 		"directory": PLUGINS_DIRECTORY

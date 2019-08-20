@@ -15,7 +15,7 @@
 
 // tests
 
-describe("pluginsmanager / init", () => {
+describe("pluginsmanager / initAll", () => {
 
 	const pluginsManager = new PluginsManager({
 		"directory": PLUGINS_DIRECTORY

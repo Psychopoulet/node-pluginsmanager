@@ -11,7 +11,7 @@
 
 // tests
 
-describe("pluginsmanager / release", () => {
+describe("pluginsmanager / releaseAll", () => {
 
 	const pluginsManager = new PluginsManager({
 		"directory": join(__dirname, "plugins")

@@ -19,21 +19,13 @@
 
 module.exports = class ServerGoodPluginWithoutDependencies extends Server {
 
-	_initWorkSpace (data) {
-
-		(0, console).log(
-			" => [TestGoodPluginWithoutDependencies|Server] - init" + (data ? " with \"" + data + "\" data" : "")
-		);
+	_initWorkSpace () {
 
 		return Promise.resolve();
 
 	}
 
-	_releaseWorkSpace (data) {
-
-		(0, console).log(
-			" => [TestGoodPluginWithoutDependencies|Server] - release" + (data ? " with \"" + data + "\" data" : "")
-		);
+	_releaseWorkSpace () {
 
 		return Promise.resolve();
 

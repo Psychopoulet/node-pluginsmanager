@@ -10,21 +10,13 @@
 
 module.exports = class MediatorGoodPlugin extends Mediator {
 
-	_initWorkSpace (data) {
-
-		(0, console).log(
-			" => [TestGoodPlugin|Mediator] - init" + (data ? " with \"" + data + "\" data" : "")
-		);
+	_initWorkSpace () {
 
 		return Promise.resolve();
 
 	}
 
-	_releaseWorkSpace (data) {
-
-		(0, console).log(
-			" => [TestGoodPlugin|Mediator] - release" + (data ? " with \"" + data + "\" data" : "")
-		);
+	_releaseWorkSpace () {
 
 		return Promise.resolve();
 
