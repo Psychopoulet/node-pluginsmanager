@@ -37,7 +37,11 @@ module.exports = class ServerGoodPlugin extends Server {
 
 			case REQUEST_PATHNAME:
 
-				res.status(RESPONSE_CODE).send(RESPONSE_CONTENT);
+				res.writeHead(RESPONSE_CODE, {
+					"Content-Type": "text/plain; charset=utf-8"
+				});
+
+				res.end(RESPONSE_CONTENT);
 
 			break;
 
@@ -56,8 +60,11 @@ module.exports = class ServerGoodPlugin extends Server {
 
 		if (REQUEST_PATHNAME === pathname) {
 
-			res.writeHead(RESPONSE_CODE, { "Content-Type": "text/html; charset=utf-8" });
-			res.end(RESPONSE_CONTENT, "utf-8");
+			res.writeHead(RESPONSE_CODE, {
+				"Content-Type": "text/plain; charset=utf-8"
+			});
+
+			res.end(RESPONSE_CONTENT);
 
 			return true;
 

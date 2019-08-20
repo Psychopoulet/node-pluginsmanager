@@ -11,7 +11,7 @@
 
 	// locals
 	const PluginsManager = require(join(__dirname, "..", "lib", "main.js"));
-	const httpRequestTest = require(join(__dirname, "..", "node_modules", "node-pluginsmanager-plugin", "test", "utils", "httpRequestTest.js"));
+	const httpRequestTest = require(join(__dirname, "utils", "httpRequestTest.js"));
 
 // consts
 
@@ -24,62 +24,67 @@
 
 describe("Server test", () => {
 
-	const pluginsManager = new PluginsManager({
-		"directory": join(__dirname, "plugins")
-	});
-
 	describe("http", () => {
 
-		const runningServer = createServer((req, res) => {
-
-			if (!pluginsManager.httpMiddleware(req, res)) {
-
-				res.writeHead(RESPONSE_CODE, {
-					"Content-Type": "text/html; charset=utf-8"
-				});
-
-				res.write(RESPONSE_CONTENT);
-				res.end();
-
-			}
-
+		const pluginsManager = new PluginsManager({
+			"directory": join(__dirname, "plugins")
 		});
 
-		beforeEach(() => {
+		let runningServer = null;
 
-			return new Promise((resolve) => {
+		before(() => {
 
-				runningServer.listen(PORT, resolve);
+			return pluginsManager.loadAll().then(() => {
+				return pluginsManager.initAll();
+			}).then(() => {
+
+				return new Promise((resolve) => {
+
+					runningServer = createServer((req, res) => {
+
+						if (!pluginsManager.httpMiddleware(req, res)) {
+
+							res.writeHead(RESPONSE_CODE, {
+								"Content-Type": "text/plain; charset=utf-8"
+							});
+
+							res.end(RESPONSE_CONTENT);
+
+						}
+
+					});
+
+					resolve();
+
+				});
+
+			}).then(() => {
+
+				return new Promise((resolve) => {
+					runningServer.listen(PORT, resolve);
+				});
 
 			});
 
 		});
 
-		afterEach(() => {
+		after(() => {
 
-			return pluginsManager.releaseAll().then(() => {
-
-				return pluginsManager.destroyAll();
-
+			return new Promise((resolve) => {
+				runningServer.close(resolve);
 			}).then(() => {
-
-				return new Promise((resolve) => {
-
-					runningServer.close(resolve);
-
-				});
-
+				runningServer = null;
+			}).then(() => {
+				return pluginsManager.releaseAll();
+			}).then(() => {
+				return pluginsManager.destroyAll();
 			});
 
 		});
 
 		it("should test normal check", () => {
 
-			return pluginsManager.initAll().then(() => {
-
-				return httpRequestTest("/TestGoodPlugin", 201, "Created");
-
-			}).then(() => {
+			return httpRequestTest("/TestGoodPlugin", 201, "Created").then(() => {
 
 				return httpRequestTest("/TestGoodPluginWithoutDependencies", 200, "OK");
 
@@ -95,59 +100,77 @@ describe("Server test", () => {
 
 	describe("app", () => {
 
-		let runningServer = express().use((req, res, next) => {
-
-			pluginsManager.appMiddleware(req, res, next);
-
-		}).get("/", (req, res) => {
-
-			res.status(RESPONSE_CODE).send(RESPONSE_CONTENT);
-
-		}).use((err, req, res, next) => {
-
-			(0, console).log(err.message ? err.message : err);
-
-			res.status(500).send("Something broke !");
-
-			next();
-
+		const pluginsManager = new PluginsManager({
+			"directory": join(__dirname, "plugins")
 		});
 
-		beforeEach(() => {
+		let runningServer = null;
 
-			return new Promise((resolve) => {
+		before(() => {
 
-				runningServer = runningServer.listen(PORT, resolve);
-
-			});
-
-		});
-
-		afterEach(() => {
-
-			return pluginsManager.releaseAll().then(() => {
-
-				return pluginsManager.destroyAll();
-
+			return pluginsManager.loadAll().then(() => {
+				return pluginsManager.initAll();
 			}).then(() => {
 
 				return new Promise((resolve) => {
 
-					runningServer.close(resolve);
+					runningServer = express().use((req, res, next) => {
 
+						pluginsManager.appMiddleware(req, res, next);
+
+					}).get("/", (req, res) => {
+
+						res.writeHead(RESPONSE_CODE, {
+							"Content-Type": "text/plain; charset=utf-8"
+						});
+
+						res.end(RESPONSE_CONTENT);
+
+					}).use((err, req, res, next) => {
+
+						(0, console).log(err.message ? err.message : err);
+
+						res.writeHead(500, {
+							"Content-Type": "text/plain; charset=utf-8"
+						});
+
+						res.end("Something broke !");
+
+						next();
+
+					});
+
+					resolve();
+
+				});
+
+			}).then(() => {
+
+				return new Promise((resolve) => {
+					runningServer = runningServer.listen(PORT, resolve);
 				});
 
 			});
 
 		});
 
+		after(() => {
+
+			return new Promise((resolve) => {
+				runningServer.close(resolve);
+			}).then(() => {
+				runningServer = null;
+			}).then(() => {
+				return pluginsManager.releaseAll();
+			}).then(() => {
+				return pluginsManager.destroyAll();
+			});
+
+		});
+
 		it("should test normal check", () => {
 
-			return pluginsManager.initAll().then(() => {
-
-				return httpRequestTest("/TestGoodPlugin", 201, "Created");
-
-			}).then(() => {
+			return httpRequestTest("/TestGoodPlugin", 201, "Created").then(() => {
 
 				return httpRequestTest("/TestGoodPluginWithoutDependencies", 200, "OK");
 
