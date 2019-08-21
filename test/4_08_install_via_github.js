@@ -30,7 +30,11 @@ describe("pluginsmanager / install via github", () => {
 		"directory": PLUGINS_DIRECTORY
 	});
 
-	afterEach(() => {
+	before(() => {
+		return pluginsManager.loadAll();
+	});
+
+	after(() => {
 
 		return pluginsManager.releaseAll().then(() => {
 			return pluginsManager.destroyAll();
