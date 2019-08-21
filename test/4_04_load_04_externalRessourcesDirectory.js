@@ -25,7 +25,7 @@ describe("pluginsmanager / externalRessourcesDirectory", () => {
 
 		return pluginsManager.loadAll().then(() => {
 
-			return isAbsoluteDirectory("test", pluginsManager.externalRessourcesDirectory);
+			return isAbsoluteDirectory("externalRessourcesDirectory", pluginsManager.externalRessourcesDirectory);
 
 		}).then(() => {
 
@@ -52,7 +52,7 @@ describe("pluginsmanager / externalRessourcesDirectory", () => {
 
 		}).then(() => {
 
-			return isAbsoluteDirectory("test", directoryTested);
+			return isAbsoluteDirectory("directoryTested", directoryTested);
 
 		}).then(() => {
 
@@ -62,7 +62,7 @@ describe("pluginsmanager / externalRessourcesDirectory", () => {
 
 			return new Promise((resolve, reject) => {
 
-				isAbsoluteDirectory("test", directoryTested).then(() => {
+				isAbsoluteDirectory("directoryTested", directoryTested).then(() => {
 					reject(new Error("There is no generated error"));
 				}).catch((err) => {
 
