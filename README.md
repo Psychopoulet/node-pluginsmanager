@@ -21,7 +21,7 @@ $ npm install node-pluginsmanager
   * simply manage plugins (extended from [node-pluginsmanager-plugin](https://github.com/Psychopoulet/node-pluginsmanager-plugin)) to interact with specifics hardwares / API / whatever
   * install plugins manually or via github & initialize them
   * update plugins via github
-  * uninstall plugins and release there ressources
+  * uninstall plugins and release there resources
   * run plugins' middlewares for server, to create specifics rules 
   * check plugins' modules' versions
 
@@ -40,7 +40,7 @@ $ npm install node-pluginsmanager
 ```typescript
 interface iPluginManagerOptions {
   "directory": string; // plugins location. default : join(homedir(), "node-pluginsmanager-plugins")
-  "externalRessourcesDirectory": string; // external ressources locations (sqlite, files, cache, etc...). default : join(homedir(), "node-pluginsmanager-plugins-ressources")
+  "externalRessourcesDirectory": string; // external resources locations (sqlite, files, cache, etc...). default : join(homedir(), "node-pluginsmanager-resources")
 }
 ```
 
@@ -59,7 +59,7 @@ interface iPluginManagerOptions {
   -- Attributes -- 
 
   * ``` directory: string ``` plugins' directory path (must be writable, you can use [homedir](https://nodejs.org/api/os.html#os_os_homedir) for create specific directory)
-  * ``` externalRessourcesDirectory: string ``` external ressources locations (sqlite, files, cache, etc...) (must be writable, you can use [homedir](https://nodejs.org/api/os.html#os_os_homedir) for create specific directory)
+  * ``` externalRessourcesDirectory: string ``` external resources locations (sqlite, files, cache, etc...) (must be writable, you can use [homedir](https://nodejs.org/api/os.html#os_os_homedir) for create specific directory)
   * ``` Array plugins: Array<[Orchestrator](https://github.com/Psychopoulet/node-pluginsmanager-plugin#orchestrator-extends-mediatoruser)> ``` plugins' orchestrators
 
   -- Constructor --
