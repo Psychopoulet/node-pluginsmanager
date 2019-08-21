@@ -7,7 +7,7 @@
 	const { strictEqual } = require("assert");
 
 	// externals
-	const { rmdirpProm } = require("node-promfs");
+	const { isDirectoryProm, rmdirpProm } = require("node-promfs");
 
 	// locals
 	const PluginsManager = require(join(__dirname, "..", "lib", "main.js"));
@@ -22,12 +22,13 @@
 	const PLUGINS_DIRECTORY = join(__dirname, "plugins");
 
 		const GOOD_PLUGIN_DIRECTORY = join(PLUGINS_DIRECTORY, GITHUB_REPO);
+			const GOOD_PLUGIN_MODULES_DIRECTORY = join(GOOD_PLUGIN_DIRECTORY, "node_modules");
 
 	const EVENTS_DATA = "test";
 
 // tests
 
-describe("pluginsmanager / uninstall", () => {
+describe("pluginsmanager / update via github", () => {
 
 	const pluginsManager = new PluginsManager({
 		"directory": PLUGINS_DIRECTORY
@@ -51,7 +52,7 @@ describe("pluginsmanager / uninstall", () => {
 
 		it("should test update without plugin", (done) => {
 
-			pluginsManager.uninstall().then(() => {
+			pluginsManager.updateViaGithub().then(() => {
 				done(new Error("tests does not generate error"));
 			}).catch((err) => {
 
@@ -66,7 +67,7 @@ describe("pluginsmanager / uninstall", () => {
 
 		it("should test update with wrong plugin", (done) => {
 
-			pluginsManager.uninstall(false).then(() => {
+			pluginsManager.updateViaGithub(false).then(() => {
 				done(new Error("tests does not generate error"));
 			}).catch((err) => {
 
@@ -83,24 +84,38 @@ describe("pluginsmanager / uninstall", () => {
 
 	describe("execute", () => {
 
-		it("should uninstall plugin", () => {
+		it("should test update plugins and dependances", () => {
 
-			pluginsManager.on("uninstalled", (plugin, data) => {
+			pluginsManager.on("updated", (plugin, data) => {
 
 				strictEqual(typeof data, "string", "Events data is not a string");
 				strictEqual(data, EVENTS_DATA, "Events data is not as expected");
 
-				(0, console).log("--- [PluginsManager/events/uninstalled] " + plugin.name + " - " + data);
+				(0, console).log("--- [PluginsManager/events/updated] " + plugin.name + " - " + data);
 
 			});
 
-			return pluginsManager.installViaGithub(GITHUB_USER, GITHUB_REPO).then((plugin) => {
+			return pluginsManager.installViaGithub(GITHUB_USER, GITHUB_REPO).then(() => {
 
-				strictEqual(typeof plugin, "object", "Plugin is not an object");
-				strictEqual(typeof plugin.name, "string", "Plugin name is not a string");
-				strictEqual(plugin.name, GITHUB_REPO, "Plugin name is not as expected");
+				return isDirectoryProm(GOOD_PLUGIN_MODULES_DIRECTORY).then((exists) => {
+					return exists ? Promise.resolve() : Promise.reject(new Error("There is no npm udpate performed"));
+				});
 
-				return pluginsManager.uninstall(plugin, EVENTS_DATA);
+			}).then(() => {
+
+				return rmdirpProm(GOOD_PLUGIN_MODULES_DIRECTORY);
+
+			}).then(() => {
+
+				strictEqual(pluginsManager.plugins.length, 3, "Distant plugin not installed");
+
+				return pluginsManager.updateViaGithub(pluginsManager.plugins[2], EVENTS_DATA);
+
+			}).then(() => {
+
+				return isDirectoryProm(GOOD_PLUGIN_MODULES_DIRECTORY).then((exists) => {
+					return exists ? Promise.resolve() : Promise.reject(new Error("There is no npm udpate performed"));
+				});
 
 			});
 

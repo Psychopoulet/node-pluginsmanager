@@ -177,6 +177,21 @@ describe("cmd / cmd", () => {
 
 	describe("execute", () => {
 
+		it("should test wrong command", (done) => {
+
+			cmd("./", "node", [ "-tzfzefzef" ]).then(() => {
+				done(new Error("tests does not generate error"));
+			}).catch((err) => {
+
+				assert.strictEqual(typeof err, "object", "generated error is not as expected");
+				assert.strictEqual(err instanceof Error, true, "generated error is not as expected");
+
+				done();
+
+			});
+
+		});
+
 		it("should test node version", () => {
 
 			return cmd("./", "node", [ "-v" ]);
