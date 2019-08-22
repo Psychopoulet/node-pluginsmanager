@@ -95,12 +95,6 @@ describe("pluginsmanager / uninstall", () => {
 				return pluginsManager.destroyAll();
 			}).then(() => {
 				return rmdirpProm(TEST_PLUGIN_DIRECTORY);
-			}).then(() => {
-
-				return new Promise((resolve) => {
-					setTimeout(resolve, 500);
-				});
-
 			});
 
 		});

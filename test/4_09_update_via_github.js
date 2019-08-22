@@ -116,13 +116,9 @@ describe("pluginsmanager / update via github", () => {
 			return pluginsManager.releaseAll().then(() => {
 				return pluginsManager.destroyAll();
 			}).then(() => {
-				return rmdirpProm(TEST_PLUGIN_DIRECTORY);
+				return rmdirpProm(TEST_PLUGIN_MODULES_DIRECTORY);
 			}).then(() => {
-
-				return new Promise((resolve) => {
-					setTimeout(resolve, 500);
-				});
-
+				return rmdirpProm(TEST_PLUGIN_DIRECTORY);
 			});
 
 		});
