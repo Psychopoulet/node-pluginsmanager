@@ -1,6 +1,6 @@
 {
   "name": "node-pluginsmanager",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "A plugins manager",
   "main": "lib/main.js",
   "typings": "lib/index.d.ts",
@@ -36,7 +36,6 @@
   },
   "dependencies": {
     "check-version-modules": "1.3.0",
-    "node-pluginsmanager-plugin": "2.1.0",
     "node-promfs": "3.6.4"
   },
   "devDependencies": {
@@ -46,6 +45,7 @@
     "eslint": "6.2.1",
     "express": "4.17.1",
     "husky": "3.0.4",
+    "node-pluginsmanager-plugin": "2.1.0",
     "mocha": "6.2.0",
     "nyc": "14.1.1"
   },
