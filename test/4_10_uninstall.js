@@ -3,25 +3,23 @@
 // deps
 
 	// natives
-	const { join } = require("path");
+	const { basename, join } = require("path");
 	const { strictEqual } = require("assert");
 
 	// externals
 	const { rmdirpProm } = require("node-promfs");
+	const { Orchestrator } = require("node-pluginsmanager-plugin");
 
 	// locals
+	const copyPlugin = require(join(__dirname, "utils", "copyPlugin.js"));
 	const PluginsManager = require(join(__dirname, "..", "lib", "main.js"));
 
 // const
 
 	const MAX_TIMOUT = 30 * 1000;
 
-	const GITHUB_USER = "Psychopoulet";
-	const GITHUB_REPO = "node-pluginsmanager-plugin-test";
-
 	const PLUGINS_DIRECTORY = join(__dirname, "plugins");
-
-		const GOOD_PLUGIN_DIRECTORY = join(PLUGINS_DIRECTORY, GITHUB_REPO);
+		const TEST_PLUGIN_DIRECTORY = join(PLUGINS_DIRECTORY, "TestUninstall");
 
 	const EVENTS_DATA = "test";
 
@@ -31,20 +29,6 @@ describe("pluginsmanager / uninstall", () => {
 
 	const pluginsManager = new PluginsManager({
 		"directory": PLUGINS_DIRECTORY
-	});
-
-	before(() => {
-		return pluginsManager.loadAll();
-	});
-
-	after(() => {
-
-		return pluginsManager.releaseAll().then(() => {
-			return pluginsManager.destroyAll();
-		}).then(() => {
-			return rmdirpProm(GOOD_PLUGIN_DIRECTORY);
-		});
-
 	});
 
 	describe("params", () => {
@@ -79,9 +63,47 @@ describe("pluginsmanager / uninstall", () => {
 
 		});
 
+		it("should test update with not loaded plugin", (done) => {
+
+			const orchestrator = new Orchestrator();
+
+				orchestrator.name = basename(TEST_PLUGIN_DIRECTORY);
+				orchestrator.github = "whatever";
+
+			pluginsManager.uninstall(orchestrator).then(() => {
+				done(new Error("tests does not generate error"));
+			}).catch((err) => {
+
+				strictEqual(typeof err, "object", "Generated error is not an object");
+				strictEqual(err instanceof Error, true, "Generated error is not an instance of Error");
+
+				done();
+
+			});
+
+		});
+
 	});
 
 	describe("execute", () => {
+
+		after(() => {
+
+			pluginsManager.removeAllListeners();
+
+			return pluginsManager.releaseAll().then(() => {
+				return pluginsManager.destroyAll();
+			}).then(() => {
+				return rmdirpProm(TEST_PLUGIN_DIRECTORY);
+			}).then(() => {
+
+				return new Promise((resolve) => {
+					setTimeout(resolve, 500);
+				});
+
+			});
+
+		});
 
 		it("should uninstall plugin", () => {
 
@@ -94,13 +116,19 @@ describe("pluginsmanager / uninstall", () => {
 
 			});
 
-			return pluginsManager.installViaGithub(GITHUB_USER, GITHUB_REPO).then((plugin) => {
+			const pluginName = basename(TEST_PLUGIN_DIRECTORY);
 
-				strictEqual(typeof plugin, "object", "Plugin is not an object");
-				strictEqual(typeof plugin.name, "string", "Plugin name is not a string");
-				strictEqual(plugin.name, GITHUB_REPO, "Plugin name is not as expected");
+			return copyPlugin(PLUGINS_DIRECTORY, "TestGoodPlugin", pluginName, {
+				"name": pluginName
+			}).then(() => {
+				return pluginsManager.loadAll();
+			}).then(() => {
 
-				return pluginsManager.uninstall(plugin, EVENTS_DATA);
+				strictEqual(pluginsManager.plugins.length, 3, "Distant plugin not installed");
+
+				return pluginsManager.uninstall(pluginsManager.plugins.filter((plugin) => {
+					return pluginName === plugin.name;
+				})[0] || null, EVENTS_DATA);
 
 			});
 

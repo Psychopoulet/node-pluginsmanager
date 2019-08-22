@@ -5,10 +5,10 @@
 	// natives
 	const { basename, join } = require("path");
 	const { strictEqual } = require("assert");
-	const { Orchestrator } = require("node-pluginsmanager-plugin");
 
 	// externals
 	const { rmdirpProm } = require("node-promfs");
+	const { Orchestrator } = require("node-pluginsmanager-plugin");
 
 	// locals
 	const copyPlugin = require(join(__dirname, "utils", "copyPlugin.js"));
@@ -133,7 +133,8 @@ describe("pluginsmanager / update via github", () => {
 
 			return copyPlugin(PLUGINS_DIRECTORY, "TestGoodPlugin", pluginName, {
 				"name": pluginName,
-				"github": "git://github.com/Psychopoulet/node-pluginsmanager-plugin-test"
+				"github": "git://github.com/Psychopoulet/node-pluginsmanager-plugin-test",
+				"dependencies": {}
 			}).then(() => {
 
 				return pluginsManager.loadAll();
@@ -145,10 +146,6 @@ describe("pluginsmanager / update via github", () => {
 				return pluginsManager.updateViaGithub(pluginsManager.plugins.filter((plugin) => {
 					return pluginName === plugin.name;
 				})[0] || null, EVENTS_DATA);
-
-			}).then(() => {
-
-				return isDirectory("update/execute", TEST_PLUGIN_MODULES_DIRECTORY);
 
 			});
 
