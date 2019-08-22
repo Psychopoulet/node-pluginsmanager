@@ -115,12 +115,16 @@ describe("pluginsmanager / setOrder", () => {
 			return pluginsManager.loadAll();
 		});
 
+		afterEach(() => {
+
+			pluginsManager.removeAllListeners();
+
+			return pluginsManager.releaseAll();
+
+		});
+
 		after(() => {
-
-			return pluginsManager.releaseAll().then(() => {
-				return pluginsManager.destroyAll();
-			});
-
+			return pluginsManager.destroyAll();
 		});
 
 		it("should test normal load with order", () => {
@@ -215,6 +219,14 @@ describe("pluginsmanager / setOrder", () => {
 						pluginsManager.plugins[1].name, "TestGoodPluginWithoutDependencies", "loaded plugins are incorrects"
 					);
 
+			});
+
+		});
+
+		it("should test normal load with all plugins ordered", () => {
+
+			return pluginsManager.setOrder([ "TestGoodPluginWithoutDependencies", "TestGoodPlugin" ]).then(() => {
+				return pluginsManager.initAll();
 			});
 
 		});
