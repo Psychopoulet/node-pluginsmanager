@@ -20,7 +20,7 @@
 
 	const GITHUB_USER = "Psychopoulet";
 	const GITHUB_REPO = "node-pluginsmanager-plugin-test";
-	const GITHUB_WRONG_REPO = "node-container";
+	const GITHUB_WRONG_REPO = "node-containerpattern";
 
 	const EVENTS_DATA = "test";
 
