@@ -12,12 +12,13 @@
 	// externals
 	const {
 		mkdirProm,
-		readdirProm, copyFileProm
+		readdirProm, copyFileProm,
+		readJSONFileProm, writeJSONFileProm
 	} = require("node-promfs");
 
 // module
 
-module.exports = function copyPlugin (directory, originName, targetName) {
+module.exports = function copyPlugin (directory, originName, targetName, packageData = null) {
 
 	const originDirectory = join(directory, originName);
 	const targetDirectory = join(directory, targetName);
@@ -59,6 +60,18 @@ module.exports = function copyPlugin (directory, originName, targetName) {
 			});
 
 		});
+
+	}).then(() => {
+
+		return packageData ? Promise.resolve().then(() => {
+
+			const pluginPackageFile = join(targetDirectory, "package.json");
+
+			return readJSONFileProm(pluginPackageFile).then((data) => {
+				return writeJSONFileProm(pluginPackageFile, Object.assign(data, packageData));
+			});
+
+		}) : Promise.resolve();
 
 	});
 

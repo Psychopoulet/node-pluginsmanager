@@ -3,7 +3,7 @@
 // deps
 
 	// natives
-	const { join } = require("path");
+	const { basename, join } = require("path");
 	const { strictEqual } = require("assert");
 	const { homedir } = require("os");
 
@@ -12,6 +12,7 @@
 	const { mkdirpProm, rmdirpProm, writeFileProm } = require("node-promfs");
 
 	// locals
+	const copyPlugin = require(join(__dirname, "utils", "copyPlugin.js"));
 	const createPluginByDirectory = require(join(__dirname, "..", "lib", "createPluginByDirectory.js"));
 
 // consts
@@ -19,6 +20,7 @@
 	const TESTS_PLUGINS_DIRECTORY = join(__dirname, "plugins");
 
 		const NOT_PLUGIN = join(TESTS_PLUGINS_DIRECTORY, "TestNotPlugin");
+		const INVALID_NAME_PLUGIN = join(TESTS_PLUGINS_DIRECTORY, "TestInvalidNamePlugin");
 		const GOOD_PLUGIN = join(TESTS_PLUGINS_DIRECTORY, "TestGoodPlugin");
 
 	const TESTS_EXTERNAL_RESSOURCES_DIRECTORY = join(homedir(), "node-pluginsmanager-plugins-ressources");
@@ -30,6 +32,8 @@ describe("createPluginByDirectory", () => {
 	before(() => {
 
 		return mkdirpProm(NOT_PLUGIN).then(() => {
+			return mkdirpProm(INVALID_NAME_PLUGIN);
+		}).then(() => {
 			return mkdirpProm(TESTS_EXTERNAL_RESSOURCES_DIRECTORY);
 		});
 
@@ -38,6 +42,8 @@ describe("createPluginByDirectory", () => {
 	after(() => {
 
 		return rmdirpProm(NOT_PLUGIN).then(() => {
+			return rmdirpProm(INVALID_NAME_PLUGIN);
+		}).then(() => {
 			return rmdirpProm(TESTS_EXTERNAL_RESSOURCES_DIRECTORY);
 		});
 
@@ -226,6 +232,27 @@ describe("createPluginByDirectory", () => {
 
 			}).then(() => {
 				return createPluginByDirectory(NOT_PLUGIN, TESTS_EXTERNAL_RESSOURCES_DIRECTORY);
+			}).then(() => {
+				done(new Error("There is no generated error"));
+			}).catch((err) => {
+
+				strictEqual(typeof err, "object", "Generated error is not an object");
+				strictEqual(err instanceof Error, true, "Generated error is not an Error");
+
+				done();
+
+			});
+
+		});
+
+		it("should test with plugin with invalid name", (done) => {
+
+			const pluginName = basename(INVALID_NAME_PLUGIN);
+
+			copyPlugin(TESTS_PLUGINS_DIRECTORY, "TestGoodPlugin", pluginName, {
+				"name": "test"
+			}).then(() => {
+				return createPluginByDirectory(INVALID_NAME_PLUGIN, TESTS_EXTERNAL_RESSOURCES_DIRECTORY);
 			}).then(() => {
 				done(new Error("There is no generated error"));
 			}).catch((err) => {
