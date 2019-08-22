@@ -10,10 +10,7 @@
 	const { join } = require("path");
 
 	// externals
-	const {
-		readJSONFileProm, writeJSONFileProm,
-		rmdirpProm
-	} = require("node-promfs");
+	const { rmdirpProm } = require("node-promfs");
 
 	// locals
 	const copyPlugin = require(join(__dirname, "utils", "copyPlugin.js"));
@@ -43,21 +40,14 @@ describe("pluginsmanager / checkAllModules", () => {
 
 	it("should test old module version", () => {
 
-		const pluginName = "test";
+		const pluginName = "CopyTest";
 		const pluginDirectory = join(pluginsManager.directory, pluginName);
-		const pluginPackageFile = join(pluginDirectory, "package.json");
 
-		return copyPlugin(pluginsManager.directory, "TestGoodPlugin", pluginName).then(() => {
-
-			return readJSONFileProm(pluginPackageFile);
-
-		}).then((data) => {
-
-			data.name = pluginName;
-			data.dependencies.simpletts = "2.3.0";
-
-			return writeJSONFileProm(pluginPackageFile, data);
-
+		return copyPlugin(pluginsManager.directory, "TestGoodPlugin", pluginName, {
+			"name": pluginName,
+			"dependencies": {
+				"simpletts": "2.3.0"
+			}
 		}).then(() => {
 
 			return pluginsManager.loadAll();

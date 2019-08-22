@@ -188,6 +188,21 @@ describe("pluginsmanager / install via github", () => {
 
 		}).timeout(MAX_TIMOUT);
 
+		it("should test download already existing repo", (done) => {
+
+			pluginsManager.installViaGithub(GITHUB_USER, GITHUB_REPO).then(() => {
+				done(new Error("tests does not generate error"));
+			}).catch((err) => {
+
+				strictEqual(typeof err, "object", "Generated error is not as expected");
+				strictEqual(err instanceof Error, true, "Generated error is not as expected");
+
+				done();
+
+			});
+
+		});
+
 	});
 
 });
