@@ -49,7 +49,7 @@ describe("checkers / isNonEmptyString", () => {
 		}).catch((err) => {
 
 			strictEqual(typeof err, "object", "Generated error is not as expected");
-			strictEqual(err instanceof Error, true, "Generated error is not as expected");
+			strictEqual(err instanceof RangeError, true, "Generated error is not as expected");
 
 			done();
 

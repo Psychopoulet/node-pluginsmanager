@@ -3,105 +3,277 @@
 // deps
 
 	// natives
-	const { join } = require("path");
+	const { basename, join } = require("path");
 	const { strictEqual } = require("assert");
+	const { homedir } = require("os");
 
 	// externals
 	const { Orchestrator } = require("node-pluginsmanager-plugin");
 	const { mkdirpProm, rmdirpProm, writeFileProm } = require("node-promfs");
 
 	// locals
+	const copyPlugin = require(join(__dirname, "utils", "copyPlugin.js"));
 	const createPluginByDirectory = require(join(__dirname, "..", "lib", "createPluginByDirectory.js"));
 
-// private
+// consts
 
-	const testsPluginsDirectory = join(__dirname, "plugins");
+	const TESTS_PLUGINS_DIRECTORY = join(__dirname, "plugins");
 
-		const notPlugin = join(testsPluginsDirectory, "TestNotPlugin");
-		const goodPlugin = join(testsPluginsDirectory, "TestGoodPlugin");
+		const NOT_PLUGIN = join(TESTS_PLUGINS_DIRECTORY, "TestNotPlugin");
+		const INVALID_NAME_PLUGIN = join(TESTS_PLUGINS_DIRECTORY, "TestInvalidNamePlugin");
+		const GOOD_PLUGIN = join(TESTS_PLUGINS_DIRECTORY, "TestGoodPlugin");
+
+	const TESTS_EXTERNAL_RESSOURCES_DIRECTORY = join(homedir(), "node-pluginsmanager-plugins-ressources");
 
 // tests
 
 describe("createPluginByDirectory", () => {
 
-	beforeEach(() => {
-		return mkdirpProm(notPlugin);
+	before(() => {
+
+		return mkdirpProm(NOT_PLUGIN).then(() => {
+			return mkdirpProm(INVALID_NAME_PLUGIN);
+		}).then(() => {
+			return mkdirpProm(TESTS_EXTERNAL_RESSOURCES_DIRECTORY);
+		});
+
 	});
 
-	afterEach(() => {
-		return rmdirpProm(notPlugin);
+	after(() => {
+
+		return rmdirpProm(NOT_PLUGIN).then(() => {
+			return rmdirpProm(INVALID_NAME_PLUGIN);
+		}).then(() => {
+			return rmdirpProm(TESTS_EXTERNAL_RESSOURCES_DIRECTORY);
+		});
+
 	});
 
-	it("should test wrong directory", (done) => {
+	describe("params", () => {
 
-		createPluginByDirectory(join(__dirname, "oqnzoefnzeofn")).then(() => {
-			done(new Error("Inexistant directory used"));
-		}).catch((err) => {
+		describe("directory", () => {
 
-			strictEqual(typeof err, "object", "Generated error is not an object");
-			strictEqual(err instanceof Error, true, "Generated error is not an Error");
+			it("should test no directory", (done) => {
 
-			done();
+				createPluginByDirectory().then(() => {
+					done(new Error("There is no generated error"));
+				}).catch((err) => {
+
+					strictEqual(typeof err, "object", "Generated error is not an object");
+					strictEqual(err instanceof ReferenceError, true, "Generated error is not an Error");
+
+					done();
+
+				});
+
+			});
+
+			it("should test wrong directory", (done) => {
+
+				createPluginByDirectory(false).then(() => {
+					done(new Error("There is no generated error"));
+				}).catch((err) => {
+
+					strictEqual(typeof err, "object", "Generated error is not an object");
+					strictEqual(err instanceof TypeError, true, "Generated error is not an Error");
+
+					done();
+
+				});
+
+			});
+
+			it("should test empty directory", (done) => {
+
+				createPluginByDirectory("").then(() => {
+					done(new Error("There is no generated error"));
+				}).catch((err) => {
+
+					strictEqual(typeof err, "object", "Generated error is not an object");
+					strictEqual(err instanceof Error, true, "Generated error is not an Error");
+
+					done();
+
+				});
+
+			});
+
+			it("should test wrong directory", (done) => {
+
+				createPluginByDirectory(join(__dirname, "oqnzoefnzeofn")).then(() => {
+					done(new Error("There is no generated error"));
+				}).catch((err) => {
+
+					strictEqual(typeof err, "object", "Generated error is not an object");
+					strictEqual(err instanceof Error, true, "Generated error is not an Error");
+
+					done();
+
+				});
+
+			});
+
+			it("should test relative directory", (done) => {
+
+				createPluginByDirectory(".").then(() => {
+					done(new Error("There is no generated error"));
+				}).catch((err) => {
+
+					strictEqual(typeof err, "object", "Generated error is not an object");
+					strictEqual(err instanceof Error, true, "Generated error is not an Error");
+
+					done();
+
+				});
+
+			});
+
+		});
+
+		describe("externalRessourcesDirectory", () => {
+
+			it("should test no directory", (done) => {
+
+				createPluginByDirectory(__dirname).then(() => {
+					done(new Error("There is no generated error"));
+				}).catch((err) => {
+
+					strictEqual(typeof err, "object", "Generated error is not an object");
+					strictEqual(err instanceof ReferenceError, true, "Generated error is not an Error");
+
+					done();
+
+				});
+
+			});
+
+			it("should test wrong directory", (done) => {
+
+				createPluginByDirectory(__dirname, false).then(() => {
+					done(new Error("There is no generated error"));
+				}).catch((err) => {
+
+					strictEqual(typeof err, "object", "Generated error is not an object");
+					strictEqual(err instanceof TypeError, true, "Generated error is not an Error");
+
+					done();
+
+				});
+
+			});
+
+			it("should test empty directory", (done) => {
+
+				createPluginByDirectory(__dirname, "").then(() => {
+					done(new Error("There is no generated error"));
+				}).catch((err) => {
+
+					strictEqual(typeof err, "object", "Generated error is not an object");
+					strictEqual(err instanceof Error, true, "Generated error is not an Error");
+
+					done();
+
+				});
+
+			});
+
+			it("should test wrong directory", (done) => {
+
+				createPluginByDirectory(__dirname, join(__dirname, "oqnzoefnzeofn")).then(() => {
+					done(new Error("There is no generated error"));
+				}).catch((err) => {
+
+					strictEqual(typeof err, "object", "Generated error is not an object");
+					strictEqual(err instanceof Error, true, "Generated error is not an Error");
+
+					done();
+
+				});
+
+			});
+
+			it("should test relative directory", (done) => {
+
+				createPluginByDirectory(__dirname, ".").then(() => {
+					done(new Error("There is no generated error"));
+				}).catch((err) => {
+
+					strictEqual(typeof err, "object", "Generated error is not an object");
+					strictEqual(err instanceof Error, true, "Generated error is not an Error");
+
+					done();
+
+				});
+
+			});
 
 		});
 
 	});
 
-	it("should test relative directory", (done) => {
+	describe("execute", () => {
 
-		createPluginByDirectory(".").then(() => {
-			done(new Error("Relative directory used"));
-		}).catch((err) => {
+		it("should test not plugin directory", (done) => {
 
-			strictEqual(typeof err, "object", "Generated error is not an object");
-			strictEqual(err instanceof Error, true, "Generated error is not an Error");
-
-			done();
-
-		});
-
-	});
-
-	it("should test not plugin directory", (done) => {
-
-		writeFileProm(
-			join(notPlugin, "package.json"),
-			JSON.stringify({
-				"name": "test",
-				"main": "TestNotPlugin.js"
-			}),
-			"utf8"
-		).then(() => {
-
-			return writeFileProm(
-				join(notPlugin, "TestNotPlugin.js"),
-				"// nothing to do here",
+			writeFileProm(
+				join(NOT_PLUGIN, "package.json"),
+				JSON.stringify({
+					"name": "test",
+					"main": "TestNotPlugin.js"
+				}),
 				"utf8"
-			);
+			).then(() => {
 
-		}).then(() => {
-			return createPluginByDirectory(notPlugin);
-		}).then(() => {
-			done(new Error("Relative directory used"));
-		}).catch((err) => {
+				return writeFileProm(
+					join(NOT_PLUGIN, "TestNotPlugin.js"),
+					"// nothing to do here",
+					"utf8"
+				);
 
-			strictEqual(typeof err, "object", "Generated error is not an object");
-			strictEqual(err instanceof Error, true, "Generated error is not an Error");
+			}).then(() => {
+				return createPluginByDirectory(NOT_PLUGIN, TESTS_EXTERNAL_RESSOURCES_DIRECTORY);
+			}).then(() => {
+				done(new Error("There is no generated error"));
+			}).catch((err) => {
 
-			done();
+				strictEqual(typeof err, "object", "Generated error is not an object");
+				strictEqual(err instanceof Error, true, "Generated error is not an Error");
+
+				done();
+
+			});
 
 		});
 
-	});
+		it("should test with plugin with invalid name", (done) => {
 
-	it("should test plugin directory", () => {
+			const pluginName = basename(INVALID_NAME_PLUGIN);
 
-		return createPluginByDirectory(goodPlugin).then((plugin) => {
+			copyPlugin(TESTS_PLUGINS_DIRECTORY, "TestGoodPlugin", pluginName, {
+				"name": "test"
+			}).then(() => {
+				return createPluginByDirectory(INVALID_NAME_PLUGIN, TESTS_EXTERNAL_RESSOURCES_DIRECTORY);
+			}).then(() => {
+				done(new Error("There is no generated error"));
+			}).catch((err) => {
 
-			strictEqual(typeof plugin, "object", "Generated plugin is not an object");
-			strictEqual(plugin instanceof Orchestrator, true, "Generated plugin is not an Orchestrator");
+				strictEqual(typeof err, "object", "Generated error is not an object");
+				strictEqual(err instanceof Error, true, "Generated error is not an Error");
 
-			return Promise.resolve();
+				done();
+
+			});
+
+		});
+
+		it("should test plugin directory", () => {
+
+			return createPluginByDirectory(GOOD_PLUGIN, TESTS_EXTERNAL_RESSOURCES_DIRECTORY).then((plugin) => {
+
+				strictEqual(typeof plugin, "object", "Generated plugin is not an object");
+				strictEqual(plugin instanceof Orchestrator, true, "Generated plugin is not an Orchestrator");
+
+			});
 
 		});
 

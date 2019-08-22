@@ -19,41 +19,31 @@
 
 module.exports = class ServerGoodPluginWithoutDependencies extends Server {
 
-	init (data) {
+	_initWorkSpace () {
 
-		return super.init(data).then(() => {
-
-			(0, console).log(
-				" => [TestGoodPluginWithoutDependencies|Server] - init" + (data ? " with \"" + data + "\" data" : "")
-			);
-
-			return Promise.resolve();
-
-		});
+		return Promise.resolve();
 
 	}
 
-	release (data) {
+	_releaseWorkSpace () {
 
-		return super.release().then(() => {
-
-			(0, console).log(
-				" => [TestGoodPluginWithoutDependencies|Server] - release" + (data ? " with \"" + data + "\" data" : "")
-			);
-
-			return Promise.resolve();
-
-		});
+		return Promise.resolve();
 
 	}
 
 	appMiddleware (req, res, next) {
 
-		switch (req.url) {
+		const { pathname } = parse(req.url);
+
+		switch (pathname) {
 
 			case REQUEST_PATHNAME:
 
-				res.status(RESPONSE_CODE).send(RESPONSE_CONTENT);
+				res.writeHead(RESPONSE_CODE, {
+					"Content-Type": "text/plain; charset=utf-8"
+				});
+
+				res.end(RESPONSE_CONTENT);
 
 			break;
 
@@ -72,8 +62,11 @@ module.exports = class ServerGoodPluginWithoutDependencies extends Server {
 
 		if (REQUEST_PATHNAME === pathname) {
 
-			res.writeHead(RESPONSE_CODE, { "Content-Type": "text/html; charset=utf-8" });
-			res.end(RESPONSE_CONTENT, "utf-8");
+			res.writeHead(RESPONSE_CODE, {
+				"Content-Type": "text/plain; charset=utf-8"
+			});
+
+			res.end(RESPONSE_CONTENT);
 
 			return true;
 

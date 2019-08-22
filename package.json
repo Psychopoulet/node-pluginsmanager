@@ -1,6 +1,6 @@
 {
   "name": "node-pluginsmanager",
-  "version": "1.0.1",
+  "version": "2.0.0",
   "description": "A plugins manager",
   "main": "lib/main.js",
   "typings": "lib/index.d.ts",
@@ -8,9 +8,12 @@
     "lint": "npx eslint ./lib/**/*.js ./test/**/*.js",
     "check-updates": "npx check-version-modules",
     "unit-tests": "npx nyc --reporter=html --reporter=text mocha",
-    "tests": "npm run-script lint && npm run-script unit-tests",
+    "tests": "npm run-script lint && npm run-script check-updates && npm run-script unit-tests",
     "ci": "npm run-script tests && npx nyc report --reporter=text-lcov | coveralls"
   },
+  "files": [
+    "/lib"
+  ],
   "husky": {
     "hooks": {
       "pre-commit": "npm run-script lint",
@@ -33,15 +36,16 @@
   },
   "dependencies": {
     "check-version-modules": "1.3.0",
-    "node-pluginsmanager-plugin": "1.0.2",
-    "node-promfs": "3.6.3"
+    "node-pluginsmanager-plugin": "2.1.0",
+    "node-promfs": "3.6.4"
   },
   "devDependencies": {
-    "@types/node": "12.7.1",
+    "@types/node": "12.7.2",
+    "@types/ws": "6.0.2",
     "coveralls": "3.0.6",
-    "eslint": "6.1.0",
+    "eslint": "6.2.1",
     "express": "4.17.1",
-    "husky": "3.0.3",
+    "husky": "3.0.4",
     "mocha": "6.2.0",
     "nyc": "14.1.1"
   },

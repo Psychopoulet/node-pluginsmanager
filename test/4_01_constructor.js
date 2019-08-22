@@ -4,6 +4,7 @@
 
 	// natives
 	const { join } = require("path");
+	const { homedir } = require("os");
 	const { deepStrictEqual, strictEqual } = require("assert");
 
 	// locals
@@ -22,7 +23,7 @@ describe("pluginsmanager / constructor", () => {
 		deepStrictEqual(pluginsManager._orderedPluginsNames, [], "Generated plugin is not as expected");
 
 		// public
-		strictEqual(pluginsManager.directory, "", "Generated plugin is not as expected");
+		strictEqual(pluginsManager.directory, join(homedir(), "node-pluginsmanager-plugins"), "Generated plugin is not as expected");
 		deepStrictEqual(pluginsManager.plugins, [], "Generated plugin is not as expected");
 
 	});

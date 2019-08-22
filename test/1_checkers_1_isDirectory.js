@@ -6,15 +6,15 @@
 	const { strictEqual } = require("assert");
 
 	// locals
-	const isInteger = require(require("path").join(__dirname, "..", "lib", "checkers", "isInteger.js"));
+	const isDirectory = require(require("path").join(__dirname, "..", "lib", "checkers", "isDirectory.js"));
 
 // tests
 
-describe("checkers / isInteger", () => {
+describe("checkers / isDirectory", () => {
 
 	it("should test with empty data", (done) => {
 
-		isInteger("number").then(() => {
+		isDirectory("directory").then(() => {
 			done(new Error("There is no generated error"));
 		}).catch((err) => {
 
@@ -29,7 +29,7 @@ describe("checkers / isInteger", () => {
 
 	it("should test with wrong data", (done) => {
 
-		isInteger("number", "1234").then(() => {
+		isDirectory("directory", 1234).then(() => {
 			done(new Error("There is no generated error"));
 		}).catch((err) => {
 
@@ -42,14 +42,14 @@ describe("checkers / isInteger", () => {
 
 	});
 
-	it("should test with wrong data", (done) => {
+	it("should test with empty data", (done) => {
 
-		isInteger("number", 0.5).then(() => {
+		isDirectory("directory", "").then(() => {
 			done(new Error("There is no generated error"));
 		}).catch((err) => {
 
 			strictEqual(typeof err, "object", "Generated error is not as expected");
-			strictEqual(err instanceof TypeError, true, "Generated error is not as expected");
+			strictEqual(err instanceof Error, true, "Generated error is not as expected");
 
 			done();
 
@@ -57,9 +57,15 @@ describe("checkers / isInteger", () => {
 
 	});
 
-	it("should test with valid data", () => {
+	it("should test with not relative directory", () => {
 
-		return isInteger("number", 1234);
+		return isDirectory("directory", "./");
+
+	});
+
+	it("should test with absolute directory", () => {
+
+		return isDirectory("directory", __dirname);
 
 	});
 
