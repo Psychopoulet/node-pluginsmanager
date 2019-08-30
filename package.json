@@ -1,6 +1,6 @@
 {
   "name": "node-pluginsmanager",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "A plugins manager",
   "main": "lib/main.js",
   "typings": "lib/index.d.ts",
@@ -8,7 +8,7 @@
     "lint": "npx eslint ./lib/**/*.js ./test/**/*.js",
     "check-updates": "npx check-version-modules",
     "unit-tests": "npx nyc --reporter=html --reporter=text mocha",
-    "tests": "npm run-script lint && npm run-script check-updates && npm run-script unit-tests",
+    "tests": "npm run-script lint && npm run-script unit-tests",
     "ci": "npm run-script tests && npx nyc report --reporter=text-lcov | coveralls"
   },
   "files": [
@@ -39,10 +39,10 @@
     "node-promfs": "3.6.4"
   },
   "devDependencies": {
-    "@types/node": "12.7.2",
-    "@types/ws": "6.0.2",
+    "@types/node": "12.7.3",
+    "@types/ws": "6.0.3",
     "coveralls": "3.0.6",
-    "eslint": "6.2.1",
+    "eslint": "6.2.2",
     "express": "4.17.1",
     "husky": "3.0.4",
     "node-pluginsmanager-plugin": "2.1.0",
