@@ -4,183 +4,141 @@
 
 	// natives
 	const { join } = require("path");
-	const { createServer } = require("http");
 
 	// externals
 	const express = require("express");
+	const WebSocketServer = require("ws").Server;
 
 	// locals
 	const PluginsManager = require(join(__dirname, "..", "lib", "main.js"));
 	const httpRequestTest = require(join(__dirname, "utils", "httpRequestTest.js"));
+	const socketRequestTest = require(join(__dirname, "utils", "socketRequestTest.js"));
 
 // consts
 
 	const PORT = "3000";
-
-	const RESPONSE_CODE = 200;
-	const RESPONSE_CONTENT = "Hello World";
+	const PORT_SOCKETS = "3001";
 
 // tests
 
 describe("Server test", () => {
 
-	describe("http", () => {
+	const pluginsManager = new PluginsManager({
+		"directory": join(__dirname, "plugins")
+	});
 
-		const pluginsManager = new PluginsManager({
-			"directory": join(__dirname, "plugins")
-		});
+	let runningServer = null;
+	let runningSocketServer = null;
 
-		let runningServer = null;
+	before(() => {
 
-		before(() => {
-
-			return pluginsManager.loadAll().then(() => {
-				return pluginsManager.initAll();
-			}).then(() => {
-
-				return new Promise((resolve) => {
-
-					runningServer = createServer((req, res) => {
-
-						if (!pluginsManager.httpMiddleware(req, res)) {
-
-							res.writeHead(RESPONSE_CODE, {
-								"Content-Type": "text/plain; charset=utf-8"
-							});
-
-							res.end(RESPONSE_CONTENT);
-
-						}
-
-					});
-
-					resolve();
-
-				});
-
-			}).then(() => {
-
-				return new Promise((resolve) => {
-					runningServer.listen(PORT, resolve);
-				});
-
-			});
-
-		});
-
-		after(() => {
+		return pluginsManager.loadAll().then(() => {
+			return pluginsManager.initAll();
+		}).then(() => {
 
 			return new Promise((resolve) => {
-				runningServer.close(resolve);
-			}).then(() => {
-				runningServer = null;
-			}).then(() => {
-				return pluginsManager.releaseAll();
-			}).then(() => {
-				return pluginsManager.destroyAll();
+
+				runningServer = express().get("/", (req, res) => {
+
+					res.writeHead(200, {
+						"Content-Type": "application/json; charset=utf-8"
+					});
+
+					res.end(JSON.stringify("Hello World"));
+
+				}).use((req, res, next) => {
+					pluginsManager.appMiddleware(req, res, next);
+				}).use((req, res) => {
+
+					res.writeHead(404, {
+						"Content-Type": "application/json; charset=utf-8"
+					});
+
+					res.end(JSON.stringify({
+						"code": "404",
+						"message": "Unknown page"
+					}));
+
+				});
+
+				resolve();
+
 			});
 
-		});
+		}).then(() => {
 
-		it("should test normal check", () => {
-
-			return httpRequestTest("/TestGoodPlugin", 201, "Created").then(() => {
-
-				return httpRequestTest("/TestGoodPluginWithoutDependencies", 200, "OK");
-
-			}).then(() => {
-
-				return httpRequestTest("/", RESPONSE_CODE, "OK");
-
+			return new Promise((resolve) => {
+				runningServer = runningServer.listen(PORT, resolve);
 			});
+
+		}).then(() => {
+
+			runningSocketServer = new WebSocketServer({
+				"port": PORT_SOCKETS
+			});
+
+			pluginsManager.socketMiddleware(runningSocketServer);
 
 		});
 
 	});
 
-	describe("app", () => {
+	after(() => {
 
-		const pluginsManager = new PluginsManager({
-			"directory": join(__dirname, "plugins")
-		});
+		return Promise.resolve().then(() => {
 
-		let runningServer = null;
-
-		before(() => {
-
-			return pluginsManager.loadAll().then(() => {
-				return pluginsManager.initAll();
-			}).then(() => {
-
-				return new Promise((resolve) => {
-
-					runningServer = express().use((req, res, next) => {
-
-						pluginsManager.appMiddleware(req, res, next);
-
-					}).get("/", (req, res) => {
-
-						res.writeHead(RESPONSE_CODE, {
-							"Content-Type": "text/plain; charset=utf-8"
-						});
-
-						res.end(RESPONSE_CONTENT);
-
-					}).use((err, req, res, next) => {
-
-						(0, console).log(err.message ? err.message : err);
-
-						res.writeHead(500, {
-							"Content-Type": "text/plain; charset=utf-8"
-						});
-
-						res.end("Something broke !");
-
-						next();
-
-					});
-
-					resolve();
-
-				});
-
-			}).then(() => {
-
-				return new Promise((resolve) => {
-					runningServer = runningServer.listen(PORT, resolve);
-				});
-
-			});
-
-		});
-
-		after(() => {
-
-			return new Promise((resolve) => {
+			return runningServer ? new Promise((resolve) => {
 				runningServer.close(resolve);
 			}).then(() => {
 				runningServer = null;
-			}).then(() => {
-				return pluginsManager.releaseAll();
-			}).then(() => {
-				return pluginsManager.destroyAll();
-			});
+			}) : Promise.resolve();
 
+		}).then(() => {
+
+			return runningSocketServer ? new Promise((resolve) => {
+				runningSocketServer.close(resolve);
+			}).then(() => {
+				runningSocketServer = null;
+			}) : Promise.resolve();
+
+		}).then(() => {
+			return pluginsManager.releaseAll();
+		}).then(() => {
+			return pluginsManager.destroyAll();
 		});
 
-		it("should test normal check", () => {
+	});
 
-			return httpRequestTest("/TestGoodPlugin", 201, "Created").then(() => {
+	it("should test request with default root", () => {
 
-				return httpRequestTest("/TestGoodPluginWithoutDependencies", 200, "OK");
+		return httpRequestTest("/", "get", null, 200, "OK", "Hello World");
 
-			}).then(() => {
+	});
 
-				return httpRequestTest("/", RESPONSE_CODE, "OK");
+	it("should test request with unknown root", () => {
 
-			});
-
+		return httpRequestTest("/vkesvrhbselirv", "get", null, 404, "Not Found", {
+			"code": "404",
+			"message": "Unknown page"
 		});
+
+	});
+
+	it("should test request with put root", () => {
+
+		return httpRequestTest("/TestGoodPlugin/create", "put", null, 201, "Created");
+
+	});
+
+	it("should test normal get root", () => {
+
+		return httpRequestTest("/TestGoodPluginWithoutDependencies/get", "get", null, 200, "OK", [ "test" ]);
+
+	});
+
+	it("should test socket server", () => {
+
+		return socketRequestTest("ping", "pong");
 
 	});
 

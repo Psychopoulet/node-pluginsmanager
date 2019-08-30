@@ -14,14 +14,25 @@
 		}
 	},
 	"paths": {
-		"/TestGoodPluginWithoutDependencies": {
+		"/TestGoodPluginWithoutDependencies/get": {
 			"get": {
 				"description": "",
 				"summary": "Simple API test for Server class",
+				"operationId": "get",
 				"parameters": [],
 				"responses": {
-					"201": {
-						"description": "Everything is fine"
+					"200": {
+						"description": "Everything is fine",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "array",
+									"items": {
+										"type": "string"
+									}
+								}
+							}
+						}
 					}
 				}
 			}

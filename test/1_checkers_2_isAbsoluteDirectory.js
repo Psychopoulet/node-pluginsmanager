@@ -3,10 +3,11 @@
 // deps
 
 	// natives
+	const { join } = require("path");
 	const { strictEqual } = require("assert");
 
 	// locals
-	const isAbsoluteDirectory = require(require("path").join(__dirname, "..", "lib", "checkers", "isAbsoluteDirectory.js"));
+	const isAbsoluteDirectory = require(join(__dirname, "..", "lib", "checkers", "isAbsoluteDirectory.js"));
 
 // tests
 

@@ -22,4 +22,10 @@ module.exports = class MediatorGoodPlugin extends Mediator {
 
 	}
 
+	create () {
+
+		return Promise.resolve();
+
+	}
+
 };

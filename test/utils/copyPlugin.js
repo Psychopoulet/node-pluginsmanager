@@ -63,13 +63,35 @@ module.exports = function copyPlugin (directory, originName, targetName, package
 
 	}).then(() => {
 
-		return packageData ? Promise.resolve().then(() => {
+		return "object" === typeof packageData ? Promise.resolve().then(() => {
 
 			const pluginPackageFile = join(targetDirectory, "package.json");
 
 			return readJSONFileProm(pluginPackageFile).then((data) => {
 				return writeJSONFileProm(pluginPackageFile, Object.assign(data, packageData));
 			});
+
+		}).then(() => {
+
+			return packageData.name || packageData.version ? Promise.resolve().then(() => {
+
+				const pluginDescriptorFile = join(targetDirectory, "Descriptor.json");
+
+				return readJSONFileProm(pluginDescriptorFile).then((data) => {
+
+					if (packageData.name) {
+						data.info.title = packageData.name;
+					}
+
+					if (packageData.version) {
+						data.info.version = packageData.version;
+					}
+
+					return writeJSONFileProm(pluginDescriptorFile, data);
+
+				});
+
+			}) : Promise.resolve();
 
 		}) : Promise.resolve();
 

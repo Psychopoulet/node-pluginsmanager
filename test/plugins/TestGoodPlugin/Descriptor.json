@@ -14,10 +14,11 @@
 		}
 	},
 	"paths": {
-		"/TestGoodPlugin": {
-			"get": {
+		"/TestGoodPlugin/create": {
+			"put": {
 				"description": "",
 				"summary": "Simple API test for Server class",
+				"operationId": "create",
 				"parameters": [],
 				"responses": {
 					"201": {

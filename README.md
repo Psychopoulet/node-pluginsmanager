@@ -8,7 +8,7 @@ A plugins manager
 [![Issues](https://img.shields.io/github/issues/Psychopoulet/node-pluginsmanager.svg)](https://github.com/Psychopoulet/node-pluginsmanager/issues)
 [![Pull requests](https://img.shields.io/github/issues-pr/Psychopoulet/node-pluginsmanager.svg)](https://github.com/Psychopoulet/node-pluginsmanager/pulls)
 
-> please note that this version is only usable with node-pluginsmanager-plugin 2.x.x
+> please note that this version is only usable with node-pluginsmanager-plugin 3.x.x
 
 ## Installation
 
@@ -68,14 +68,16 @@ interface iPluginManagerOptions {
 
   -- Methods --
 
+  > Please note that the "httpMiddleware" method was removed, you juste have to use "appMiddleware" with basic http request, and use "next" parameter as a callback to execute some stuff with the request if it is not managed by the plugins
+
   * ``` getPluginsNames(): Array<string> ``` return plugins' names
   * ``` setOrder(pluginsNames: Array<string>): Promise<void> ``` create a forced order to synchronously initialize plugins. not ordered plugins are asynchronously initialized after.
 
   * ``` checkAllModules(): Promise<void> ``` check all modules' versions for all plugins
   * ``` checkModules(plugin: [Orchestrator](https://github.com/Psychopoulet/node-pluginsmanager-plugin#orchestrator-extends-mediatoruser)): Promise<void> ``` check all modules' versions for a specific plugin
 
-  * ``` appMiddleware(req: Request, res: Response, next: Function): void ``` use for implements all plugins' middlewares in app (express or other)
-  * ``` httpMiddleware(req: Request, res: Response): boolean ``` use for implements all plugins' middlewares in native http/https server
+  * ``` appMiddleware(req: Request, res: Response, next: Function): void ``` used for execute all plugins' middlewares in app (express or other)
+  * ``` socketMiddleware(server: WebSocketServer): void ``` middleware for socket to add bilateral push events
 
   * ``` beforeInitAll(callback: () => Promise<any>): Promise<void> ``` add a function executed before initializing all plugins
   * ``` initAll(data?: any): Promise<void> ``` initialize all plugins asynchronously, using "data" in arguments for "init" plugin's Orchestrator method

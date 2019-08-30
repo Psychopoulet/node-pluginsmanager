@@ -3,13 +3,14 @@
 // deps
 
 	// natives
+	const { join } = require("path");
 	const { strictEqual } = require("assert");
 
 	// externals
 	const { Orchestrator } = require("node-pluginsmanager-plugin");
 
 	// locals
-	const isOrchestrator = require(require("path").join(__dirname, "..", "lib", "checkers", "isOrchestrator.js"));
+	const isOrchestrator = require(join(__dirname, "..", "lib", "checkers", "isOrchestrator.js"));
 
 // tests
 

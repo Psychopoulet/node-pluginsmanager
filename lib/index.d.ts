@@ -5,6 +5,7 @@ declare module "node-pluginsmanager" {
 
 	import * as Events from "events";
 	import { Orchestrator } from "node-pluginsmanager-plugin";
+	import { Server as WebSocketServer } from "ws";
 
 	interface iPluginManagerOptions {
 		"directory": string; // plugins location. default : join(homedir(), "node-pluginsmanager-plugins")
@@ -52,7 +53,7 @@ declare module "node-pluginsmanager" {
 				// network
 
 				public appMiddleware(req: Request, res: Response, next: Function): void;
-				public httpMiddleware(req: Request, res: Response): boolean;
+				public socketMiddleware(server: WebSocketServer): void;
 
 				// load / destroy
 

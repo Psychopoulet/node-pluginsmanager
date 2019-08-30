@@ -3,76 +3,68 @@
 
 // deps
 
-	// natives
-	const { parse } = require("url");
-
 	// externals
 	const { Server } = require("node-pluginsmanager-plugin");
-
-// consts
-
-	const REQUEST_PATHNAME = "/TestGoodPluginWithoutDependencies";
-	const RESPONSE_CODE = 200;
-	const RESPONSE_CONTENT = "Hello World";
 
 // module
 
 module.exports = class ServerGoodPluginWithoutDependencies extends Server {
 
-	_initWorkSpace () {
+	constructor (opt) {
 
-		return Promise.resolve();
+		super(opt);
+
+		this._socketServer = null;
+		this._onConnection = null;
 
 	}
 
 	_releaseWorkSpace () {
 
-		return Promise.resolve();
+		return this._socketServer ? Promise.resolve().then(() => {
+
+			if ("function" === typeof this._onConnection) {
+
+				this._socketServer.removeListener("connection", this._onConnection);
+				this._onConnection = null;
+
+			}
+
+			this._socketServer = null;
+
+		}) : Promise.resolve();
 
 	}
 
-	appMiddleware (req, res, next) {
+	socketMiddleware (server) {
 
-		const { pathname } = parse(req.url);
+		this._socketServer = server;
+		this._onConnection = (socket) => {
 
-		switch (pathname) {
+			(0, console).log("server", "socket", "connection");
 
-			case REQUEST_PATHNAME:
+			socket.on("message", (payload) => {
 
-				res.writeHead(RESPONSE_CODE, {
-					"Content-Type": "text/plain; charset=utf-8"
-				});
+				(0, console).log("server", "socket", "message", payload);
 
-				res.end(RESPONSE_CONTENT);
+				const req = JSON.parse(payload);
 
-			break;
+				if (req.name && "ping" === req.name) {
 
-			default:
-				return next();
+					socket.send(JSON.stringify({
+						"name": "pong",
+						"params": [ "test" ]
+					}));
 
-		}
+				}
 
-		return null;
-
-	}
-
-	httpMiddleware (req, res) {
-
-		const { pathname } = parse(req.url);
-
-		if (REQUEST_PATHNAME === pathname) {
-
-			res.writeHead(RESPONSE_CODE, {
-				"Content-Type": "text/plain; charset=utf-8"
+			}).on("close", () => {
+				(0, console).log("server", "socket", "close");
 			});
 
-			res.end(RESPONSE_CONTENT);
+		};
 
-			return true;
-
-		}
-
-		return false;
+		this._socketServer.on("connection", this._onConnection);
 
 	}
 
