@@ -3,10 +3,11 @@
 // deps
 
 	// natives
+	const { join } = require("path");
 	const { strictEqual } = require("assert");
 
 	// locals
-	const isFunction = require(require("path").join(__dirname, "..", "lib", "checkers", "isFunction.js"));
+	const isFunction = require(join(__dirname, "..", "lib", "checkers", "isFunction.js"));
 
 // tests
 

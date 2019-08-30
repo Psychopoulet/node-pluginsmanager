@@ -3,10 +3,11 @@
 // deps
 
 	// natives
+	const { join } = require("path");
 	const { strictEqual } = require("assert");
 
 	// locals
-	const isNonEmptyArray = require(require("path").join(__dirname, "..", "lib", "checkers", "isNonEmptyArray.js"));
+	const isNonEmptyArray = require(join(__dirname, "..", "lib", "checkers", "isNonEmptyArray.js"));
 
 // tests
 
