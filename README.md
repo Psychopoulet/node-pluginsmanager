@@ -8,7 +8,7 @@ A plugins manager
 [![Issues](https://img.shields.io/github/issues/Psychopoulet/node-pluginsmanager.svg)](https://github.com/Psychopoulet/node-pluginsmanager/issues)
 [![Pull requests](https://img.shields.io/github/issues-pr/Psychopoulet/node-pluginsmanager.svg)](https://github.com/Psychopoulet/node-pluginsmanager/pulls)
 
-> please note that this version is only usable with node-pluginsmanager-plugin 2.x.x
+> please note that this version is only usable with node-pluginsmanager-plugin 3.x.x
 
 ## Installation
 
