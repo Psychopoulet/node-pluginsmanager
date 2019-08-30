@@ -22,4 +22,10 @@ module.exports = class MediatorGoodPluginWithoutDependencies extends Mediator {
 
 	}
 
+	get () {
+
+		return Promise.resolve([ "test" ]);
+
+	}
+
 };
