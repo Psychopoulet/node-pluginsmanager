@@ -68,6 +68,8 @@ interface iPluginManagerOptions {
 
   -- Methods --
 
+  > Please note that the "httpMiddleware" method was removed, you juste have to use "appMiddleware" with basic http request, and use "next" parameter as a callback to execute some stuff with the request if it is not managed by the plugins
+
   * ``` getPluginsNames(): Array<string> ``` return plugins' names
   * ``` setOrder(pluginsNames: Array<string>): Promise<void> ``` create a forced order to synchronously initialize plugins. not ordered plugins are asynchronously initialized after.
 

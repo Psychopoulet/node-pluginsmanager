@@ -7,14 +7,17 @@
 
 	// externals
 	const express = require("express");
+	const WebSocketServer = require("ws").Server;
 
 	// locals
 	const PluginsManager = require(join(__dirname, "..", "lib", "main.js"));
 	const httpRequestTest = require(join(__dirname, "utils", "httpRequestTest.js"));
+	const socketRequestTest = require(join(__dirname, "utils", "socketRequestTest.js"));
 
 // consts
 
 	const PORT = "3000";
+	const PORT_SOCKETS = "3001";
 
 // tests
 
@@ -25,6 +28,7 @@ describe("Server test", () => {
 	});
 
 	let runningServer = null;
+	let runningSocketServer = null;
 
 	before(() => {
 
@@ -67,16 +71,36 @@ describe("Server test", () => {
 				runningServer = runningServer.listen(PORT, resolve);
 			});
 
+		}).then(() => {
+
+			runningSocketServer = new WebSocketServer({
+				"port": PORT_SOCKETS
+			});
+
+			pluginsManager.socketMiddleware(runningSocketServer);
+
 		});
 
 	});
 
 	after(() => {
 
-		return new Promise((resolve) => {
-			runningServer.close(resolve);
+		return Promise.resolve().then(() => {
+
+			return runningServer ? new Promise((resolve) => {
+				runningServer.close(resolve);
+			}).then(() => {
+				runningServer = null;
+			}) : Promise.resolve();
+
 		}).then(() => {
-			runningServer = null;
+
+			return runningSocketServer ? new Promise((resolve) => {
+				runningSocketServer.close(resolve);
+			}).then(() => {
+				runningSocketServer = null;
+			}) : Promise.resolve();
+
 		}).then(() => {
 			return pluginsManager.releaseAll();
 		}).then(() => {
@@ -109,6 +133,12 @@ describe("Server test", () => {
 	it("should test normal get root", () => {
 
 		return httpRequestTest("/TestGoodPluginWithoutDependencies/get", "get", null, 200, "OK", [ "test" ]);
+
+	});
+
+	it("should test socket server", () => {
+
+		return socketRequestTest("ping", "pong");
 
 	});
 
