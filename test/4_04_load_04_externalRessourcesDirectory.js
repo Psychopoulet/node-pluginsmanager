@@ -32,13 +32,13 @@ describe("pluginsmanager / externalRessourcesDirectory", () => {
 			pluginsManager.plugins.forEach((plugin) => {
 
 				strictEqual(
-					join(pluginsManager.externalRessourcesDirectory, plugin.name), plugin.externalRessourcesDirectory,
+					join(pluginsManager.externalRessourcesDirectory, plugin.name), plugin._externalRessourcesDirectory,
 					"plugin's externalRessourcesDirectory is not valid"
 				);
 
 			});
 
-			directoryTested = pluginsManager.plugins[0].externalRessourcesDirectory;
+			directoryTested = pluginsManager.plugins[0]._externalRessourcesDirectory;
 
 		}).then(() => {
 
