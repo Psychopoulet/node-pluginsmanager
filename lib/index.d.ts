@@ -52,7 +52,6 @@ declare module "node-pluginsmanager" {
 				// network
 
 				public appMiddleware(req: Request, res: Response, next: Function): void;
-				public httpMiddleware(req: Request, res: Response): boolean;
 
 				// load / destroy
 

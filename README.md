@@ -75,7 +75,6 @@ interface iPluginManagerOptions {
   * ``` checkModules(plugin: [Orchestrator](https://github.com/Psychopoulet/node-pluginsmanager-plugin#orchestrator-extends-mediatoruser)): Promise<void> ``` check all modules' versions for a specific plugin
 
   * ``` appMiddleware(req: Request, res: Response, next: Function): void ``` use for implements all plugins' middlewares in app (express or other)
-  * ``` httpMiddleware(req: Request, res: Response): boolean ``` use for implements all plugins' middlewares in native http/https server
 
   * ``` beforeInitAll(callback: () => Promise<any>): Promise<void> ``` add a function executed before initializing all plugins
   * ``` initAll(data?: any): Promise<void> ``` initialize all plugins asynchronously, using "data" in arguments for "init" plugin's Orchestrator method
