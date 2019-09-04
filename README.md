@@ -29,7 +29,7 @@ $ npm install node-pluginsmanager
 
 ### Plugin
 
-![Plugin](https://raw.githubusercontent.com/Psychopoulet/node-pluginsmanager-plugin/master/documentation/functional.jpg)
+![Plugin](https://raw.githubusercontent.com/Psychopoulet/node-pluginsmanager-plugin/master/documentation/pictures/functional.jpg)
 
 ### Routes
 
