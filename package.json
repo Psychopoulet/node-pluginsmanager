@@ -45,7 +45,7 @@
     "eslint": "6.2.2",
     "express": "4.17.1",
     "husky": "3.0.4",
-    "node-pluginsmanager-plugin": "3.0.0",
+    "node-pluginsmanager-plugin": "3.0.1",
     "mocha": "6.2.0",
     "nyc": "14.1.1",
     "ws": "7.1.2"
