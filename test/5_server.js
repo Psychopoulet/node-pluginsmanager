@@ -126,13 +126,13 @@ describe("Server test", () => {
 
 	it("should test request with put root", () => {
 
-		return httpRequestTest("/TestGoodPlugin/create", "put", null, 201, "Created");
+		return httpRequestTest("/test-good-plugin/create", "put", null, 201, "Created");
 
 	});
 
 	it("should test normal get root", () => {
 
-		return httpRequestTest("/TestGoodPluginWithoutDependencies/get", "get", null, 200, "OK", [ "test" ]);
+		return httpRequestTest("/test-good-plugin-without-dependencies/get", "get", null, 200, "OK", [ "test" ]);
 
 	});
 

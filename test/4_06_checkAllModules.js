@@ -40,10 +40,10 @@ describe("pluginsmanager / checkAllModules", () => {
 
 	it("should test old module version", () => {
 
-		const pluginName = "CopyTest";
+		const pluginName = "copy-test";
 		const pluginDirectory = join(pluginsManager.directory, pluginName);
 
-		return copyPlugin(pluginsManager.directory, "TestGoodPlugin", pluginName, {
+		return copyPlugin(pluginsManager.directory, "test-good-plugin", pluginName, {
 			"name": pluginName,
 			"dependencies": {
 				"simpletts": "2.3.0"

@@ -19,7 +19,7 @@
 	const MAX_TIMOUT = 30 * 1000;
 
 	const PLUGINS_DIRECTORY = join(__dirname, "plugins");
-		const TEST_PLUGIN_DIRECTORY = join(PLUGINS_DIRECTORY, "TestUninstall");
+		const TEST_PLUGIN_DIRECTORY = join(PLUGINS_DIRECTORY, "test-uninstall");
 
 	const EVENTS_DATA = "test";
 
@@ -101,18 +101,18 @@ describe("pluginsmanager / uninstall", () => {
 
 		it("should uninstall plugin", () => {
 
-			pluginsManager.on("uninstalled", (plugin, data) => {
+			pluginsManager.on("uninstalled", (pluginName, data) => {
 
 				strictEqual(typeof data, "string", "Events data is not a string");
 				strictEqual(data, EVENTS_DATA, "Events data is not as expected");
 
-				(0, console).log("--- [PluginsManager/events/uninstalled] " + plugin.name + " - " + data);
+				(0, console).log("--- [PluginsManager/events/uninstalled] " + pluginName + " - " + data);
 
 			});
 
 			const pluginName = basename(TEST_PLUGIN_DIRECTORY);
 
-			return copyPlugin(PLUGINS_DIRECTORY, "TestGoodPlugin", pluginName, {
+			return copyPlugin(PLUGINS_DIRECTORY, "test-good-plugin", pluginName, {
 				"name": pluginName
 			}).then(() => {
 				return pluginsManager.loadAll();

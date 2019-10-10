@@ -21,7 +21,7 @@
 
 	const PLUGINS_DIRECTORY = join(__dirname, "plugins");
 
-		const TEST_PLUGIN_DIRECTORY = join(PLUGINS_DIRECTORY, "TestUpdate");
+		const TEST_PLUGIN_DIRECTORY = join(PLUGINS_DIRECTORY, "test-update");
 			const TEST_PLUGIN_MODULES_DIRECTORY = join(TEST_PLUGIN_DIRECTORY, "node_modules");
 
 	const EVENTS_DATA = "test";
@@ -127,7 +127,7 @@ describe("pluginsmanager / update via github", () => {
 
 			const pluginName = basename(TEST_PLUGIN_DIRECTORY);
 
-			return copyPlugin(PLUGINS_DIRECTORY, "TestGoodPlugin", pluginName, {
+			return copyPlugin(PLUGINS_DIRECTORY, "test-good-plugin", pluginName, {
 				"name": pluginName,
 				"github": "git://github.com/Psychopoulet/node-pluginsmanager-plugin-test",
 				"dependencies": {}
@@ -160,7 +160,7 @@ describe("pluginsmanager / update via github", () => {
 
 			const pluginName = basename(TEST_PLUGIN_DIRECTORY);
 
-			return copyPlugin(PLUGINS_DIRECTORY, "TestGoodPlugin", pluginName, {
+			return copyPlugin(PLUGINS_DIRECTORY, "test-good-plugin", pluginName, {
 				"name": pluginName,
 				"repository": "git://github.com/Psychopoulet/node-pluginsmanager-plugin-test"
 			}).then(() => {
@@ -187,7 +187,7 @@ describe("pluginsmanager / update via github", () => {
 
 			const pluginName = basename(TEST_PLUGIN_DIRECTORY);
 
-			return copyPlugin(PLUGINS_DIRECTORY, "TestGoodPlugin", pluginName, {
+			return copyPlugin(PLUGINS_DIRECTORY, "test-good-plugin", pluginName, {
 				"name": pluginName,
 				"repository": {
 					"type": "git",

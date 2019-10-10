@@ -85,12 +85,12 @@ describe("pluginsmanager / setOrder", () => {
 		});
 
 		it("should add normal order with normal directories basenames", () => {
-			return pluginsManager.setOrder([ "TestGoodPlugin" ]);
+			return pluginsManager.setOrder([ "test-good-plugin" ]);
 		});
 
 		it("should test normal run with order and twice the same plugin", (done) => {
 
-			pluginsManager.setOrder([ "TestGoodPlugin", "TestGoodPlugin" ]).then(() => {
+			pluginsManager.setOrder([ "test-good-plugin", "test-good-plugin" ]).then(() => {
 				done(new Error("Does not generate Error"));
 			}).catch((err) => {
 
@@ -129,7 +129,7 @@ describe("pluginsmanager / setOrder", () => {
 
 		it("should test normal load with order", () => {
 
-			return pluginsManager.setOrder([ "TestGoodPluginWithoutDependencies" ]).then(() => {
+			return pluginsManager.setOrder([ "test-good-plugin-without-dependencies" ]).then(() => {
 
 				return new Promise((resolve, reject) => {
 
@@ -137,10 +137,10 @@ describe("pluginsmanager / setOrder", () => {
 					pluginsManager.on("initialized", (plugin, data) => {
 
 						if (0 === i) {
-							strictEqual(plugin.name, "TestGoodPluginWithoutDependencies", "initialized plugins are incorrects");
+							strictEqual(plugin.name, "test-good-plugin-without-dependencies", "initialized plugins are incorrects");
 						}
 						else if (1 === i) {
-							strictEqual(plugin.name, "TestGoodPlugin", "initialized plugins are incorrects");
+							strictEqual(plugin.name, "test-good-plugin", "initialized plugins are incorrects");
 						}
 
 						++i;
@@ -175,12 +175,12 @@ describe("pluginsmanager / setOrder", () => {
 				strictEqual(pluginsManager.plugins instanceof Array, true, "loaded plugins are incorrects");
 				strictEqual(pluginsManager.plugins.length, 2, "loaded plugins are incorrects");
 
-				// TestGoodPlugin
+				// test-good-plugin
 
 				strictEqual("object" === typeof pluginsManager.plugins[0], true, "loaded plugins are incorrects");
 
 					strictEqual(
-						pluginsManager.plugins[0].name, "TestGoodPlugin",
+						pluginsManager.plugins[0].name, "test-good-plugin",
 						"Loaded plugins' name are not correct"
 					);
 
@@ -194,14 +194,14 @@ describe("pluginsmanager / setOrder", () => {
 						pluginsManager.plugins[0].description, "A test for node-pluginsmanager", "loaded plugins are incorrects"
 					);
 
-					deepStrictEqual(pluginsManager.plugins[0].name, "TestGoodPlugin", "loaded plugins are incorrects");
+					deepStrictEqual(pluginsManager.plugins[0].name, "test-good-plugin", "loaded plugins are incorrects");
 
-				// TestGoodPluginWithoutDependencies
+				// test-good-plugin-without-dependencies
 
 				strictEqual("object" === typeof pluginsManager.plugins[1], true, "loaded plugins are incorrects");
 
 					strictEqual(
-						pluginsManager.plugins[1].name, "TestGoodPluginWithoutDependencies",
+						pluginsManager.plugins[1].name, "test-good-plugin-without-dependencies",
 						"Loaded plugins' name are not correct"
 					);
 
@@ -216,7 +216,7 @@ describe("pluginsmanager / setOrder", () => {
 					);
 
 					deepStrictEqual(
-						pluginsManager.plugins[1].name, "TestGoodPluginWithoutDependencies", "loaded plugins are incorrects"
+						pluginsManager.plugins[1].name, "test-good-plugin-without-dependencies", "loaded plugins are incorrects"
 					);
 
 			});
@@ -225,7 +225,7 @@ describe("pluginsmanager / setOrder", () => {
 
 		it("should test normal load with all plugins ordered", () => {
 
-			return pluginsManager.setOrder([ "TestGoodPluginWithoutDependencies", "TestGoodPlugin" ]).then(() => {
+			return pluginsManager.setOrder([ "test-good-plugin-without-dependencies", "test-good-plugin" ]).then(() => {
 				return pluginsManager.initAll();
 			});
 

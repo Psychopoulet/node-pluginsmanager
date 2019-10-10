@@ -1,8 +1,8 @@
 {
 	"openapi": "3.0.2",
 	"info": {
-		"title": "TestGoodPluginWithoutDependencies",
-		"version": "0.0.3",
+		"title": "test-good-plugin",
+		"version": "0.0.4",
 		"description": "An abstract parent plugin for node-pluginsmanager",
 		"contact": {
 			"name": "Sébastien VIDAL",
@@ -14,25 +14,14 @@
 		}
 	},
 	"paths": {
-		"/TestGoodPluginWithoutDependencies/get": {
-			"get": {
+		"/test-good-plugin/create": {
+			"put": {
 				"description": "",
 				"summary": "Simple API test for Server class",
-				"operationId": "get",
-				"parameters": [],
+				"operationId": "create",
 				"responses": {
-					"200": {
-						"description": "Everything is fine",
-						"content": {
-							"application/json": {
-								"schema": {
-									"type": "array",
-									"items": {
-										"type": "string"
-									}
-								}
-							}
-						}
+					"201": {
+						"description": "Everything is fine"
 					}
 				}
 			}

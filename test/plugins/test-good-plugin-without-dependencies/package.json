@@ -1,6 +1,6 @@
 {
-  "name": "TestGoodPluginWithoutDependencies",
-  "version": "0.0.3",
+  "name": "test-good-plugin-without-dependencies",
+  "version": "0.0.4",
   "description": "A test for node-pluginsmanager",
   "main": "Orchestrator.js",
   "authors": [

@@ -1,6 +1,6 @@
 {
   "name": "node-pluginsmanager",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "A plugins manager",
   "main": "lib/main.js",
   "typings": "lib/index.d.ts",
@@ -39,14 +39,15 @@
     "node-promfs": "3.6.4"
   },
   "devDependencies": {
-    "@types/node": "12.7.3",
+    "@types/node": "12.7.12",
     "@types/ws": "6.0.3",
+    "@types/socket.io": "2.1.4",
     "coveralls": "3.0.6",
-    "eslint": "6.2.2",
+    "eslint": "6.5.1",
     "express": "4.17.1",
-    "husky": "3.0.4",
-    "node-pluginsmanager-plugin": "3.0.1",
-    "mocha": "6.2.0",
+    "husky": "3.0.8",
+    "node-pluginsmanager-plugin": "3.1.0",
+    "mocha": "6.2.1",
     "nyc": "14.1.1",
     "ws": "7.1.2"
   },
