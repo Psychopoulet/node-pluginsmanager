@@ -79,6 +79,9 @@ module.exports = function copyPlugin (directory, originName, targetName, package
 
 				return readJSONFileProm(pluginDescriptorFile).then((data) => {
 
+					const oldTitle = data.info.title;
+					const newTitle = packageData.name;
+
 					if (packageData.name) {
 						data.info.title = packageData.name;
 					}
@@ -86,6 +89,13 @@ module.exports = function copyPlugin (directory, originName, targetName, package
 					if (packageData.version) {
 						data.info.version = packageData.version;
 					}
+
+					const paths = {};
+					Object.keys(data.paths).forEach((path) => {
+						paths[path.replace(oldTitle, newTitle)] = data.paths[oldTitle];
+					});
+
+					data.paths = paths;
 
 					return writeJSONFileProm(pluginDescriptorFile, data);
 

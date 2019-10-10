@@ -21,7 +21,7 @@
 
 		const NOT_PLUGIN = join(TESTS_PLUGINS_DIRECTORY, "TestNotPlugin");
 		const INVALID_NAME_PLUGIN = join(TESTS_PLUGINS_DIRECTORY, "TestInvalidNamePlugin");
-		const GOOD_PLUGIN = join(TESTS_PLUGINS_DIRECTORY, "TestGoodPlugin");
+		const GOOD_PLUGIN = join(TESTS_PLUGINS_DIRECTORY, "test-good-plugin");
 
 	const TESTS_EXTERNAL_RESSOURCES_DIRECTORY = join(homedir(), "node-pluginsmanager-plugins-ressources");
 
@@ -249,7 +249,7 @@ describe("createPluginByDirectory", () => {
 
 			const pluginName = basename(INVALID_NAME_PLUGIN);
 
-			copyPlugin(TESTS_PLUGINS_DIRECTORY, "TestGoodPlugin", pluginName, {
+			copyPlugin(TESTS_PLUGINS_DIRECTORY, GOOD_PLUGIN, pluginName, {
 				"name": "test"
 			}).then(() => {
 				return createPluginByDirectory(INVALID_NAME_PLUGIN, TESTS_EXTERNAL_RESSOURCES_DIRECTORY);
