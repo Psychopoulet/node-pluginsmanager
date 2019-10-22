@@ -111,25 +111,60 @@ describe("pluginsmanager / setOrder", () => {
 			"directory": PLUGINS_DIRECTORY
 		});
 
-		before(() => {
-			return pluginsManager.loadAll();
-		});
-
 		afterEach(() => {
 
 			pluginsManager.removeAllListeners();
 
-			return pluginsManager.releaseAll();
+			return pluginsManager.releaseAll().then(() => {
+				return pluginsManager.destroyAll();
+			});
 
-		});
-
-		after(() => {
-			return pluginsManager.destroyAll();
 		});
 
 		it("should test normal load with order", () => {
 
 			return pluginsManager.setOrder([ "test-good-plugin-without-dependencies" ]).then(() => {
+
+				return new Promise((resolve, reject) => {
+
+					let i = 0;
+					pluginsManager.on("loaded", (plugin, data) => {
+
+						if (0 === i) {
+							strictEqual(plugin.name, "test-good-plugin-without-dependencies", "initialized plugins are incorrects");
+						}
+						else if (1 === i) {
+							strictEqual(plugin.name, "test-good-plugin", "initialized plugins are incorrects");
+						}
+
+						++i;
+
+						strictEqual(typeof data, "string", "Events data is not a string");
+						strictEqual(data, EVENTS_DATA, "Events data is not as expected");
+
+						(0, console).log("--- [PluginsManager/events/initialized] " + plugin.name + " - " + data);
+
+					}).on("allloaded", (data) => {
+
+						try {
+
+							strictEqual(typeof data, "string", "Events data is not a string");
+							strictEqual(data, EVENTS_DATA, "Events data is not as expected");
+
+							resolve();
+
+						}
+						catch (e) {
+							reject(e);
+						}
+
+					});
+
+					pluginsManager.loadAll(EVENTS_DATA).catch(reject);
+
+				});
+
+			}).then(() => {
 
 				return new Promise((resolve, reject) => {
 
@@ -226,6 +261,8 @@ describe("pluginsmanager / setOrder", () => {
 		it("should test normal load with all plugins ordered", () => {
 
 			return pluginsManager.setOrder([ "test-good-plugin-without-dependencies", "test-good-plugin" ]).then(() => {
+				return pluginsManager.loadAll();
+			}).then(() => {
 				return pluginsManager.initAll();
 			});
 
