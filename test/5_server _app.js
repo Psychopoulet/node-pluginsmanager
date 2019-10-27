@@ -32,7 +32,9 @@ describe("Server test", () => {
 
 	before(() => {
 
-		return pluginsManager.loadAll().then(() => {
+		return pluginsManager.setOrder([ "test-good-plugin-without-dependencies" ]).then(() => {
+			return pluginsManager.loadAll();
+		}).then(() => {
 			return pluginsManager.initAll();
 		}).then(() => {
 
