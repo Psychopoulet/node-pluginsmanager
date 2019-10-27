@@ -36,6 +36,14 @@ module.exports = class ServerGoodPluginWithoutDependencies extends Server {
 
 	}
 
+	appMiddleware (req, res, next) {
+
+		(0, console).log("ServerGoodPluginWithoutDependencies", "appMiddleware");
+
+		super.appMiddleware(req, res, next);
+
+	}
+
 	socketMiddleware (server) {
 
 		this._socketServer = server;
