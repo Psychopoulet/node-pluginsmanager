@@ -10,6 +10,7 @@ declare module "node-pluginsmanager" {
 	interface iPluginManagerOptions {
 		"directory": string; // plugins location. default : join(homedir(), "node-pluginsmanager-plugins")
 		"externalRessourcesDirectory": string; // external resources locations (sqlite, files, cache, etc...). default : join(homedir(), "node-pluginsmanager-resources")
+		"logger": Function | null;
 	}
 
 	class PluginManager extends Events {
