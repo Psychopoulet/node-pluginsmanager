@@ -8,7 +8,7 @@ A plugins manager
 [![Issues](https://img.shields.io/github/issues/Psychopoulet/node-pluginsmanager.svg)](https://github.com/Psychopoulet/node-pluginsmanager/issues)
 [![Pull requests](https://img.shields.io/github/issues-pr/Psychopoulet/node-pluginsmanager.svg)](https://github.com/Psychopoulet/node-pluginsmanager/pulls)
 
-> please note that this version is only usable with node-pluginsmanager-plugin 3.x.x
+> please note that this version is only usable with node-pluginsmanager-plugin 4.x.x
 
 ## Installation
 
@@ -22,7 +22,7 @@ $ npm install node-pluginsmanager
   * install plugins manually or via github & initialize them
   * update plugins via github
   * uninstall plugins and release there resources
-  * run plugins' middlewares for server, to create specifics rules 
+  * run plugins' middlewares for server, to create specifics rules
   * check plugins' modules' versions
 
 ## Architecture
@@ -50,13 +50,13 @@ interface iPluginManagerOptions {
 
   > can set optionnal options for "events" constructor
 
-  -- Attributes -- 
+  -- Attributes --
 
   * ``` directory: string ``` used to set PluginsManager directory value
 
 ### PluginsManager (extends "events")
 
-  -- Attributes -- 
+  -- Attributes --
 
   * ``` directory: string ``` plugins' directory path (must be writable, you can use [homedir](https://nodejs.org/api/os.html#os_os_homedir) for create specific directory)
   * ``` externalRessourcesDirectory: string ``` external resources locations (sqlite, files, cache, etc...) (must be writable, you can use [homedir](https://nodejs.org/api/os.html#os_os_homedir) for create specific directory)
@@ -95,7 +95,7 @@ interface iPluginManagerOptions {
 
   * ``` on("initialized", (plugin: [Orchestrator](https://github.com/Psychopoulet/node-pluginsmanager-plugin#orchestrator-extends-mediatoruser)) => void) : this ``` fires if a plugin is initialized
   * ``` on("allinitialized", () => void) : this ``` fires if all the plugins are initialized
-  
+
   * ``` on("released", (pluginName: string) => void) : this ``` fires if a plugin is released
   * ``` on("allreleased", (plugin: [Orchestrator](https://github.com/Psychopoulet/node-pluginsmanager-plugin#orchestrator-extends-mediatoruser)) => void) : this ``` fires if all the plugins are released
   * ``` on("destroyed", (pluginName: string) => void) : this ``` fires if a plugin is destroyed

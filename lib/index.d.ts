@@ -3,7 +3,7 @@
 
 declare module "node-pluginsmanager" {
 
-	import * as Events from "events";
+	import { EventEmitter } from "events";
 	import { Orchestrator } from "node-pluginsmanager-plugin";
 	import { Server as WebSocketServer } from "ws";
 
@@ -13,7 +13,7 @@ declare module "node-pluginsmanager" {
 		"logger": Function | null;
 	}
 
-	class PluginManager extends Events {
+	class PluginManager extends EventEmitter {
 
 		// attributes
 

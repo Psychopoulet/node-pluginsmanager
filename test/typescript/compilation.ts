@@ -1,6 +1,6 @@
 /// <reference path="../../lib/index.d.ts" />
 
-import * as PluginManager from '../../lib/main.js';
+import * as PluginManager from "../../lib/main.js";
 
 console.log(PluginManager);
 
