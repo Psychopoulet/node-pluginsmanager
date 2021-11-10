@@ -178,7 +178,18 @@ describe("pluginsmanager / loadAll", () => {
 
 			return new Promise((resolve, reject) => {
 
-				pluginsManager.on("loaded", (plugin, data) => {
+				pluginsManager.on("loading", (pluginName, data) => {
+
+					strictEqual(typeof pluginName, "string", "Events pluginName is not a string");
+
+					strictEqual(typeof data, "string", "Events data is not a string");
+					strictEqual(data, EVENTS_DATA, "Events data is not as expected");
+
+					(0, console).log("--- [PluginsManager/events/loading] " + pluginName + " - " + data);
+
+				}).on("loaded", (plugin, data) => {
+
+					strictEqual(typeof plugin, "object", "Events plugin is not an object");
 
 					strictEqual(typeof data, "string", "Events data is not a string");
 					strictEqual(data, EVENTS_DATA, "Events data is not as expected");
