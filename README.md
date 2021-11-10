@@ -93,17 +93,23 @@ interface iPluginManagerOptions {
 
   * ``` on("error", (err: Error) => void) : this ``` fires if an error occurs
 
-  * ``` on("initialized", (plugin: [Orchestrator](https://github.com/Psychopoulet/node-pluginsmanager-plugin#orchestrator-extends-mediatoruser)) => void) : this ``` fires if a plugin is initialized
-  * ``` on("allinitialized", () => void) : this ``` fires if all the plugins are initialized
+  * ``` on("loading", (plugin: [Orchestrator](https://github.com/Psychopoulet/node-pluginsmanager-plugin#orchestrator-extends-mediatoruser), data?: any) => void) : this ``` fires if a plugin starts load
+  * ``` on("loaded", (plugin: [Orchestrator](https://github.com/Psychopoulet/node-pluginsmanager-plugin#orchestrator-extends-mediatoruser), data?: any) => void) : this ``` fires if a plugin ends load
+  * ``` on("allloaded", (data?: any) => void) : this ``` fires if all the plugins are loaded
 
-  * ``` on("released", (pluginName: string) => void) : this ``` fires if a plugin is released
-  * ``` on("allreleased", (plugin: [Orchestrator](https://github.com/Psychopoulet/node-pluginsmanager-plugin#orchestrator-extends-mediatoruser)) => void) : this ``` fires if all the plugins are released
-  * ``` on("destroyed", (pluginName: string) => void) : this ``` fires if a plugin is destroyed
-  * ``` on("alldestroyed", (plugin: [Orchestrator](https://github.com/Psychopoulet/node-pluginsmanager-plugin#orchestrator-extends-mediatoruser)) => void) : this ``` fires if all the plugins are destroyed
+  * ``` on("initializing", (plugin: [Orchestrator](https://github.com/Psychopoulet/node-pluginsmanager-plugin#orchestrator-extends-mediatoruser), data?: any) => void) : this ``` fires if a plugin starts init
+  * ``` on("initialized", (plugin: [Orchestrator](https://github.com/Psychopoulet/node-pluginsmanager-plugin#orchestrator-extends-mediatoruser), data?: any) => void) : this ``` fires if a plugin ends init
+  * ``` on("allinitialized", (data?: any) => void) : this ``` fires if all the plugins are initialized
 
-  * ``` on("installed", (plugin: [Orchestrator](https://github.com/Psychopoulet/node-pluginsmanager-plugin#orchestrator-extends-mediatoruser)) => void) : this ``` fires if a plugin is installed
-  * ``` on("updated", (plugin: [Orchestrator](https://github.com/Psychopoulet/node-pluginsmanager-plugin#orchestrator-extends-mediatoruser)) => void) : this ``` fires if a plugin is updated
-  * ``` on("uninstalled", (pluginName: string) => void) : this ``` fires if a plugin is uninstalled
+  * ``` on("released", (plugin: [Orchestrator](https://github.com/Psychopoulet/node-pluginsmanager-plugin#orchestrator-extends-mediatoruser), data?: any) => void) : this ``` fires if a plugin is released
+  * ``` on("allreleased", (data?: any) => void) : this ``` fires if all the plugins are released
+
+  * ``` on("destroyed", (pluginName: string, data?: any) => void) : this ``` fires if a plugin is destroyed
+  * ``` on("alldestroyed", (data?: any) => void) : this ``` fires if all the plugins are destroyed
+
+  * ``` on("installed", (pluginName: string, data?: any) => void) : this ``` fires if a plugin is installed
+  * ``` on("updated", (plugin: [Orchestrator](https://github.com/Psychopoulet/node-pluginsmanager-plugin#orchestrator-extends-mediatoruser), data?: any) => void) : this ``` fires if a plugin is updated
+  * ``` on("uninstalled", (pluginName: string, data?: any) => void) : this ``` fires if a plugin is uninstalled
 
 ## Examples
 
@@ -126,9 +132,22 @@ manager
       console.log("--- [event/error] '" + msg.error + "' ---");
   })
 
+  // load
+
+    .on("loading", (pluginName) => {
+      console.log("--- [event/loading] '" + pluginName + "' loading ---");
+    }).on("loaded", (plugin) => {
+      console.log("--- [event/loaded] '" + plugin.name + "' (v" + plugin.version + ") loaded ---");
+    })
+    .on("allloaded", () => {
+      console.log("--- [event/allloaded] all plugins allloaded ---");
+    })
+
   // init
 
-    .on("initialized", (plugin) => {
+    .on("initializing", (plugin) => {
+      console.log("--- [event/initializing] '" + plugin.name + "' (v" + plugin.version + ") initialized ---");
+    }).on("initialized", (plugin) => {
       console.log("--- [event/initialized] '" + plugin.name + "' (v" + plugin.version + ") initialized ---");
     })
     .on("allinitialized", () => {
@@ -143,6 +162,9 @@ manager
     .on("allreleased", () => {
       console.log("--- [event/released] all plugins released ---");
     })
+
+  // destroy
+
     .on("destroyed", (pluginName) => {
       console.log("--- [event/destroyed] '" + pluginName + " destroyed ---");
     })
