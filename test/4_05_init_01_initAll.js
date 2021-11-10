@@ -254,7 +254,18 @@ describe("pluginsmanager / initAll", () => {
 
 			return new Promise((resolve, reject) => {
 
-				pluginsManager.on("initialized", (plugin, data) => {
+				pluginsManager.on("initializing", (plugin, data) => {
+
+					strictEqual(typeof plugin, "object", "Events plugin is not an object");
+
+					strictEqual(typeof data, "string", "Events data is not a string");
+					strictEqual(data, EVENTS_DATA, "Events data is not as expected");
+
+					(0, console).log("--- [PluginsManager/events/initializing] " + plugin.name + " - " + data);
+
+				}).on("initialized", (plugin, data) => {
+
+					strictEqual(typeof plugin, "object", "Events plugin is not an object");
 
 					strictEqual(typeof data, "string", "Events data is not a string");
 					strictEqual(data, EVENTS_DATA, "Events data is not as expected");
