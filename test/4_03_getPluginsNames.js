@@ -25,6 +25,10 @@ describe("pluginsmanager / getPluginsNames", () => {
 
 	it("should check plugins names before loading", () => {
 
+		assert.strictEqual(typeof pluginsManager.plugins, "object", "loaded plugins is not an object");
+		assert.strictEqual(pluginsManager.plugins instanceof Array, true, "loaded plugins are incorrects");
+		assert.strictEqual(pluginsManager.plugins.length, 0, "loaded plugins are incorrects");
+
 		const pluginsNames = pluginsManager.getPluginsNames();
 
 		assert.strictEqual(typeof pluginsNames, "object", "plugins names is not an object");
@@ -37,9 +41,8 @@ describe("pluginsmanager / getPluginsNames", () => {
 
 		return pluginsManager.loadAll().then(() => {
 
+			assert.strictEqual(typeof pluginsManager.plugins, "object", "loaded plugins is not an object");
 			assert.strictEqual(pluginsManager.plugins instanceof Array, true, "loaded plugins are incorrects");
-			assert.strictEqual(pluginsManager.plugins.length, 2, "loaded plugins are incorrects");
-
 			assert.strictEqual(pluginsManager.plugins.length, 2, "loaded plugins are incorrects");
 
 			const pluginsNames = pluginsManager.getPluginsNames();
