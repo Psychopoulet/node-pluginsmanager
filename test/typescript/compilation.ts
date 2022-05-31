@@ -6,13 +6,21 @@
 	import { join } from "path"
 	import { homedir } from "os"
 
+	// externals
+	import { mkdirp, remove } from "fs-extra";
+
 	// locals
 	import PluginManager = require("node-pluginsmanager");
 
 // consts
 
+	const EXTERNAL_DIRECTORY: string = join(homedir(), "MySoftware");
+	const EXTERNAL_DIRECTORY_PLUGINS: string = join(EXTERNAL_DIRECTORY, "plugins");
+	const EXTERNAL_DIRECTORY_RESSOURCES: string = join(EXTERNAL_DIRECTORY, "ressources");
+
 	const manager: PluginManager = new PluginManager({
-		"directory": join(homedir(), "MySoftware", "plugins")
+		"directory": EXTERNAL_DIRECTORY_PLUGINS,
+		"externalRessourcesDirectory": EXTERNAL_DIRECTORY_RESSOURCES
 	});
 
 // module
@@ -77,7 +85,17 @@ try {
 		});
 
 	}).then((): Promise<void> => {
+
+		return mkdirp(EXTERNAL_DIRECTORY).then((): Promise<void> => {
+			return mkdirp(EXTERNAL_DIRECTORY_PLUGINS);
+		}).then((): Promise<void> => {
+			return mkdirp(EXTERNAL_DIRECTORY_RESSOURCES);
+		});
+
+	}).then((): Promise<void> => {
+
 		return manager.initAll();
+
 	}).then((): void => {
 
 		console.log("all plugins initialized");
@@ -112,6 +130,21 @@ try {
 			console.log(err);
 		});
 		*/
+
+	}).then((): Promise<void> => {
+
+		return remove(EXTERNAL_DIRECTORY_RESSOURCES).then((): Promise<void> => {
+			return remove(EXTERNAL_DIRECTORY_PLUGINS);
+		}).then((): Promise<void> => {
+			return remove(EXTERNAL_DIRECTORY);
+		});
+
+	}).catch((err: Error): void => {
+
+		console.error(err);
+
+		process.exitCode = 1;
+		process.exit(1);
 
 	});
 

@@ -8,7 +8,7 @@
 	const { join } = require("path");
 
 	// externals
-	const { mkdirpProm, rmdirpProm } = require("node-promfs");
+	const { mkdirp, remove } = require("fs-extra");
 
 	// locals
 
@@ -32,11 +32,11 @@
 describe("cmd / git", () => {
 
 	before(() => {
-		return mkdirpProm(PLUGINS_DIRECTORY);
+		return mkdirp(PLUGINS_DIRECTORY);
 	});
 
 	after(() => {
-		return rmdirpProm(PLUGINS_DIRECTORY);
+		return remove(PLUGINS_DIRECTORY);
 	});
 
 	describe("install", () => {
