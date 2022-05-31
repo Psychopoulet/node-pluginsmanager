@@ -113,6 +113,13 @@ try {
 		});
 		*/
 
+	}).catch((err: Error): void => {
+
+		console.error(err);
+
+		process.exitCode = 1;
+		process.exit(1);
+
 	});
 
 }

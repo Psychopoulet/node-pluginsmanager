@@ -10,7 +10,7 @@
 	const { join } = require("path");
 
 	// externals
-	const { rmdirpProm } = require("node-promfs");
+	const { remove } = require("fs-extra");
 
 	// locals
 	const copyPlugin = require(join(__dirname, "utils", "copyPlugin.js"));
@@ -71,7 +71,7 @@ describe("pluginsmanager / checkAllModules", () => {
 		}).then(() => {
 			return pluginsManager.destroyAll();
 		}).then(() => {
-			return rmdirpProm(pluginDirectory);
+			return remove(pluginDirectory);
 		});
 
 	}).timeout(MAX_TIMOUT);

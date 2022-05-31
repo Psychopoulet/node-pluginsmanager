@@ -10,11 +10,7 @@
 	const { join } = require("path");
 
 	// externals
-	const {
-		mkdirProm,
-		readdirProm, copyFileProm,
-		readJSONFileProm, writeJSONFileProm
-	} = require("node-promfs");
+	const { mkdir, readdir, copy, readJson, writeJson } = require("fs-extra");
 
 // module
 
@@ -24,10 +20,10 @@ module.exports = function copyPlugin (directory, originName, targetName, package
 	const targetDirectory = join(directory, targetName);
 
 	// create dir
-	return mkdirProm(targetDirectory).then(() => {
+	return mkdir(targetDirectory).then(() => {
 
 		// copy dir
-		return readdirProm(originDirectory).then((files) => {
+		return readdir(originDirectory).then((files) => {
 
 			return new Promise((resolve, reject) => {
 
@@ -35,7 +31,7 @@ module.exports = function copyPlugin (directory, originName, targetName, package
 
 				for (let i = 0; i < files.length; ++i) {
 
-					copyFileProm(
+					copy(
 						join(originDirectory, files[i]),
 						join(targetDirectory, files[i])
 					).then(() => {
@@ -67,8 +63,8 @@ module.exports = function copyPlugin (directory, originName, targetName, package
 
 			const pluginPackageFile = join(targetDirectory, "package.json");
 
-			return readJSONFileProm(pluginPackageFile).then((data) => {
-				return writeJSONFileProm(pluginPackageFile, Object.assign(data, packageData));
+			return readJson(pluginPackageFile).then((data) => {
+				return writeJson(pluginPackageFile, Object.assign(data, packageData));
 			});
 
 		}).then(() => {
@@ -77,7 +73,7 @@ module.exports = function copyPlugin (directory, originName, targetName, package
 
 				const pluginDescriptorFile = join(targetDirectory, "Descriptor.json");
 
-				return readJSONFileProm(pluginDescriptorFile).then((data) => {
+				return readJson(pluginDescriptorFile).then((data) => {
 
 					const oldTitle = data.info.title;
 					const newTitle = packageData.name;
@@ -97,7 +93,7 @@ module.exports = function copyPlugin (directory, originName, targetName, package
 
 					data.paths = paths;
 
-					return writeJSONFileProm(pluginDescriptorFile, data);
+					return writeJson(pluginDescriptorFile, data);
 
 				});
 

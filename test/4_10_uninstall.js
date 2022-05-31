@@ -7,7 +7,7 @@
 	const { strictEqual } = require("assert");
 
 	// externals
-	const { rmdirpProm } = require("node-promfs");
+	const { remove } = require("fs-extra");
 	const { Orchestrator } = require("node-pluginsmanager-plugin");
 
 	// locals
@@ -94,7 +94,7 @@ describe("pluginsmanager / uninstall", () => {
 			return pluginsManager.releaseAll().then(() => {
 				return pluginsManager.destroyAll();
 			}).then(() => {
-				return rmdirpProm(TEST_PLUGIN_DIRECTORY);
+				return remove(TEST_PLUGIN_DIRECTORY);
 			});
 
 		});
