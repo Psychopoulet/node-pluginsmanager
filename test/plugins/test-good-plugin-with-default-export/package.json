@@ -1,0 +1,12 @@
+{
+  "name": "test-good-plugin-with-default-export",
+  "version": "0.0.4",
+  "description": "A test for node-pluginsmanager",
+  "main": "Orchestrator.js",
+  "authors": [
+    "Sébastien VIDAL",
+    "test"
+  ],
+  "dependencies": { },
+  "license": "ISC"
+}
