@@ -168,7 +168,7 @@ describe("pluginsmanager / loadAll", () => {
 
 				strictEqual(typeof pluginsManager.plugins, "object", "plugins is not an object");
 				strictEqual(pluginsManager.plugins instanceof Array, true, "plugins is not an Array");
-				strictEqual(pluginsManager.plugins.length, 2, "plugins length is not valid");
+				strictEqual(pluginsManager.plugins.length, 3, "plugins length is not valid");
 
 			});
 
