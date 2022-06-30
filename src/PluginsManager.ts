@@ -9,9 +9,7 @@
 
 	// externals
 	const versionModulesChecker = require("check-version-modules");
-	const {
-		mkdirpProm, readdirProm, rmdirpProm
-	} = require("node-promfs");
+	const { mkdirp, readdir, remove } = require("fs-extra");
 
 	// locals
 	const isAbsoluteDirectory = require(join(__dirname, "checkers", "isAbsoluteDirectory.js"));
@@ -225,7 +223,7 @@ export default class PluginsManager extends Events {
 				// create dir if not exist
 				return isNonEmptyString("initAll/directory", this.directory).then(() => {
 
-					return mkdirpProm(this.directory).then(() => {
+					return mkdirp(this.directory).then(() => {
 						return isAbsoluteDirectory("initAll/directory", this.directory);
 					});
 
@@ -234,7 +232,7 @@ export default class PluginsManager extends Events {
 
 					return isNonEmptyString("initAll/externalRessourcesDirectory", this.externalRessourcesDirectory).then(() => {
 
-						return mkdirpProm(this.externalRessourcesDirectory).then(() => {
+						return mkdirp(this.externalRessourcesDirectory).then(() => {
 							return isAbsoluteDirectory("initAll/externalRessourcesDirectory", this.externalRessourcesDirectory);
 						});
 
@@ -252,7 +250,7 @@ export default class PluginsManager extends Events {
 
 					return "function" !== typeof this._beforeLoadAll ? Promise.resolve() : new Promise((resolve, reject) => {
 
-						const fn = this._beforeLoadAll();
+						const fn = this._beforeLoadAll(data);
 
 						if (!(fn instanceof Promise)) {
 							resolve();
@@ -266,7 +264,7 @@ export default class PluginsManager extends Events {
 				// init plugins
 				}).then(() => {
 
-					return readdirProm(this.directory);
+					return readdir(this.directory);
 
 				// load all
 				}).then((files) => {
@@ -348,7 +346,7 @@ export default class PluginsManager extends Events {
 				// remove all external resources
 				}).then(() => {
 
-					return rmdirpProm(this.externalRessourcesDirectory);
+					return remove(this.externalRessourcesDirectory);
 
 				});
 
@@ -379,7 +377,7 @@ export default class PluginsManager extends Events {
 					// execute _beforeInitAll
 					return "function" !== typeof this._beforeInitAll ? Promise.resolve() : new Promise((resolve, reject) => {
 
-						const fn = this._beforeInitAll();
+						const fn = this._beforeInitAll(data);
 
 						if (!(fn instanceof Promise)) {
 							resolve();
@@ -527,7 +525,7 @@ export default class PluginsManager extends Events {
 
 							isAbsoluteDirectory("installViaGithub/plugindirectory", directory).then(() => {
 
-								return rmdirpProm(directory).then(() => {
+								return remove(directory).then(() => {
 									reject(err);
 								});
 
@@ -697,7 +695,7 @@ export default class PluginsManager extends Events {
 
 					return plugin.release(data).then(() => {
 
-						return rmdirpProm(join(this.externalRessourcesDirectory, pluginName));
+						return remove(join(this.externalRessourcesDirectory, pluginName));
 
 					}).then(() => {
 
@@ -726,7 +724,7 @@ export default class PluginsManager extends Events {
 
 						this.emit("uninstalled", pluginName, data);
 
-						return rmdirpProm(directory);
+						return remove(directory);
 
 					});
 
