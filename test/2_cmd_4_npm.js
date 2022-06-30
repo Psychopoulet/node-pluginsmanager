@@ -8,7 +8,7 @@
 	const { join } = require("path");
 
 	// externals
-	const { mkdirpProm, rmdirpProm, writeJSONFileProm } = require("node-promfs");
+	const { mkdirp, remove, writeJson } = require("fs-extra");
 
 	// locals
 
@@ -30,9 +30,9 @@ describe("cmd / npm", () => {
 
 	before(() => {
 
-		return mkdirpProm(PLUGINS_DIRECTORY).then(() => {
+		return mkdirp(PLUGINS_DIRECTORY).then(() => {
 
-			return writeJSONFileProm(join(PLUGINS_DIRECTORY, "package.json"), {
+			return writeJson(join(PLUGINS_DIRECTORY, "package.json"), {
 				"dependencies": {
 					"node-promfs": "3.6.2"
 				}
@@ -43,7 +43,7 @@ describe("cmd / npm", () => {
 	});
 
 	after(() => {
-		return rmdirpProm(PLUGINS_DIRECTORY);
+		return remove(PLUGINS_DIRECTORY);
 	});
 
 	it("should test wrong repository", (done) => {

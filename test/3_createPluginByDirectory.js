@@ -9,7 +9,7 @@
 
 	// externals
 	const { Orchestrator } = require("node-pluginsmanager-plugin");
-	const { mkdirpProm, rmdirpProm, writeFileProm } = require("node-promfs");
+	const { mkdirp, remove, writeFile } = require("fs-extra");
 
 	// locals
 	const copyPlugin = require(join(__dirname, "utils", "copyPlugin.js"));
@@ -31,20 +31,20 @@ describe("createPluginByDirectory", () => {
 
 	before(() => {
 
-		return mkdirpProm(NOT_PLUGIN).then(() => {
-			return mkdirpProm(INVALID_NAME_PLUGIN);
+		return mkdirp(NOT_PLUGIN).then(() => {
+			return mkdirp(INVALID_NAME_PLUGIN);
 		}).then(() => {
-			return mkdirpProm(TESTS_EXTERNAL_RESSOURCES_DIRECTORY);
+			return mkdirp(TESTS_EXTERNAL_RESSOURCES_DIRECTORY);
 		});
 
 	});
 
 	after(() => {
 
-		return rmdirpProm(NOT_PLUGIN).then(() => {
-			return rmdirpProm(INVALID_NAME_PLUGIN);
+		return remove(NOT_PLUGIN).then(() => {
+			return remove(INVALID_NAME_PLUGIN);
 		}).then(() => {
-			return rmdirpProm(TESTS_EXTERNAL_RESSOURCES_DIRECTORY);
+			return remove(TESTS_EXTERNAL_RESSOURCES_DIRECTORY);
 		});
 
 	});
@@ -215,7 +215,7 @@ describe("createPluginByDirectory", () => {
 
 		it("should test not plugin directory", (done) => {
 
-			writeFileProm(
+			writeFile(
 				join(NOT_PLUGIN, "package.json"),
 				JSON.stringify({
 					"name": "test",
@@ -224,7 +224,7 @@ describe("createPluginByDirectory", () => {
 				"utf8"
 			).then(() => {
 
-				return writeFileProm(
+				return writeFile(
 					join(NOT_PLUGIN, "TestNotPlugin.js"),
 					"// nothing to do here",
 					"utf8"

@@ -7,7 +7,7 @@
 	const { strictEqual } = require("assert");
 
 	// externals
-	const { rmdirpProm } = require("node-promfs");
+	const { remove } = require("fs-extra");
 
 	// locals
 	const PluginsManager = require(join(__dirname, "..", "lib", "main.js"));
@@ -41,9 +41,9 @@ describe("pluginsmanager / install via github", () => {
 		return pluginsManager.releaseAll().then(() => {
 			return pluginsManager.destroyAll();
 		}).then(() => {
-			return rmdirpProm(join(PLUGINS_DIRECTORY, GITHUB_REPO));
+			return remove(join(PLUGINS_DIRECTORY, GITHUB_REPO));
 		}).then(() => {
-			return rmdirpProm(join(PLUGINS_DIRECTORY, GITHUB_WRONG_REPO));
+			return remove(join(PLUGINS_DIRECTORY, GITHUB_WRONG_REPO));
 		});
 
 	});

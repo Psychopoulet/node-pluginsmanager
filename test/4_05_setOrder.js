@@ -208,7 +208,7 @@ describe("pluginsmanager / setOrder", () => {
 			}).then(() => {
 
 				strictEqual(pluginsManager.plugins instanceof Array, true, "loaded plugins are incorrects");
-				strictEqual(pluginsManager.plugins.length, 2, "loaded plugins are incorrects");
+				strictEqual(pluginsManager.plugins.length, 3, "loaded plugins are incorrects");
 
 				// test-good-plugin
 
@@ -236,7 +236,7 @@ describe("pluginsmanager / setOrder", () => {
 				strictEqual("object" === typeof pluginsManager.plugins[1], true, "loaded plugins are incorrects");
 
 					strictEqual(
-						pluginsManager.plugins[1].name, "test-good-plugin-without-dependencies",
+						pluginsManager.plugins[1].name, "test-good-plugin-with-default-export",
 						"Loaded plugins' name are not correct"
 					);
 
@@ -251,7 +251,7 @@ describe("pluginsmanager / setOrder", () => {
 					);
 
 					deepStrictEqual(
-						pluginsManager.plugins[1].name, "test-good-plugin-without-dependencies", "loaded plugins are incorrects"
+						pluginsManager.plugins[1].name, "test-good-plugin-with-default-export", "loaded plugins are incorrects"
 					);
 
 			});

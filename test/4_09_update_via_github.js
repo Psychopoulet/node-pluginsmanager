@@ -7,7 +7,7 @@
 	const { strictEqual } = require("assert");
 
 	// externals
-	const { rmdirpProm } = require("node-promfs");
+	const { remove } = require("fs-extra");
 	const { Orchestrator } = require("node-pluginsmanager-plugin");
 
 	// locals
@@ -116,9 +116,9 @@ describe("pluginsmanager / update via github", () => {
 			return pluginsManager.releaseAll().then(() => {
 				return pluginsManager.destroyAll();
 			}).then(() => {
-				return rmdirpProm(TEST_PLUGIN_MODULES_DIRECTORY);
+				return remove(TEST_PLUGIN_MODULES_DIRECTORY);
 			}).then(() => {
-				return rmdirpProm(TEST_PLUGIN_DIRECTORY);
+				return remove(TEST_PLUGIN_DIRECTORY);
 			});
 
 		});
@@ -137,7 +137,7 @@ describe("pluginsmanager / update via github", () => {
 
 			}).then(() => {
 
-				strictEqual(pluginsManager.plugins.length, 3, "Distant plugin not installed");
+				strictEqual(pluginsManager.plugins.length, 4, "Distant plugin not installed");
 
 				return pluginsManager.updateViaGithub(pluginsManager.plugins.filter((plugin) => {
 					return pluginName === plugin.name;
@@ -169,7 +169,7 @@ describe("pluginsmanager / update via github", () => {
 
 			}).then(() => {
 
-				strictEqual(pluginsManager.plugins.length, 3, "Distant plugin not installed");
+				strictEqual(pluginsManager.plugins.length, 4, "Distant plugin not installed");
 
 				return pluginsManager.updateViaGithub(pluginsManager.plugins.filter((plugin) => {
 					return pluginName === plugin.name;
@@ -199,7 +199,7 @@ describe("pluginsmanager / update via github", () => {
 
 			}).then(() => {
 
-				strictEqual(pluginsManager.plugins.length, 3, "Distant plugin not installed");
+				strictEqual(pluginsManager.plugins.length, 4, "Distant plugin not installed");
 
 				return pluginsManager.updateViaGithub(pluginsManager.plugins.filter((plugin) => {
 					return pluginName === plugin.name;
