@@ -2,7 +2,7 @@
 
 // module
 
-module.exports = (msg) => {
+export default function stdToString (msg: any): string {
 
 	if ("object" !== typeof msg) {
 		return String(msg);

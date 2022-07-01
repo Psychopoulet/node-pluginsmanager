@@ -19,16 +19,16 @@
 	import checkOrchestrator from "./checkers/checkOrchestrator";
 	import createPluginByDirectory from "./createPluginByDirectory";
 
+	import loadSortedPlugins from "./loadSortedPlugins";
+	import initSortedPlugins from "./initSortedPlugins";
+
 		// git
-		const gitInstall = require(join(__dirname, "cmd", "git", "install.js"));
-		const gitUpdate = require(join(__dirname, "cmd", "git", "update.js"));
+		import gitInstall from "./cmd/git/gitInstall";
+		import gitUpdate from "./cmd/git/gitUpdate";
 
 		// npm
-		const npmInstall = require(join(__dirname, "cmd", "npm", "install.js"));
-		const npmUpdate = require(join(__dirname, "cmd", "npm", "update.js"));
-
-	const loadSortedPlugins = require(join(__dirname, "loadSortedPlugins.js"));
-	const initSortedPlugins = require(join(__dirname, "initSortedPlugins.js"));
+		import npmInstall from "./cmd/npm/npmInstall";
+		import npmUpdate from "./cmd/npm/npmUpdate";
 
 // types & interfaces
 
@@ -44,8 +44,8 @@
 
 // consts
 
-	const DEFAULT_PLUGINS_DIRECTORY = join(homedir(), "node-pluginsmanager-plugins");
-	const DEFAULT_RESSOURCES_DIRECTORY = join(homedir(), "node-pluginsmanager-resources");
+	const DEFAULT_PLUGINS_DIRECTORY: string = join(homedir(), "node-pluginsmanager-plugins");
+	const DEFAULT_RESSOURCES_DIRECTORY: string = join(homedir(), "node-pluginsmanager-resources");
 
 // module
 
