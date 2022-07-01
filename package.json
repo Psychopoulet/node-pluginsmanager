@@ -2,7 +2,7 @@
   "name": "node-pluginsmanager",
   "version": "2.4.0",
   "description": "A plugins manager",
-  
+
   "type": "commonjs",
   "typings": "./lib/cjs/main.d.cts",
   "main": "./lib/cjs/main.cjs",
@@ -57,6 +57,7 @@
   },
   "devDependencies": {
     "@types/express": "4.17.13",
+    "@types/fs-extra": "9.0.13",
     "@types/node": "18.0.0",
     "@types/socket.io": "3.0.2",
     "@types/ws": "8.5.3",
