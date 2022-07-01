@@ -8,17 +8,14 @@
 	import { homedir } from "os";
 
 	// externals
-
 	import versionModulesChecker from "check-version-modules";
 	import { mkdirp, readdir, remove } from "fs-extra";
+	import { checkFunction, checkNonEmptyArray, checkNonEmptyString, tLogger } from "node-pluginsmanager-plugin";
 
 	// locals
-	const isAbsoluteDirectory = require(join(__dirname, "checkers", "isAbsoluteDirectory.js"));
-	const isFunction = require(join(__dirname, "checkers", "isFunction.js"));
-	const isNonEmptyArray = require(join(__dirname, "checkers", "isNonEmptyArray.js"));
-	const isNonEmptyString = require(join(__dirname, "checkers", "isNonEmptyString.js"));
-	const isOrchestrator = require(join(__dirname, "checkers", "isOrchestrator.js"));
-	const createPluginByDirectory = require(join(__dirname, "createPluginByDirectory.js"));
+	import checkAbsoluteDirectory from "./checkers/checkAbsoluteDirectory";
+	import checkOrchestrator from "./checkers/checkOrchestrator";
+	import createPluginByDirectory from "./createPluginByDirectory";
 
 		// git
 		const gitInstall = require(join(__dirname, "cmd", "git", "install.js"));
@@ -40,7 +37,7 @@
 	interface iPluginManagerOptions {
 		"directory"?: string;
 		"externalRessourcesDirectory"?: string;
-		"logger"?: Function | null;
+		"logger"?: tLogger | null;
 	}
 
 
@@ -57,8 +54,10 @@ export default class PluginsManager extends EventEmitter {
 
 		// protected
 
-		protected _beforeLoadAll: (...data: any) => Promise<void> | void | null;
-		protected _beforeInitAll: (...data: any) => Promise<void> | void | null;
+		protected _beforeLoadAll: ((...data: any) => Promise<void>) | void | null;
+		protected _beforeInitAll: ((...data: any) => Promise<void>) | void | null;
+
+		protected _logger: tLogger | null;
 
 		protected _orderedPluginsNames: Array<string>;
 
@@ -109,7 +108,7 @@ export default class PluginsManager extends EventEmitter {
 		// create a forced order to synchronously initialize plugins. not ordered plugins are asynchronously initialized after.
 		public setOrder (pluginsNames: Array<string>): Promise<void> {
 
-			return isNonEmptyArray("setOrder/pluginsNames", pluginsNames).then(() => {
+			return checkNonEmptyArray("setOrder/pluginsNames", pluginsNames).then(() => {
 
 				const errors = [];
 				for (let i = 0; i < pluginsNames.length; ++i) {
@@ -164,9 +163,9 @@ export default class PluginsManager extends EventEmitter {
 
 		public checkModules (plugin: Orchestrator): Promise<void> {
 
-			return isAbsoluteDirectory("checkModules/directory", this.directory).then(() => {
+			return checkAbsoluteDirectory("checkModules/directory", this.directory).then(() => {
 
-				return isOrchestrator("checkModules/plugin", plugin);
+				return checkOrchestrator("checkModules/plugin", plugin);
 
 			}).then(() => {
 
@@ -233,7 +232,7 @@ export default class PluginsManager extends EventEmitter {
 		// add a function executed before loading all plugins
 		public beforeLoadAll (callback: (...data: any) => Promise<void> | void): Promise<void> {
 
-			return isFunction("beforeLoadAll/callback", callback).then(() => {
+			return checkFunction("beforeLoadAll/callback", callback).then(() => {
 
 				this._beforeLoadAll = callback;
 
@@ -247,19 +246,19 @@ export default class PluginsManager extends EventEmitter {
 		public loadAll (...data: any): Promise<void> {
 
 			// create dir if not exist
-			return isNonEmptyString("initAll/directory", this.directory).then(() => {
+			return checkNonEmptyString("initAll/directory", this.directory).then(() => {
 
 				return mkdirp(this.directory).then(() => {
-					return isAbsoluteDirectory("initAll/directory", this.directory);
+					return checkAbsoluteDirectory("initAll/directory", this.directory);
 				});
 
 			// create dir if not exist
 			}).then(() => {
 
-				return isNonEmptyString("initAll/externalRessourcesDirectory", this.externalRessourcesDirectory).then(() => {
+				return checkNonEmptyString("initAll/externalRessourcesDirectory", this.externalRessourcesDirectory).then(() => {
 
 					return mkdirp(this.externalRessourcesDirectory).then(() => {
-						return isAbsoluteDirectory("initAll/externalRessourcesDirectory", this.externalRessourcesDirectory);
+						return checkAbsoluteDirectory("initAll/externalRessourcesDirectory", this.externalRessourcesDirectory);
 					});
 
 				});
@@ -382,7 +381,7 @@ export default class PluginsManager extends EventEmitter {
 		// add a function executed before initializing all plugins
 		public beforeInitAll (callback: (...data: any) => Promise<void> | void): Promise<void> {
 
-			return isFunction("beforeInitAll/callback", callback).then(() => {
+			return checkFunction("beforeInitAll/callback", callback).then(() => {
 
 				this._beforeInitAll = callback;
 
@@ -395,9 +394,9 @@ export default class PluginsManager extends EventEmitter {
 		// initialize all plugins asynchronously, using "data" in arguments for "init" plugin's Orchestrator method
 		public initAll (...data: any): Promise<void> {
 
-			return isAbsoluteDirectory("initAll/directory", this.directory).then(() => {
+			return checkAbsoluteDirectory("initAll/directory", this.directory).then(() => {
 
-				return isAbsoluteDirectory("initAll/externalRessourcesDirectory", this.externalRessourcesDirectory);
+				return checkAbsoluteDirectory("initAll/externalRessourcesDirectory", this.externalRessourcesDirectory);
 
 			}).then(() => {
 
@@ -478,17 +477,17 @@ export default class PluginsManager extends EventEmitter {
 		// install a plugin via github repo, using "data" in arguments for "install" and "init" plugin's Orchestrator methods
 		public installViaGithub (user: string, repo: string, ...data: any): Promise<Orchestrator> {
 
-			return isAbsoluteDirectory("installViaGithub/directory", this.directory).then(() => {
-				return isNonEmptyString("installViaGithub/user", user);
+			return checkAbsoluteDirectory("installViaGithub/directory", this.directory).then(() => {
+				return checkNonEmptyString("installViaGithub/user", user);
 			}).then(() => {
-				return isNonEmptyString("installViaGithub/repo", repo);
+				return checkNonEmptyString("installViaGithub/repo", repo);
 			}).then(() => {
 
 				const directory = join(this.directory, repo);
 
 				return new Promise((resolve, reject) => {
 
-					isAbsoluteDirectory("installViaGithub/plugindirectory", directory).then(() => {
+					checkAbsoluteDirectory("installViaGithub/plugindirectory", directory).then(() => {
 						reject(new Error("\"" + repo + "\" plugin already exists"));
 					}).catch(() => {
 						resolve(directory);
@@ -550,7 +549,7 @@ export default class PluginsManager extends EventEmitter {
 
 					return new Promise((resolve, reject) => {
 
-						isAbsoluteDirectory("installViaGithub/plugindirectory", directory).then(() => {
+						checkAbsoluteDirectory("installViaGithub/plugindirectory", directory).then(() => {
 
 							return remove(directory).then(() => {
 								reject(err);
@@ -577,7 +576,7 @@ export default class PluginsManager extends EventEmitter {
 			// check plugin
 			return Promise.resolve().then(() => {
 
-				return isOrchestrator("updateViaGithub/plugin", plugin).then(() => {
+				return checkOrchestrator("updateViaGithub/plugin", plugin).then(() => {
 
 					let github = "";
 					if ("string" === typeof plugin.github) {
@@ -590,7 +589,7 @@ export default class PluginsManager extends EventEmitter {
 						github = plugin.repository.url;
 					}
 
-					return isNonEmptyString("updateViaGithub/github", github).catch(() => {
+					return checkNonEmptyString("updateViaGithub/github", github).catch(() => {
 
 						return Promise.reject(new ReferenceError(
 							"Plugin \"" + plugin.name + "\" must be linked in the package to a github project to be updated"
@@ -611,11 +610,11 @@ export default class PluginsManager extends EventEmitter {
 			// check plugin directory
 			}).then(() => {
 
-				return isAbsoluteDirectory("updateViaGithub/directory", this.directory).then(() => {
+				return checkAbsoluteDirectory("updateViaGithub/directory", this.directory).then(() => {
 
 					directory = join(this.directory, plugin.name);
 
-					return isAbsoluteDirectory("updateViaGithub/plugindirectory", directory);
+					return checkAbsoluteDirectory("updateViaGithub/plugindirectory", directory);
 
 				});
 
@@ -697,7 +696,7 @@ export default class PluginsManager extends EventEmitter {
 			// check plugin
 			return Promise.resolve().then(() => {
 
-				return isOrchestrator("uninstall/plugin", plugin).then(() => {
+				return checkOrchestrator("uninstall/plugin", plugin).then(() => {
 
 					key = this.getPluginsNames().findIndex((name) => {
 						return name === plugin.name;
@@ -710,12 +709,12 @@ export default class PluginsManager extends EventEmitter {
 			// check plugin directory
 			}).then(() => {
 
-				return isAbsoluteDirectory("uninstall/directory", this.directory).then(() => {
+				return checkAbsoluteDirectory("uninstall/directory", this.directory).then(() => {
 
 					pluginName = plugin.name;
 					directory = join(this.directory, pluginName);
 
-					return isAbsoluteDirectory("uninstall/plugindirectory", directory);
+					return checkAbsoluteDirectory("uninstall/plugindirectory", directory);
 
 				});
 
