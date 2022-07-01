@@ -3,7 +3,7 @@
 // deps
 
 	// natives
-	import { lstat } from "fs";
+	import { lstat, Stats } from "fs";
 
 	// locals
 	import checkNonEmptyString from "./checkNonEmptyString";
@@ -16,7 +16,7 @@ export default function checkDirectory (dataName: string, directory: string): Pr
 
 		return new Promise((resolve: (exists: boolean) => void): void => {
 
-			lstat(directory, (err, stats): void => {
+			lstat(directory, (err: Error | null, stats: Stats): void => {
 				return resolve(Boolean(!err && stats.isDirectory()));
 			});
 

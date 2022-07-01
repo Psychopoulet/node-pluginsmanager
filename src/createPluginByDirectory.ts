@@ -13,7 +13,12 @@
 // types & interfaces
 
 	// natives
-	import {  Orchestrator, tLogger } from "node-pluginsmanager-plugin";
+	import { Orchestrator, tLogger } from "node-pluginsmanager-plugin";
+
+	// locals
+
+	type tMultiExportPlugin = { "Orchestrator": typeof Orchestrator; };
+	type tDefaultExportPlugin = { "default": typeof Orchestrator; };
 
 // module
 
@@ -23,24 +28,45 @@ export default function createPluginByDirectory (directory: string, externalRess
 		return checkAbsoluteDirectory("createPluginByDirectory/externalRessourcesDirectory", externalRessourcesDirectory);
 	}).then((): Promise<Orchestrator> => {
 
-		return Promise.resolve().then((): Promise<Orchestrator> => {
+		return new Promise((resolve: (value: tMultiExportPlugin | tDefaultExportPlugin | typeof Orchestrator) => void, reject: (err: Error) => void): void => {
 
-			let Plugin: any = require(directory);
+			try {
+				resolve(require(directory) as tMultiExportPlugin | tDefaultExportPlugin | typeof Orchestrator);
+			}
+			catch (e) {
+				reject(e as Error);
+			}
 
-			if (Plugin.Orchestrator) {
-				Plugin = Plugin.Orchestrator;
+		}).then((Plugin:tMultiExportPlugin | tDefaultExportPlugin | typeof Orchestrator): Promise<typeof Orchestrator> => {
+
+			if ((Plugin as tMultiExportPlugin).Orchestrator) {
+				return Promise.resolve((Plugin as tMultiExportPlugin).Orchestrator);
 			}
-			else if (Plugin.default) {
-				Plugin = Plugin.default;
+			else if ((Plugin as tDefaultExportPlugin).default) {
+				return Promise.resolve((Plugin as tDefaultExportPlugin).default);
 			}
+			else {
+				return Promise.resolve(Plugin as typeof Orchestrator);
+			}
+
+		}).then((Plugin: typeof Orchestrator): Promise<Orchestrator> => {
 
 			return checkFunction("createPluginByDirectory/function", Plugin).then((): Promise<Orchestrator> => {
 
 				const pluginBaseNameDirectory: string = basename(directory);
 
 				const plugin: Orchestrator = new Plugin({
+
+					// usefull for inherited Orchestrators
 					"externalRessourcesDirectory": join(externalRessourcesDirectory, pluginBaseNameDirectory),
-					"logger": logger
+					"logger": logger as tLogger,
+
+					// useless, setted in inherited Orchestrators
+					"packageFile": "",
+					"descriptorFile": "",
+					"mediatorFile": "",
+					"serverFile": ""
+
 				});
 
 				return checkOrchestrator("createPluginByDirectory/orchestrator", plugin).then((): Promise<void> => {

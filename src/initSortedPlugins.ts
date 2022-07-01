@@ -9,7 +9,7 @@
 
 	// methods
 
-		function _initPlugin (plugin: Orchestrator, emit: Function, ...data: any): Promise<void> {
+		function _initPlugin (plugin: Orchestrator, emit: (eventName: string, ...subdata: any) => void, ...data: any): Promise<void> {
 
 			emit("initializing", plugin, ...data);
 
@@ -23,7 +23,7 @@
 
 		}
 
-		function _initPlugins (pluginsToInit: Array<Orchestrator>, emit: Function, data: Array<any>, i: number = 0): Promise<void> {
+		function _initPlugins (pluginsToInit: Array<Orchestrator>, emit: (eventName: string, ...subdata: any) => void, data: Array<any>, i: number = 0): Promise<void> {
 
 			return i < pluginsToInit.length ? Promise.resolve().then((): Promise<void> => {
 
@@ -42,13 +42,13 @@
 
 export default function initSortedPlugins (
 	plugins: Array<Orchestrator>, orderedPluginsNames: Array<string>,
-	emit: Function, ...data: any
+	emit: (eventName: string, ...subdata: any) => void, ...data: any
 ): Promise<void> {
 
 	// if no plugins, does not run
 	return !plugins.length ? Promise.resolve() : Promise.resolve().then((): Promise<void> => {
 
-		const sortedPlugins = [
+		const sortedPlugins: Array<Orchestrator> = [
 			...plugins.filter((plugin): boolean => {
 				return orderedPluginsNames.includes(plugin.name);
 			})
@@ -61,7 +61,7 @@ export default function initSortedPlugins (
 
 	}).then((): Promise<void> => {
 
-		const unsortedPlugin = [
+		const unsortedPlugin: Array<Orchestrator> = [
 			...plugins.filter((plugin: Orchestrator): boolean => {
 				return !orderedPluginsNames.includes(plugin.name);
 			}).sort((a: Orchestrator, b: Orchestrator): -1 | 0 | 1 => {
