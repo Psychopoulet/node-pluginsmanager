@@ -6,7 +6,7 @@
 	import EventEmitter from "events";
 
 	// locals
-	import { checkFunction } from "node-pluginsmanager-plugin";
+	import checkFunction from "./checkFunction";
 
 // module
 

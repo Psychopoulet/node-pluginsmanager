@@ -10,10 +10,12 @@
 	// externals
 	import versionModulesChecker from "check-version-modules";
 	import { mkdirp, readdir, remove } from "fs-extra";
-	import { checkFunction, checkNonEmptyArray, checkNonEmptyString, tLogger } from "node-pluginsmanager-plugin";
 
 	// locals
 	import checkAbsoluteDirectory from "./checkers/checkAbsoluteDirectory";
+	import checkFunction from "./checkers/checkFunction";
+	import checkNonEmptyArray from "./checkers/checkNonEmptyArray";
+	import checkNonEmptyString from "./checkers/checkNonEmptyString";
 	import checkOrchestrator from "./checkers/checkOrchestrator";
 	import createPluginByDirectory from "./createPluginByDirectory";
 
@@ -30,7 +32,7 @@
 
 // types & interfaces
 
-	import { Orchestrator, iIncomingMessage, iServerResponse } from "node-pluginsmanager-plugin";
+	import { Orchestrator, tLogger, iIncomingMessage, iServerResponse } from "node-pluginsmanager-plugin";
 	import { Server as WebSocketServer } from "ws";
 	import { Server as SocketIOServer } from "socket.io";
 
@@ -39,7 +41,6 @@
 		"externalRessourcesDirectory"?: string;
 		"logger"?: tLogger | null;
 	}
-
 
 // consts
 

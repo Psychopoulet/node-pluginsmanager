@@ -5,8 +5,8 @@
 	// natives
 	import { lstat } from "fs";
 
-	// externals
-	import { checkNonEmptyString } from "node-pluginsmanager-plugin";
+	// locals
+	import checkNonEmptyString from "./checkNonEmptyString";
 
 // module
 
