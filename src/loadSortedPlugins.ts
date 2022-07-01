@@ -30,7 +30,7 @@
 			// is already exists ?
 			return plugin ? Promise.resolve() : Promise.resolve().then((): Promise<Orchestrator> => {
 
-				emit("loading", pluginFileName, data);
+				emit("loading", pluginFileName, ...data);
 
 				const directory: string = join(globalDirectory, pluginFileName);
 
@@ -39,7 +39,7 @@
 			// emit event
 			}).then((createdPlugin: Orchestrator): Promise<void> => {
 
-				emit("loaded", createdPlugin, data);
+				emit("loaded", createdPlugin, ...data);
 				loadedPlugins.push(createdPlugin);
 
 				return Promise.resolve();

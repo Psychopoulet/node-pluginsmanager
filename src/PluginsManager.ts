@@ -418,9 +418,7 @@ export default class PluginsManager extends EventEmitter {
 			// init plugins
 			}).then((): Promise<void> => {
 
-				return initSortedPlugins(
-					this.plugins, this._orderedPluginsNames, this.emit.bind(this), data
-				);
+				return initSortedPlugins(this.plugins, this._orderedPluginsNames, this.emit.bind(this), ...data);
 
 			// end
 			}).then((): Promise<void> => {
