@@ -546,16 +546,16 @@ export default class PluginsManager extends EventEmitter {
 
 				}).catch((err: Error) => {
 
-					return new Promise((resolve, reject: (err: Error) => void): void => {
+					return new Promise((resolve: Function, reject: (err: Error) => void): void => {
 
 						checkAbsoluteDirectory("installViaGithub/plugindirectory", directory).then((): Promise<void> => {
 
 							return remove(directory).then((): void => {
-								return reject(err);
+								return err ? reject(err) : resolve();
 							});
 
 						}).catch((): void => {
-							return reject(err);
+							return err ? reject(err) : resolve();
 						});
 
 					});
