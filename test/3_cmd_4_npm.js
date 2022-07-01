@@ -12,11 +12,11 @@
 
 	// locals
 
-	const NPM_DIRECTORY = join(__dirname, "..", "lib", "cmd", "npm");
+	const NPM_DIRECTORY = join(__dirname, "..", "lib", "cjs", "cmd", "npm");
 
-		const cmd = require(join(NPM_DIRECTORY, "cmd.js"));
-		const install = require(join(NPM_DIRECTORY, "install.js"));
-		const update = require(join(NPM_DIRECTORY, "update.js"));
+		const cmd = require(join(NPM_DIRECTORY, "npmCmd.js"));
+		const install = require(join(NPM_DIRECTORY, "npmInstall.js"));
+		const update = require(join(NPM_DIRECTORY, "npmUpdate.js"));
 
 // const
 
@@ -48,7 +48,7 @@ describe("cmd / npm", () => {
 
 	it("should test wrong repository", (done) => {
 
-		cmd("zfefzefzefz").then(() => {
+		cmd.default("zfefzefzefz").then(() => {
 			done(new Error("Wrong parameters used"));
 		}).catch((err) => {
 
@@ -62,11 +62,11 @@ describe("cmd / npm", () => {
 	});
 
 	it("should test right install", () => {
-		return install(PLUGINS_DIRECTORY);
+		return install.default(PLUGINS_DIRECTORY);
 	}).timeout(MAX_TIMOUT);
 
 	it("should test right update", () => {
-		return update(PLUGINS_DIRECTORY);
+		return update.default(PLUGINS_DIRECTORY);
 	}).timeout(MAX_TIMOUT);
 
 });
