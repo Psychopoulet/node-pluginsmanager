@@ -55,7 +55,7 @@ describe("createPluginByDirectory", () => {
 
 			it("should test no directory", (done) => {
 
-				createPluginByDirectory().then(() => {
+				createPluginByDirectory.default().then(() => {
 					done(new Error("There is no generated error"));
 				}).catch((err) => {
 
@@ -70,7 +70,7 @@ describe("createPluginByDirectory", () => {
 
 			it("should test wrong directory", (done) => {
 
-				createPluginByDirectory(false).then(() => {
+				createPluginByDirectory.default(false).then(() => {
 					done(new Error("There is no generated error"));
 				}).catch((err) => {
 
@@ -85,7 +85,7 @@ describe("createPluginByDirectory", () => {
 
 			it("should test empty directory", (done) => {
 
-				createPluginByDirectory("").then(() => {
+				createPluginByDirectory.default("").then(() => {
 					done(new Error("There is no generated error"));
 				}).catch((err) => {
 
@@ -100,7 +100,7 @@ describe("createPluginByDirectory", () => {
 
 			it("should test wrong directory", (done) => {
 
-				createPluginByDirectory(join(__dirname, "oqnzoefnzeofn")).then(() => {
+				createPluginByDirectory.default(join(__dirname, "oqnzoefnzeofn")).then(() => {
 					done(new Error("There is no generated error"));
 				}).catch((err) => {
 
@@ -115,7 +115,7 @@ describe("createPluginByDirectory", () => {
 
 			it("should test relative directory", (done) => {
 
-				createPluginByDirectory(".").then(() => {
+				createPluginByDirectory.default(".").then(() => {
 					done(new Error("There is no generated error"));
 				}).catch((err) => {
 
@@ -134,7 +134,7 @@ describe("createPluginByDirectory", () => {
 
 			it("should test no directory", (done) => {
 
-				createPluginByDirectory(__dirname).then(() => {
+				createPluginByDirectory.default(__dirname).then(() => {
 					done(new Error("There is no generated error"));
 				}).catch((err) => {
 
@@ -149,7 +149,7 @@ describe("createPluginByDirectory", () => {
 
 			it("should test wrong directory", (done) => {
 
-				createPluginByDirectory(__dirname, false).then(() => {
+				createPluginByDirectory.default(__dirname, false).then(() => {
 					done(new Error("There is no generated error"));
 				}).catch((err) => {
 
@@ -164,7 +164,7 @@ describe("createPluginByDirectory", () => {
 
 			it("should test empty directory", (done) => {
 
-				createPluginByDirectory(__dirname, "").then(() => {
+				createPluginByDirectory.default(__dirname, "").then(() => {
 					done(new Error("There is no generated error"));
 				}).catch((err) => {
 
@@ -179,7 +179,7 @@ describe("createPluginByDirectory", () => {
 
 			it("should test wrong directory", (done) => {
 
-				createPluginByDirectory(__dirname, join(__dirname, "oqnzoefnzeofn")).then(() => {
+				createPluginByDirectory.default(__dirname, join(__dirname, "oqnzoefnzeofn")).then(() => {
 					done(new Error("There is no generated error"));
 				}).catch((err) => {
 
@@ -194,7 +194,7 @@ describe("createPluginByDirectory", () => {
 
 			it("should test relative directory", (done) => {
 
-				createPluginByDirectory(__dirname, ".").then(() => {
+				createPluginByDirectory.default(__dirname, ".").then(() => {
 					done(new Error("There is no generated error"));
 				}).catch((err) => {
 
@@ -231,7 +231,7 @@ describe("createPluginByDirectory", () => {
 				);
 
 			}).then(() => {
-				return createPluginByDirectory(NOT_PLUGIN, TESTS_EXTERNAL_RESSOURCES_DIRECTORY);
+				return createPluginByDirectory.default(NOT_PLUGIN, TESTS_EXTERNAL_RESSOURCES_DIRECTORY);
 			}).then(() => {
 				done(new Error("There is no generated error"));
 			}).catch((err) => {
@@ -252,7 +252,7 @@ describe("createPluginByDirectory", () => {
 			copyPlugin(TESTS_PLUGINS_DIRECTORY, GOOD_PLUGIN, pluginName, {
 				"name": "test"
 			}).then(() => {
-				return createPluginByDirectory(INVALID_NAME_PLUGIN, TESTS_EXTERNAL_RESSOURCES_DIRECTORY);
+				return createPluginByDirectory.default(INVALID_NAME_PLUGIN, TESTS_EXTERNAL_RESSOURCES_DIRECTORY);
 			}).then(() => {
 				done(new Error("There is no generated error"));
 			}).catch((err) => {
@@ -268,7 +268,7 @@ describe("createPluginByDirectory", () => {
 
 		it("should test plugin directory", () => {
 
-			return createPluginByDirectory(GOOD_PLUGIN, TESTS_EXTERNAL_RESSOURCES_DIRECTORY).then((plugin) => {
+			return createPluginByDirectory.default(GOOD_PLUGIN, TESTS_EXTERNAL_RESSOURCES_DIRECTORY).then((plugin) => {
 
 				strictEqual(typeof plugin, "object", "Generated plugin is not an object");
 				strictEqual(plugin instanceof Orchestrator, true, "Generated plugin is not an Orchestrator");

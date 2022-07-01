@@ -17,7 +17,7 @@ describe("extractGithub", () => {
 
 		const github = extractGithub.default();
 
-		strictEqual(typeof err, "string", "generated github type is not as expected");
+		strictEqual(typeof github, "string", "generated github type is not as expected");
 		strictEqual(github, "", "generated github is not as expected");
 
 	});
@@ -28,7 +28,7 @@ describe("extractGithub", () => {
 			"github": "test"
 		});
 
-		strictEqual(typeof err, "string", "generated github type is not as expected");
+		strictEqual(typeof github, "string", "generated github type is not as expected");
 		strictEqual(github, "test", "generated github is not as expected");
 
 	});
@@ -39,7 +39,7 @@ describe("extractGithub", () => {
 			"repository": "test"
 		});
 
-		strictEqual(typeof err, "string", "generated github type is not as expected");
+		strictEqual(typeof github, "string", "generated github type is not as expected");
 		strictEqual(github, "test", "generated github is not as expected");
 
 	});
@@ -52,7 +52,7 @@ describe("extractGithub", () => {
 			}
 		});
 
-		strictEqual(typeof err, "string", "generated github type is not as expected");
+		strictEqual(typeof github, "string", "generated github type is not as expected");
 		strictEqual(github, "test", "generated github is not as expected");
 
 	});
