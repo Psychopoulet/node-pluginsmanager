@@ -1,0 +1,33 @@
+"use strict";
+
+// deps
+
+	// natives
+	import { lstat } from "fs";
+
+	// externals
+	import { checkNonEmptyString } from "node-pluginsmanager-plugin";
+
+// module
+
+export default function checkDirectory (dataName: string, directory: string): Promise<void> {
+
+	return checkNonEmptyString(dataName, directory).then((): Promise<boolean> => {
+
+		return new Promise((resolve: (exists: boolean) => void): void => {
+
+			lstat(directory, (err, stats): void => {
+				return resolve(Boolean(!err && stats.isDirectory()));
+			});
+
+		});
+
+	}).then((exists: boolean): Promise<void> => {
+
+		return exists ? Promise.resolve() : Promise.reject(new Error(
+			"\"" + dataName + "\" (" + directory + ") is not a valid directory"
+		));
+
+	});
+
+};
