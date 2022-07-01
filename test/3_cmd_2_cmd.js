@@ -4,10 +4,10 @@
 
 	// natives
 	const { join } = require("path");
-	const assert = require("assert");
+	const { strictEqual } = require("assert");
 
 	// locals
-	const cmd = require(join(__dirname, "..", "lib", "cmd", "cmd.js"));
+	const cmd = require(join(__dirname, "..", "lib", "cjs", "cmd", "cmd.js"));
 
 // tests
 
@@ -17,12 +17,12 @@ describe("cmd / cmd", () => {
 
 		it("should test without directory", (done) => {
 
-			cmd().then(() => {
+			cmd.default().then(() => {
 				done(new Error("tests does not generate error"));
 			}).catch((err) => {
 
-				assert.strictEqual(typeof err, "object", "generated error is not as expected");
-				assert.strictEqual(err instanceof ReferenceError, true, "generated error is not as expected");
+				strictEqual(typeof err, "object", "generated error is not as expected");
+				strictEqual(err instanceof ReferenceError, true, "generated error is not as expected");
 
 				done();
 
@@ -32,12 +32,12 @@ describe("cmd / cmd", () => {
 
 		it("should test wrong directory", (done) => {
 
-			cmd(false).then(() => {
+			cmd.default(false).then(() => {
 				done(new Error("tests does not generate error"));
 			}).catch((err) => {
 
-				assert.strictEqual(typeof err, "object", "generated error is not as expected");
-				assert.strictEqual(err instanceof TypeError, true, "generated error is not as expected");
+				strictEqual(typeof err, "object", "generated error is not as expected");
+				strictEqual(err instanceof TypeError, true, "generated error is not as expected");
 
 				done();
 
@@ -47,12 +47,12 @@ describe("cmd / cmd", () => {
 
 		it("should test empty directory", (done) => {
 
-			cmd("").then(() => {
+			cmd.default("").then(() => {
 				done(new Error("tests does not generate error"));
 			}).catch((err) => {
 
-				assert.strictEqual(typeof err, "object", "generated error is not as expected");
-				assert.strictEqual(err instanceof RangeError, true, "generated error is not as expected");
+				strictEqual(typeof err, "object", "generated error is not as expected");
+				strictEqual(err instanceof RangeError, true, "generated error is not as expected");
 
 				done();
 
@@ -62,12 +62,12 @@ describe("cmd / cmd", () => {
 
 		it("should test invalid directory", (done) => {
 
-			cmd(join(__dirname, "sifnzsoifgevnzoeifnz")).then(() => {
+			cmd.default(join(__dirname, "sifnzsoifgevnzoeifnz")).then(() => {
 				done(new Error("tests does not generate error"));
 			}).catch((err) => {
 
-				assert.strictEqual(typeof err, "object", "generated error is not as expected");
-				assert.strictEqual(err instanceof Error, true, "generated error is not as expected");
+				strictEqual(typeof err, "object", "generated error is not as expected");
+				strictEqual(err instanceof Error, true, "generated error is not as expected");
 
 				done();
 
@@ -81,12 +81,12 @@ describe("cmd / cmd", () => {
 
 		it("should test missing command", (done) => {
 
-			cmd("test").then(() => {
+			cmd.default("test").then(() => {
 				done(new Error("tests does not generate error"));
 			}).catch((err) => {
 
-				assert.strictEqual(typeof err, "object", "generated error is not as expected");
-				assert.strictEqual(err instanceof ReferenceError, true, "generated error is not as expected");
+				strictEqual(typeof err, "object", "generated error is not as expected");
+				strictEqual(err instanceof ReferenceError, true, "generated error is not as expected");
 
 				done();
 
@@ -96,12 +96,12 @@ describe("cmd / cmd", () => {
 
 		it("should test wrong command", (done) => {
 
-			cmd("test", false).then(() => {
+			cmd.default("test", false).then(() => {
 				done(new Error("tests does not generate error"));
 			}).catch((err) => {
 
-				assert.strictEqual(typeof err, "object", "generated error is not as expected");
-				assert.strictEqual(err instanceof TypeError, true, "generated error is not as expected");
+				strictEqual(typeof err, "object", "generated error is not as expected");
+				strictEqual(err instanceof TypeError, true, "generated error is not as expected");
 
 				done();
 
@@ -111,12 +111,12 @@ describe("cmd / cmd", () => {
 
 		it("should test empty command", (done) => {
 
-			cmd("test", "").then(() => {
+			cmd.default("test", "").then(() => {
 				done(new Error("tests does not generate error"));
 			}).catch((err) => {
 
-				assert.strictEqual(typeof err, "object", "generated error is not as expected");
-				assert.strictEqual(err instanceof RangeError, true, "generated error is not as expected");
+				strictEqual(typeof err, "object", "generated error is not as expected");
+				strictEqual(err instanceof RangeError, true, "generated error is not as expected");
 
 				done();
 
@@ -130,12 +130,12 @@ describe("cmd / cmd", () => {
 
 		it("should test missing params", (done) => {
 
-			cmd("test", "test").then(() => {
+			cmd.default("test", "test").then(() => {
 				done(new Error("tests does not generate error"));
 			}).catch((err) => {
 
-				assert.strictEqual(typeof err, "object", "generated error is not as expected");
-				assert.strictEqual(err instanceof ReferenceError, true, "generated error is not as expected");
+				strictEqual(typeof err, "object", "generated error is not as expected");
+				strictEqual(err instanceof ReferenceError, true, "generated error is not as expected");
 
 				done();
 
@@ -145,12 +145,12 @@ describe("cmd / cmd", () => {
 
 		it("should test wrong params", (done) => {
 
-			cmd("test", "test", false).then(() => {
+			cmd.default("test", "test", false).then(() => {
 				done(new Error("tests does not generate error"));
 			}).catch((err) => {
 
-				assert.strictEqual(typeof err, "object", "generated error is not as expected");
-				assert.strictEqual(err instanceof TypeError, true, "generated error is not as expected");
+				strictEqual(typeof err, "object", "generated error is not as expected");
+				strictEqual(err instanceof TypeError, true, "generated error is not as expected");
 
 				done();
 
@@ -160,12 +160,12 @@ describe("cmd / cmd", () => {
 
 		it("should test empty params", (done) => {
 
-			cmd("test", "test", []).then(() => {
+			cmd.default("test", "test", []).then(() => {
 				done(new Error("tests does not generate error"));
 			}).catch((err) => {
 
-				assert.strictEqual(typeof err, "object", "generated error is not as expected");
-				assert.strictEqual(err instanceof RangeError, true, "generated error is not as expected");
+				strictEqual(typeof err, "object", "generated error is not as expected");
+				strictEqual(err instanceof RangeError, true, "generated error is not as expected");
 
 				done();
 
@@ -179,12 +179,12 @@ describe("cmd / cmd", () => {
 
 		it("should test wrong command", (done) => {
 
-			cmd("./", "node", [ "-tzfzefzef" ]).then(() => {
+			cmd.default("./", "node", [ "-tzfzefzef" ]).then(() => {
 				done(new Error("tests does not generate error"));
 			}).catch((err) => {
 
-				assert.strictEqual(typeof err, "object", "generated error is not as expected");
-				assert.strictEqual(err instanceof Error, true, "generated error is not as expected");
+				strictEqual(typeof err, "object", "generated error is not as expected");
+				strictEqual(err instanceof Error, true, "generated error is not as expected");
 
 				done();
 
@@ -194,7 +194,7 @@ describe("cmd / cmd", () => {
 
 		it("should test node version", () => {
 
-			return cmd("./", "node", [ "-v" ]);
+			return cmd.default("./", "node", [ "-v" ]);
 
 		});
 

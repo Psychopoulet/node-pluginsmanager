@@ -3,7 +3,7 @@
 // deps
 
 	// natives
-	const assert = require("assert");
+	const { strictEqual } = require("assert");
 	const { homedir } = require("os");
 	const { join } = require("path");
 
@@ -12,10 +12,10 @@
 
 	// locals
 
-	const GIT_DIRECTORY = join(__dirname, "..", "lib", "cmd", "git");
+	const GIT_DIRECTORY = join(__dirname, "..", "lib", "cjs", "cmd", "git");
 
-		const install = require(join(GIT_DIRECTORY, "install.js"));
-		const update = require(join(GIT_DIRECTORY, "update.js"));
+		const install = require(join(GIT_DIRECTORY, "gitInstall.js"));
+		const update = require(join(GIT_DIRECTORY, "gitUpdate.js"));
 
 // const
 
@@ -45,12 +45,12 @@ describe("cmd / git", () => {
 
 			it("should test with missing directory", (done) => {
 
-				install().then(() => {
+				install.default().then(() => {
 					done(new Error("tests does not generate error"));
 				}).catch((err) => {
 
-					assert.strictEqual(typeof err, "object", "generated error is not as expected");
-					assert.strictEqual(err instanceof ReferenceError, true, "generated error is not as expected");
+					strictEqual(typeof err, "object", "generated error is not as expected");
+					strictEqual(err instanceof ReferenceError, true, "generated error is not as expected");
 
 					done();
 
@@ -60,12 +60,12 @@ describe("cmd / git", () => {
 
 			it("should test with missing user", (done) => {
 
-				install(DOWNLOADED_PLUGIN_DIRECTORY).then(() => {
+				install.default(DOWNLOADED_PLUGIN_DIRECTORY).then(() => {
 					done(new Error("tests does not generate error"));
 				}).catch((err) => {
 
-					assert.strictEqual(typeof err, "object", "generated error is not as expected");
-					assert.strictEqual(err instanceof ReferenceError, true, "generated error is not as expected");
+					strictEqual(typeof err, "object", "generated error is not as expected");
+					strictEqual(err instanceof ReferenceError, true, "generated error is not as expected");
 
 					done();
 
@@ -75,12 +75,12 @@ describe("cmd / git", () => {
 
 			it("should test with missing repo", (done) => {
 
-				install(DOWNLOADED_PLUGIN_DIRECTORY, GITHUB_USER).then(() => {
+				install.default(DOWNLOADED_PLUGIN_DIRECTORY, GITHUB_USER).then(() => {
 					done(new Error("tests does not generate error"));
 				}).catch((err) => {
 
-					assert.strictEqual(typeof err, "object", "generated error is not as expected");
-					assert.strictEqual(err instanceof ReferenceError, true, "generated error is not as expected");
+					strictEqual(typeof err, "object", "generated error is not as expected");
+					strictEqual(err instanceof ReferenceError, true, "generated error is not as expected");
 
 					done();
 
@@ -94,12 +94,12 @@ describe("cmd / git", () => {
 
 			it("should test with wrong directory", (done) => {
 
-				install(false).then(() => {
+				install.default(false).then(() => {
 					done(new Error("tests does not generate error"));
 				}).catch((err) => {
 
-					assert.strictEqual(typeof err, "object", "generated error is not as expected");
-					assert.strictEqual(err instanceof TypeError, true, "generated error is not as expected");
+					strictEqual(typeof err, "object", "generated error is not as expected");
+					strictEqual(err instanceof TypeError, true, "generated error is not as expected");
 
 					done();
 
@@ -109,12 +109,12 @@ describe("cmd / git", () => {
 
 			it("should test with wrong user", (done) => {
 
-				install(DOWNLOADED_PLUGIN_DIRECTORY, false).then(() => {
+				install.default(DOWNLOADED_PLUGIN_DIRECTORY, false).then(() => {
 					done(new Error("tests does not generate error"));
 				}).catch((err) => {
 
-					assert.strictEqual(typeof err, "object", "generated error is not as expected");
-					assert.strictEqual(err instanceof TypeError, true, "generated error is not as expected");
+					strictEqual(typeof err, "object", "generated error is not as expected");
+					strictEqual(err instanceof TypeError, true, "generated error is not as expected");
 
 					done();
 
@@ -124,12 +124,12 @@ describe("cmd / git", () => {
 
 			it("should test with wrong repo", (done) => {
 
-				install(DOWNLOADED_PLUGIN_DIRECTORY, GITHUB_USER, false).then(() => {
+				install.default(DOWNLOADED_PLUGIN_DIRECTORY, GITHUB_USER, false).then(() => {
 					done(new Error("tests does not generate error"));
 				}).catch((err) => {
 
-					assert.strictEqual(typeof err, "object", "generated error is not as expected");
-					assert.strictEqual(err instanceof TypeError, true, "generated error is not as expected");
+					strictEqual(typeof err, "object", "generated error is not as expected");
+					strictEqual(err instanceof TypeError, true, "generated error is not as expected");
 
 					done();
 
@@ -143,12 +143,12 @@ describe("cmd / git", () => {
 
 			it("should test with empty data", (done) => {
 
-				install("").then(() => {
+				install.default("").then(() => {
 					done(new Error("tests does not generate error"));
 				}).catch((err) => {
 
-					assert.strictEqual(typeof err, "object", "generated error is not as expected");
-					assert.strictEqual(err instanceof Error, true, "generated error is not as expected");
+					strictEqual(typeof err, "object", "generated error is not as expected");
+					strictEqual(err instanceof Error, true, "generated error is not as expected");
 
 					done();
 
@@ -158,12 +158,12 @@ describe("cmd / git", () => {
 
 			it("should test with empty user", (done) => {
 
-				install(DOWNLOADED_PLUGIN_DIRECTORY, "").then(() => {
+				install.default(DOWNLOADED_PLUGIN_DIRECTORY, "").then(() => {
 					done(new Error("tests does not generate error"));
 				}).catch((err) => {
 
-					assert.strictEqual(typeof err, "object", "generated error is not as expected");
-					assert.strictEqual(err instanceof Error, true, "generated error is not as expected");
+					strictEqual(typeof err, "object", "generated error is not as expected");
+					strictEqual(err instanceof Error, true, "generated error is not as expected");
 
 					done();
 
@@ -173,12 +173,12 @@ describe("cmd / git", () => {
 
 			it("should test with empty repo", (done) => {
 
-				install(DOWNLOADED_PLUGIN_DIRECTORY, GITHUB_USER, "").then(() => {
+				install.default(DOWNLOADED_PLUGIN_DIRECTORY, GITHUB_USER, "").then(() => {
 					done(new Error("tests does not generate error"));
 				}).catch((err) => {
 
-					assert.strictEqual(typeof err, "object", "generated error is not as expected");
-					assert.strictEqual(err instanceof Error, true, "generated error is not as expected");
+					strictEqual(typeof err, "object", "generated error is not as expected");
+					strictEqual(err instanceof Error, true, "generated error is not as expected");
 
 					done();
 
@@ -191,17 +191,17 @@ describe("cmd / git", () => {
 		describe("valid", () => {
 
 			it("should test with valid data", () => {
-				return install(DOWNLOADED_PLUGIN_DIRECTORY, GITHUB_USER, GITHUB_PACKAGE);
+				return install.default(DOWNLOADED_PLUGIN_DIRECTORY, GITHUB_USER, GITHUB_PACKAGE);
 			}).timeout(MAX_TIMOUT);
 
 			it("should test with already existing directory", (done) => {
 
-				install(DOWNLOADED_PLUGIN_DIRECTORY, GITHUB_USER, GITHUB_PACKAGE).then(() => {
+				install.default(DOWNLOADED_PLUGIN_DIRECTORY, GITHUB_USER, GITHUB_PACKAGE).then(() => {
 					done(new Error("tests does not generate error"));
 				}).catch((err) => {
 
-					assert.strictEqual(typeof err, "object", "generated error is not as expected");
-					assert.strictEqual(err instanceof Error, true, "generated error is not as expected");
+					strictEqual(typeof err, "object", "generated error is not as expected");
+					strictEqual(err instanceof Error, true, "generated error is not as expected");
 
 					done();
 
@@ -217,12 +217,12 @@ describe("cmd / git", () => {
 
 		it("should test with missing data", (done) => {
 
-			update().then(() => {
+			update.default().then(() => {
 				done(new Error("tests does not generate error"));
 			}).catch((err) => {
 
-				assert.strictEqual(typeof err, "object", "generated error is not as expected");
-				assert.strictEqual(err instanceof ReferenceError, true, "generated error is not as expected");
+				strictEqual(typeof err, "object", "generated error is not as expected");
+				strictEqual(err instanceof ReferenceError, true, "generated error is not as expected");
 
 				done();
 
@@ -232,12 +232,12 @@ describe("cmd / git", () => {
 
 		it("should test with wrong data", (done) => {
 
-			update(false).then(() => {
+			update.default(false).then(() => {
 				done(new Error("tests does not generate error"));
 			}).catch((err) => {
 
-				assert.strictEqual(typeof err, "object", "generated error is not as expected");
-				assert.strictEqual(err instanceof TypeError, true, "generated error is not as expected");
+				strictEqual(typeof err, "object", "generated error is not as expected");
+				strictEqual(err instanceof TypeError, true, "generated error is not as expected");
 
 				done();
 
@@ -247,12 +247,12 @@ describe("cmd / git", () => {
 
 		it("should test with empty data", (done) => {
 
-			update("").then(() => {
+			update.default("").then(() => {
 				done(new Error("tests does not generate error"));
 			}).catch((err) => {
 
-				assert.strictEqual(typeof err, "object", "generated error is not as expected");
-				assert.strictEqual(err instanceof Error, true, "generated error is not as expected");
+				strictEqual(typeof err, "object", "generated error is not as expected");
+				strictEqual(err instanceof Error, true, "generated error is not as expected");
 
 				done();
 
@@ -262,12 +262,12 @@ describe("cmd / git", () => {
 
 		it("should test with not existing directory", (done) => {
 
-			update(DOWNLOADED_PLUGIN_DIRECTORY + "test", GITHUB_USER, GITHUB_PACKAGE).then(() => {
+			update.default(DOWNLOADED_PLUGIN_DIRECTORY + "test", GITHUB_USER, GITHUB_PACKAGE).then(() => {
 				done(new Error("tests does not generate error"));
 			}).catch((err) => {
 
-				assert.strictEqual(typeof err, "object", "generated error is not as expected");
-				assert.strictEqual(err instanceof Error, true, "generated error is not as expected");
+				strictEqual(typeof err, "object", "generated error is not as expected");
+				strictEqual(err instanceof Error, true, "generated error is not as expected");
 
 				done();
 
@@ -276,7 +276,7 @@ describe("cmd / git", () => {
 		});
 
 		it("should test with valid data", () => {
-			return update(DOWNLOADED_PLUGIN_DIRECTORY);
+			return update.default(DOWNLOADED_PLUGIN_DIRECTORY);
 		}).timeout(MAX_TIMOUT);
 
 	});

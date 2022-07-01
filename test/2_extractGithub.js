@@ -4,7 +4,7 @@
 
 	// natives
 	const { join } = require("path");
-	const assert = require("assert");
+	const { strictEqual } = require("assert");
 
 	// locals
 	const extractGithub = require(join(__dirname, "..", "lib", "cjs", "extractGithub.js"));
@@ -17,8 +17,8 @@ describe("extractGithub", () => {
 
 		const github = extractGithub.default();
 
-		assert.strictEqual(typeof err, "string", "generated github type is not as expected");
-		assert.strictEqual(github, "", "generated github is not as expected");
+		strictEqual(typeof err, "string", "generated github type is not as expected");
+		strictEqual(github, "", "generated github is not as expected");
 
 	});
 
@@ -28,8 +28,8 @@ describe("extractGithub", () => {
 			"github": "test"
 		});
 
-		assert.strictEqual(typeof err, "string", "generated github type is not as expected");
-		assert.strictEqual(github, "test", "generated github is not as expected");
+		strictEqual(typeof err, "string", "generated github type is not as expected");
+		strictEqual(github, "test", "generated github is not as expected");
 
 	});
 
@@ -39,8 +39,8 @@ describe("extractGithub", () => {
 			"repository": "test"
 		});
 
-		assert.strictEqual(typeof err, "string", "generated github type is not as expected");
-		assert.strictEqual(github, "test", "generated github is not as expected");
+		strictEqual(typeof err, "string", "generated github type is not as expected");
+		strictEqual(github, "test", "generated github is not as expected");
 
 	});
 
@@ -52,8 +52,8 @@ describe("extractGithub", () => {
 			}
 		});
 
-		assert.strictEqual(typeof err, "string", "generated github type is not as expected");
-		assert.strictEqual(github, "test", "generated github is not as expected");
+		strictEqual(typeof err, "string", "generated github type is not as expected");
+		strictEqual(github, "test", "generated github is not as expected");
 
 	});
 

@@ -6,26 +6,26 @@
 	const { strictEqual } = require("assert");
 
 	// locals
-	const stdToString = require(require("path").join(__dirname, "..", "lib", "cmd", "stdToString.js"));
+	const stdToString = require(require("path").join(__dirname, "..", "lib", "cjs", "cmd", "stdToString.js"));
 
 // tests
 
 describe("cmd / stdToString", () => {
 
 	it("should test with number", () => {
-		strictEqual(stdToString(3.14), "3.14", "It does not generate the wanted string");
+		strictEqual(stdToString.default(3.14), "3.14", "It does not generate the wanted string");
 	});
 
 	it("should test Buffer", () => {
-		strictEqual(stdToString(Buffer.from("Test", "ascii")), "Test", "It does not generate the wanted string");
+		strictEqual(stdToString.default(Buffer.from("Test", "ascii")), "Test", "It does not generate the wanted string");
 	});
 
 	it("should test Error", () => {
-		strictEqual(stdToString(new Error("Test")), "Test", "It does not generate the wanted string");
+		strictEqual(stdToString.default(new Error("Test")), "Test", "It does not generate the wanted string");
 	});
 
 	it("should test string", () => {
-		strictEqual(stdToString({ "code": "Test" }), "[object Object]", "It does not generate the wanted string");
+		strictEqual(stdToString.default({ "code": "Test" }), "[object Object]", "It does not generate the wanted string");
 	});
 
 });
