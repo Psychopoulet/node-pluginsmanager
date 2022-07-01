@@ -7,15 +7,15 @@
 	const { strictEqual } = require("assert");
 
 	// locals
-	const isNonEmptyArray = require(join(__dirname, "..", "lib", "checkers", "isNonEmptyArray.js"));
+	const checkAbsoluteDirectory = require(join(__dirname, "..", "lib", "cjs", "checkers", "checkAbsoluteDirectory.js"));
 
 // tests
 
-describe("checkers / isNonEmptyArray", () => {
+describe("checkers / checkAbsoluteDirectory", () => {
 
 	it("should test with empty data", (done) => {
 
-		isNonEmptyArray("array").then(() => {
+		checkAbsoluteDirectory.default("directory").then(() => {
 			done(new Error("There is no generated error"));
 		}).catch((err) => {
 
@@ -30,22 +30,7 @@ describe("checkers / isNonEmptyArray", () => {
 
 	it("should test with wrong data", (done) => {
 
-		isNonEmptyArray("array", 1234).then(() => {
-			done(new Error("There is no generated error"));
-		}).catch((err) => {
-
-			strictEqual(typeof err, "object", "Generated error is not as expected");
-			strictEqual(err instanceof TypeError, true, "Generated error is not as expected");
-
-			done();
-
-		});
-
-	});
-
-	it("should test with wrong data", (done) => {
-
-		isNonEmptyArray("array", {}).then(() => {
+		checkAbsoluteDirectory.default("directory", 1234).then(() => {
 			done(new Error("There is no generated error"));
 		}).catch((err) => {
 
@@ -60,12 +45,12 @@ describe("checkers / isNonEmptyArray", () => {
 
 	it("should test with empty data", (done) => {
 
-		isNonEmptyArray("array", []).then(() => {
+		checkAbsoluteDirectory.default("directory", "").then(() => {
 			done(new Error("There is no generated error"));
 		}).catch((err) => {
 
 			strictEqual(typeof err, "object", "Generated error is not as expected");
-			strictEqual(err instanceof RangeError, true, "Generated error is not as expected");
+			strictEqual(err instanceof Error, true, "Generated error is not as expected");
 
 			done();
 
@@ -73,9 +58,24 @@ describe("checkers / isNonEmptyArray", () => {
 
 	});
 
-	it("should test with absolute array", () => {
+	it("should test with not absolute directory", (done) => {
 
-		return isNonEmptyArray("array", [ "test" ]);
+		checkAbsoluteDirectory.default("directory", "./").then(() => {
+			done(new Error("There is no generated error"));
+		}).catch((err) => {
+
+			strictEqual(typeof err, "object", "Generated error is not as expected");
+			strictEqual(err instanceof Error, true, "Generated error is not as expected");
+
+			done();
+
+		});
+
+	});
+
+	it("should test with absolute directory", () => {
+
+		return checkAbsoluteDirectory.default("directory", __dirname);
 
 	});
 

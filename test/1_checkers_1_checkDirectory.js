@@ -7,15 +7,15 @@
 	const { strictEqual } = require("assert");
 
 	// locals
-	const isAbsoluteDirectory = require(join(__dirname, "..", "lib", "checkers", "isAbsoluteDirectory.js"));
+	const checkDirectory = require(join(__dirname, "..", "lib", "cjs", "checkers", "checkDirectory.js"));
 
 // tests
 
-describe("checkers / isAbsoluteDirectory", () => {
+describe("checkers / checkDirectory", () => {
 
 	it("should test with empty data", (done) => {
 
-		isAbsoluteDirectory("directory").then(() => {
+		checkDirectory.default("directory").then(() => {
 			done(new Error("There is no generated error"));
 		}).catch((err) => {
 
@@ -30,7 +30,7 @@ describe("checkers / isAbsoluteDirectory", () => {
 
 	it("should test with wrong data", (done) => {
 
-		isAbsoluteDirectory("directory", 1234).then(() => {
+		checkDirectory.default("directory", 1234).then(() => {
 			done(new Error("There is no generated error"));
 		}).catch((err) => {
 
@@ -45,7 +45,7 @@ describe("checkers / isAbsoluteDirectory", () => {
 
 	it("should test with empty data", (done) => {
 
-		isAbsoluteDirectory("directory", "").then(() => {
+		checkDirectory.default("directory", "").then(() => {
 			done(new Error("There is no generated error"));
 		}).catch((err) => {
 
@@ -58,24 +58,15 @@ describe("checkers / isAbsoluteDirectory", () => {
 
 	});
 
-	it("should test with not absolute directory", (done) => {
+	it("should test with not relative directory", () => {
 
-		isAbsoluteDirectory("directory", "./").then(() => {
-			done(new Error("There is no generated error"));
-		}).catch((err) => {
-
-			strictEqual(typeof err, "object", "Generated error is not as expected");
-			strictEqual(err instanceof Error, true, "Generated error is not as expected");
-
-			done();
-
-		});
+		return checkDirectory.default("directory", "./");
 
 	});
 
 	it("should test with absolute directory", () => {
 
-		return isAbsoluteDirectory("directory", __dirname);
+		return checkDirectory.default("directory", __dirname);
 
 	});
 

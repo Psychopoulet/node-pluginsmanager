@@ -7,15 +7,15 @@
 	const { strictEqual } = require("assert");
 
 	// locals
-	const isFunction = require(join(__dirname, "..", "lib", "checkers", "isFunction.js"));
+	const checkFunction = require(join(__dirname, "..", "lib", "cjs", "checkers", "checkFunction.js"));
 
 // tests
 
-describe("checkers / isFunction", () => {
+describe("checkers / checkFunction", () => {
 
 	it("should test with empty data", (done) => {
 
-		isFunction("function").then(() => {
+		checkFunction.default("function").then(() => {
 			done(new Error("There is no generated error"));
 		}).catch((err) => {
 
@@ -30,7 +30,7 @@ describe("checkers / isFunction", () => {
 
 	it("should test with wrong data", (done) => {
 
-		isFunction("function", 1234).then(() => {
+		checkFunction.default("function", 1234).then(() => {
 			done(new Error("There is no generated error"));
 		}).catch((err) => {
 
@@ -45,7 +45,7 @@ describe("checkers / isFunction", () => {
 
 	it("should test with valid data", () => {
 
-		return isFunction("function", () => {
+		return checkFunction.default("function", () => {
 			// nothing to do here
 		});
 
