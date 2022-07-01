@@ -15,7 +15,7 @@ describe("checkers / checkNonEmptyString", () => {
 
 	it("should test with empty data", (done) => {
 
-		checkNonEmptyString("string").then(() => {
+		checkNonEmptyString.default("string").then(() => {
 			done(new Error("There is no generated error"));
 		}).catch((err) => {
 
@@ -30,7 +30,7 @@ describe("checkers / checkNonEmptyString", () => {
 
 	it("should test with wrong data", (done) => {
 
-		checkNonEmptyString("string", 1234).then(() => {
+		checkNonEmptyString.default("string", 1234).then(() => {
 			done(new Error("There is no generated error"));
 		}).catch((err) => {
 
@@ -45,7 +45,7 @@ describe("checkers / checkNonEmptyString", () => {
 
 	it("should test with empty data", (done) => {
 
-		checkNonEmptyString("string", "").then(() => {
+		checkNonEmptyString.default("string", "").then(() => {
 			done(new Error("There is no generated error"));
 		}).catch((err) => {
 
@@ -60,7 +60,7 @@ describe("checkers / checkNonEmptyString", () => {
 
 	it("should test with absolute string", () => {
 
-		return checkNonEmptyString("string", "test");
+		return checkNonEmptyString.default("string", "test");
 
 	});
 
