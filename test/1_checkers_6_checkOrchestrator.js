@@ -6,16 +6,19 @@
 	const { join } = require("path");
 	const { strictEqual } = require("assert");
 
+	// externals
+	const { Orchestrator } = require("node-pluginsmanager-plugin");
+
 	// locals
-	const isDirectory = require(join(__dirname, "..", "lib", "checkers", "isDirectory.js"));
+	const checkOrchestrator = require(join(__dirname, "..", "lib", "cjs", "checkers", "checkOrchestrator.js"));
 
 // tests
 
-describe("checkers / isDirectory", () => {
+describe("checkers / checkOrchestrator", () => {
 
 	it("should test with empty data", (done) => {
 
-		isDirectory("directory").then(() => {
+		checkOrchestrator.default("orchestrator").then(() => {
 			done(new Error("There is no generated error"));
 		}).catch((err) => {
 
@@ -30,7 +33,7 @@ describe("checkers / isDirectory", () => {
 
 	it("should test with wrong data", (done) => {
 
-		isDirectory("directory", 1234).then(() => {
+		checkOrchestrator.default("orchestrator", 1234).then(() => {
 			done(new Error("There is no generated error"));
 		}).catch((err) => {
 
@@ -43,14 +46,14 @@ describe("checkers / isDirectory", () => {
 
 	});
 
-	it("should test with empty data", (done) => {
+	it("should test with wrong object", (done) => {
 
-		isDirectory("directory", "").then(() => {
+		checkOrchestrator.default("orchestrator", {}).then(() => {
 			done(new Error("There is no generated error"));
 		}).catch((err) => {
 
 			strictEqual(typeof err, "object", "Generated error is not as expected");
-			strictEqual(err instanceof Error, true, "Generated error is not as expected");
+			strictEqual(err instanceof TypeError, true, "Generated error is not as expected");
 
 			done();
 
@@ -58,15 +61,9 @@ describe("checkers / isDirectory", () => {
 
 	});
 
-	it("should test with not relative directory", () => {
+	it("should test with Orchestrator", () => {
 
-		return isDirectory("directory", "./");
-
-	});
-
-	it("should test with absolute directory", () => {
-
-		return isDirectory("directory", __dirname);
+		return checkOrchestrator.default("orchestrator", new Orchestrator());
 
 	});
 

@@ -7,15 +7,15 @@
 	const { strictEqual } = require("assert");
 
 	// locals
-	const isNonEmptyString = require(join(__dirname, "..", "lib", "checkers", "isNonEmptyString.js"));
+	const checkNonEmptyArray = require(join(__dirname, "..", "lib", "cjs", "checkers", "checkNonEmptyArray.js"));
 
 // tests
 
-describe("checkers / isNonEmptyString", () => {
+describe("checkers / checkNonEmptyArray", () => {
 
 	it("should test with empty data", (done) => {
 
-		isNonEmptyString("string").then(() => {
+		checkNonEmptyArray.default("array").then(() => {
 			done(new Error("There is no generated error"));
 		}).catch((err) => {
 
@@ -30,7 +30,22 @@ describe("checkers / isNonEmptyString", () => {
 
 	it("should test with wrong data", (done) => {
 
-		isNonEmptyString("string", 1234).then(() => {
+		checkNonEmptyArray.default("array", 1234).then(() => {
+			done(new Error("There is no generated error"));
+		}).catch((err) => {
+
+			strictEqual(typeof err, "object", "Generated error is not as expected");
+			strictEqual(err instanceof TypeError, true, "Generated error is not as expected");
+
+			done();
+
+		});
+
+	});
+
+	it("should test with wrong data", (done) => {
+
+		checkNonEmptyArray.default("array", {}).then(() => {
 			done(new Error("There is no generated error"));
 		}).catch((err) => {
 
@@ -45,7 +60,7 @@ describe("checkers / isNonEmptyString", () => {
 
 	it("should test with empty data", (done) => {
 
-		isNonEmptyString("string", "").then(() => {
+		checkNonEmptyArray.default("array", []).then(() => {
 			done(new Error("There is no generated error"));
 		}).catch((err) => {
 
@@ -58,9 +73,9 @@ describe("checkers / isNonEmptyString", () => {
 
 	});
 
-	it("should test with absolute string", () => {
+	it("should test with absolute array", () => {
 
-		return isNonEmptyString("string", "test");
+		return checkNonEmptyArray.default("array", [ "test" ]);
 
 	});
 

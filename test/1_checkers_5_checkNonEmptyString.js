@@ -6,19 +6,16 @@
 	const { join } = require("path");
 	const { strictEqual } = require("assert");
 
-	// externals
-	const { Orchestrator } = require("node-pluginsmanager-plugin");
-
 	// locals
-	const isOrchestrator = require(join(__dirname, "..", "lib", "checkers", "isOrchestrator.js"));
+	const checkNonEmptyString = require(join(__dirname, "..", "lib", "cjs", "checkers", "checkNonEmptyString.js"));
 
 // tests
 
-describe("checkers / isOrchestrator", () => {
+describe("checkers / checkNonEmptyString", () => {
 
 	it("should test with empty data", (done) => {
 
-		isOrchestrator("orchestrator").then(() => {
+		checkNonEmptyString("string").then(() => {
 			done(new Error("There is no generated error"));
 		}).catch((err) => {
 
@@ -33,7 +30,7 @@ describe("checkers / isOrchestrator", () => {
 
 	it("should test with wrong data", (done) => {
 
-		isOrchestrator("orchestrator", 1234).then(() => {
+		checkNonEmptyString("string", 1234).then(() => {
 			done(new Error("There is no generated error"));
 		}).catch((err) => {
 
@@ -46,14 +43,14 @@ describe("checkers / isOrchestrator", () => {
 
 	});
 
-	it("should test with wrong object", (done) => {
+	it("should test with empty data", (done) => {
 
-		isOrchestrator("orchestrator", {}).then(() => {
+		checkNonEmptyString("string", "").then(() => {
 			done(new Error("There is no generated error"));
 		}).catch((err) => {
 
 			strictEqual(typeof err, "object", "Generated error is not as expected");
-			strictEqual(err instanceof TypeError, true, "Generated error is not as expected");
+			strictEqual(err instanceof RangeError, true, "Generated error is not as expected");
 
 			done();
 
@@ -61,9 +58,9 @@ describe("checkers / isOrchestrator", () => {
 
 	});
 
-	it("should test with Orchestrator", () => {
+	it("should test with absolute string", () => {
 
-		return isOrchestrator("orchestrator", new Orchestrator());
+		return checkNonEmptyString("string", "test");
 
 	});
 
