@@ -17,7 +17,7 @@
 
 // module
 
-export default function createPluginByDirectory (directory: string, externalRessourcesDirectory: string, logger: tLogger): Promise<Orchestrator> {
+export default function createPluginByDirectory (directory: string, externalRessourcesDirectory: string, logger: tLogger | null): Promise<Orchestrator> {
 
 	return checkAbsoluteDirectory("createPluginByDirectory/directory", directory).then((): Promise<void> => {
 		return checkAbsoluteDirectory("createPluginByDirectory/externalRessourcesDirectory", externalRessourcesDirectory);

@@ -19,7 +19,7 @@
 		function _loadPlugin (
 			globalDirectory: string, externalRessourcesDirectory: string,
 			pluginFileName: string, loadedPlugins: Array<Orchestrator>,
-			emit: Function, logger: tLogger, ...data: any
+			emit: Function, logger: tLogger | null, ...data: any
 		): Promise<void> {
 
 			// is already loaded ?
@@ -51,7 +51,7 @@
 		function _loadPlugins (
 			globalDirectory: string, externalRessourcesDirectory: string,
 			pluginsToLoad: Array<string>, loadedPlugins: Array<Orchestrator>,
-			emit: Function, logger: tLogger, data: Array<any>, i: number = 0
+			emit: Function, logger: tLogger | null, data: Array<any>, i: number = 0
 		): Promise<void> {
 
 			return i < pluginsToLoad.length ? Promise.resolve().then((): Promise<void> => {
@@ -72,7 +72,7 @@
 export default function loadSortedPlugins (
 	globalDirectory: string, externalRessourcesDirectory: string,
 	files: Array<string>, loadedPlugins: Array<Orchestrator>, orderedPluginsNames: Array<string>,
-	emit: Function, logger: tLogger, ...data: any
+	emit: Function, logger: tLogger | null, ...data: any
 ): Promise<void> {
 
 	// if no files, does not run

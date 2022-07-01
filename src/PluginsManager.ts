@@ -42,6 +42,8 @@
 		"logger"?: tLogger | null;
 	}
 
+	type tBeforeAllMethodCallback = (...data: any) => Promise<void> | void;
+
 // consts
 
 	const DEFAULT_PLUGINS_DIRECTORY: string = join(homedir(), "node-pluginsmanager-plugins");
@@ -55,8 +57,8 @@ export default class PluginsManager extends EventEmitter {
 
 		// protected
 
-		protected _beforeLoadAll: ((...data: any) => Promise<void>) | void | null;
-		protected _beforeInitAll: ((...data: any) => Promise<void>) | void | null;
+		protected _beforeLoadAll: tBeforeAllMethodCallback | null;
+		protected _beforeInitAll: tBeforeAllMethodCallback | null;
 
 		protected _logger: tLogger | null;
 
@@ -100,7 +102,7 @@ export default class PluginsManager extends EventEmitter {
 
 		public getPluginsNames (): Array<string> {
 
-			return [ ...this.plugins ].map((plugin) => {
+			return [ ...this.plugins ].map((plugin: Orchestrator): string => {
 				return plugin.name;
 			});
 
@@ -109,9 +111,9 @@ export default class PluginsManager extends EventEmitter {
 		// create a forced order to synchronously initialize plugins. not ordered plugins are asynchronously initialized after.
 		public setOrder (pluginsNames: Array<string>): Promise<void> {
 
-			return checkNonEmptyArray("setOrder/pluginsNames", pluginsNames).then(() => {
+			return checkNonEmptyArray("setOrder/pluginsNames", pluginsNames).then((): Promise<void> => {
 
-				const errors = [];
+				const errors: Array<string> = [];
 				for (let i = 0; i < pluginsNames.length; ++i) {
 
 					if ("string" !== typeof pluginsNames[i]) {
@@ -130,7 +132,7 @@ export default class PluginsManager extends EventEmitter {
 
 				return !errors.length ? Promise.resolve() : Promise.reject(new Error(errors.join("\r\n")));
 
-			}).then(() => {
+			}).then((): Promise<void> => {
 
 				this._orderedPluginsNames = pluginsNames;
 
@@ -148,9 +150,9 @@ export default class PluginsManager extends EventEmitter {
 
 		public checkAllModules (): Promise<void> {
 
-			const _checkPluginsModules = (i = 0) => {
+			const _checkPluginsModules: (i?: number) => Promise<void> = (i: number = 0): Promise<void> => {
 
-				return i < this.plugins.length ? this.checkModules(this.plugins[i]).then(() => {
+				return i < this.plugins.length ? this.checkModules(this.plugins[i]).then((): Promise<void> => {
 
 					return _checkPluginsModules(i + 1);
 
@@ -164,11 +166,11 @@ export default class PluginsManager extends EventEmitter {
 
 		public checkModules (plugin: Orchestrator): Promise<void> {
 
-			return checkAbsoluteDirectory("checkModules/directory", this.directory).then(() => {
+			return checkAbsoluteDirectory("checkModules/directory", this.directory).then((): Promise<void> => {
 
 				return checkOrchestrator("checkModules/plugin", plugin);
 
-			}).then(() => {
+			}).then((): Promise<void> => {
 
 				return versionModulesChecker(join(this.directory, plugin.name, "package.json"), {
 					"failAtMajor": true,
@@ -176,7 +178,7 @@ export default class PluginsManager extends EventEmitter {
 					"failAtPatch": false,
 					"dev": false,
 					"console": false
-				}).then((valid) => {
+				}).then((valid: boolean): Promise<void> => {
 
 					return valid ? Promise.resolve() : Promise.reject(new Error("\"" + plugin.name + "\" plugin has obsoletes modules"));
 
@@ -189,7 +191,7 @@ export default class PluginsManager extends EventEmitter {
 		// used for execute all plugins' middlewares in app (express or other)
 		public appMiddleware (req: iIncomingMessage, res: iServerResponse, next: Function): void {
 
-			const plugins = this.plugins.filter((plugin) => {
+			const plugins: Array<Orchestrator> = this.plugins.filter((plugin: Orchestrator): boolean => {
 				return "function" === typeof plugin.appMiddleware;
 			});
 
@@ -198,7 +200,7 @@ export default class PluginsManager extends EventEmitter {
 			}
 			else {
 
-				const _recursiveNext = (i) => {
+				const _recursiveNext: (i?: number) => Function = (i: number = 1): Function => {
 
 					if (i >= plugins.length) {
 						return next;
@@ -213,7 +215,7 @@ export default class PluginsManager extends EventEmitter {
 
 				};
 
-				return plugins[0].appMiddleware(req, res, _recursiveNext(1));
+				return plugins[0].appMiddleware(req, res, _recursiveNext());
 
 			}
 
@@ -222,18 +224,18 @@ export default class PluginsManager extends EventEmitter {
 		// middleware for socket to add bilateral push events
 		public socketMiddleware (server: WebSocketServer | SocketIOServer): void {
 
-			this.plugins.filter((plugin) => {
+			this.plugins.filter((plugin: Orchestrator): boolean => {
 				return "function" === typeof plugin.socketMiddleware;
-			}).forEach((plugin) => {
+			}).forEach((plugin: Orchestrator): void => {
 				plugin.socketMiddleware(server);
 			});
 
 		}
 
 		// add a function executed before loading all plugins
-		public beforeLoadAll (callback: (...data: any) => Promise<void> | void): Promise<void> {
+		public beforeLoadAll (callback: tBeforeAllMethodCallback): Promise<void> {
 
-			return checkFunction("beforeLoadAll/callback", callback).then(() => {
+			return checkFunction("beforeLoadAll/callback", callback).then((): Promise<void> => {
 
 				this._beforeLoadAll = callback;
 
@@ -247,36 +249,36 @@ export default class PluginsManager extends EventEmitter {
 		public loadAll (...data: any): Promise<void> {
 
 			// create dir if not exist
-			return checkNonEmptyString("initAll/directory", this.directory).then(() => {
+			return checkNonEmptyString("initAll/directory", this.directory).then((): Promise<void> => {
 
-				return mkdirp(this.directory).then(() => {
+				return mkdirp(this.directory).then((): Promise<void> => {
 					return checkAbsoluteDirectory("initAll/directory", this.directory);
 				});
 
 			// create dir if not exist
-			}).then(() => {
+			}).then((): Promise<void> => {
 
-				return checkNonEmptyString("initAll/externalRessourcesDirectory", this.externalRessourcesDirectory).then(() => {
+				return checkNonEmptyString("initAll/externalRessourcesDirectory", this.externalRessourcesDirectory).then((): Promise<void> => {
 
-					return mkdirp(this.externalRessourcesDirectory).then(() => {
+					return mkdirp(this.externalRessourcesDirectory).then((): Promise<void> => {
 						return checkAbsoluteDirectory("initAll/externalRessourcesDirectory", this.externalRessourcesDirectory);
 					});
 
 				});
 
 			// ensure loop
-			}).then(() => {
+			}).then((): Promise<void> => {
 
-				return new Promise((resolve) => {
+				return new Promise((resolve: () => void): void => {
 					setImmediate(resolve);
 				});
 
 			// execute _beforeLoadAll
-			}).then(() => {
+			}).then((): Promise<void> => {
 
-				return "function" !== typeof this._beforeLoadAll ? Promise.resolve() : new Promise((resolve, reject) => {
+				return "function" !== typeof this._beforeLoadAll ? Promise.resolve() : new Promise((resolve: () => void, reject: (err: Error) => void): void => {
 
-					const fn = this._beforeLoadAll(...data);
+					const fn = (this._beforeLoadAll as tBeforeAllMethodCallback)(...data);
 
 					if (!(fn instanceof Promise)) {
 						resolve();
@@ -288,12 +290,12 @@ export default class PluginsManager extends EventEmitter {
 				});
 
 			// init plugins
-			}).then(() => {
+			}).then((): Promise<Array<string>> => {
 
 				return readdir(this.directory);
 
 			// load all
-			}).then((files) => {
+			}).then((files: Array<string>): Promise<void> => {
 
 				return loadSortedPlugins(
 					this.directory, this.externalRessourcesDirectory, files, this.plugins,
@@ -301,9 +303,9 @@ export default class PluginsManager extends EventEmitter {
 				);
 
 			// sort plugins
-			}).then(() => {
+			}).then((): Promise<void> => {
 
-				this.plugins.sort((a, b) => {
+				this.plugins.sort((a: Orchestrator, b: Orchestrator): -1 | 0 | 1 => {
 
 					if (a.name < b.name) {
 						return -1;
@@ -320,7 +322,7 @@ export default class PluginsManager extends EventEmitter {
 				return Promise.resolve();
 
 			// end
-			}).then(() => {
+			}).then((): Promise<void> => {
 
 				this.emit("allloaded", ...data);
 
@@ -380,7 +382,7 @@ export default class PluginsManager extends EventEmitter {
 		}
 
 		// add a function executed before initializing all plugins
-		public beforeInitAll (callback: (...data: any) => Promise<void> | void): Promise<void> {
+		public beforeInitAll (callback: tBeforeAllMethodCallback): Promise<void> {
 
 			return checkFunction("beforeInitAll/callback", callback).then(() => {
 
