@@ -4,11 +4,11 @@
 
 	// natives
 	import { join, basename } from "path";
-	import { checkFunction } from "node-pluginsmanager-plugin";
 
 	// locals
-	import checkOrchestrator from "./checkers/checkOrchestrator";
 	import checkAbsoluteDirectory from "./checkers/checkAbsoluteDirectory";
+	import checkOrchestrator from "./checkers/checkOrchestrator";
+	import checkFunction from "./checkers/checkFunction";
 
 // types & interfaces
 
