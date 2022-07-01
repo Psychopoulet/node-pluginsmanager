@@ -1,4 +1,4 @@
-/// <reference path="../../lib/index.d.ts" />
+/// <reference path="../../lib/cjs/main.d.cts" />
 
 // deps
 
@@ -8,9 +8,10 @@
 
 	// externals
 	import { mkdirp, remove } from "fs-extra";
+	import { Orchestrator } from "node-pluginsmanager-plugin";
 
 	// locals
-	import PluginManager = require("node-pluginsmanager");
+	import PluginManager from "../../lib/cjs/main.cjs";
 
 // consts
 
@@ -33,48 +34,48 @@ try {
 	manager
 
 		// error
-		.on("error", (msg): void => {
-			console.log("--- [event/error] '" + msg.error + "' ---");
+		.on("error", (err: Error): void => {
+			console.log("--- [event/error] '" + err.message + "' ---");
 		})
 
 		// load
-		.on("loading", (pluginName): void => {
+		.on("loading", (pluginName: string): void => {
 			console.log("--- [event/loading] '" + pluginName + "' loading ---");
-		}).on("loaded", (plugin): void => {
+		}).on("loaded", (plugin: Orchestrator): void => {
 			console.log("--- [event/loaded] '" + plugin.name + "' (v" + plugin.version + ") loaded ---");
 		}).on("allloaded", (): void => {
 			console.log("--- [event/allloaded] all plugins allloaded ---");
 		})
 
 		// init
-		.on("initializing", (plugin): void => {
+		.on("initializing", (plugin: Orchestrator): void => {
 			console.log("--- [event/initializing] '" + plugin.name + "' (v" + plugin.version + ") initialized ---");
-		}).on("initialized", (plugin): void => {
+		}).on("initialized", (plugin: Orchestrator): void => {
 			console.log("--- [event/initialized] '" + plugin.name + "' (v" + plugin.version + ") initialized ---");
 		}).on("allinitialized", (): void => {
 			console.log("--- [event/initialized] all plugins initialized ---");
 		})
 
 		// release
-		.on("released", (pluginName): void => {
+		.on("released", (pluginName: string): void => {
 			console.log("--- [event/released] '" + pluginName + " released ---");
 		}).on("allreleased", (): void => {
 			console.log("--- [event/released] all plugins released ---");
 		})
 
 		// destroy
-		.on("destroyed", (pluginName): void => {
+		.on("destroyed", (pluginName: string): void => {
 			console.log("--- [event/destroyed] '" + pluginName + " destroyed ---");
 		}).on("alldestroyed", (): void => {
 			console.log("--- [event/destroyed] all plugins destroyed ---");
 		})
 
 		// write
-		.on("installed", (plugin): void => {
+		.on("installed", (plugin: Orchestrator): void => {
 			console.log("--- [event/installed] '" + plugin.name + "' (v" + plugin.version + ") installed ---");
-		}).on("updated", (plugin): void => {
+		}).on("updated", (plugin: Orchestrator): void => {
 			console.log("--- [event/updated] '" + plugin.name + "' (v" + plugin.version + ") updated ---");
-		}).on("uninstalled", (pluginName): void => {
+		}).on("uninstalled", (pluginName: string): void => {
 			console.log("--- [event/uninstalled] '" + pluginName + "' uninstalled ---");
 		});
 
