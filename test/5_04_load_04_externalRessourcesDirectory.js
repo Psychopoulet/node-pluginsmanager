@@ -8,8 +8,8 @@
 	const { mkdir } = require("fs");
 
 	// locals
-	const PluginsManager = require(join(__dirname, "..", "lib", "main.js"));
-	const isAbsoluteDirectory = require(require("path").join(__dirname, "..", "lib", "checkers", "isAbsoluteDirectory.js"));
+	const PluginsManager = require(join(__dirname, "..", "lib", "cjs", "main.cjs"));
+	const checkAbsoluteDirectory = require(require("path").join(__dirname, "..", "lib", "cjs", "checkers", "checkAbsoluteDirectory.js"));
 
 // tests
 
@@ -25,7 +25,7 @@ describe("pluginsmanager / externalRessourcesDirectory", () => {
 
 		return pluginsManager.loadAll().then(() => {
 
-			return isAbsoluteDirectory("externalRessourcesDirectory", pluginsManager.externalRessourcesDirectory);
+			return checkAbsoluteDirectory.default("externalRessourcesDirectory", pluginsManager.externalRessourcesDirectory);
 
 		}).then(() => {
 
@@ -52,7 +52,7 @@ describe("pluginsmanager / externalRessourcesDirectory", () => {
 
 		}).then(() => {
 
-			return isAbsoluteDirectory("directoryTested", directoryTested);
+			return checkAbsoluteDirectory.default("directoryTested", directoryTested);
 
 		}).then(() => {
 
@@ -62,7 +62,7 @@ describe("pluginsmanager / externalRessourcesDirectory", () => {
 
 			return new Promise((resolve, reject) => {
 
-				isAbsoluteDirectory("directoryTested", directoryTested).then(() => {
+				checkAbsoluteDirectory.default("directoryTested", directoryTested).then(() => {
 					reject(new Error("There is no generated error"));
 				}).catch((err) => {
 

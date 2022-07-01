@@ -11,9 +11,9 @@
 	const { Orchestrator } = require("node-pluginsmanager-plugin");
 
 	// locals
+	const PluginsManager = require(join(__dirname, "..", "lib", "cjs", "main.cjs"));
+	const checkDirectory = require(join(__dirname, "..", "lib", "cjs", "checkers", "checkDirectory.js"));
 	const copyPlugin = require(join(__dirname, "utils", "copyPlugin.js"));
-	const PluginsManager = require(join(__dirname, "..", "lib", "main.js"));
-	const isDirectory = require(join(__dirname, "..", "lib", "checkers", "isDirectory.js"));
 
 // const
 
@@ -177,7 +177,7 @@ describe("pluginsmanager / update via github", () => {
 
 			}).then(() => {
 
-				return isDirectory("update/execute", TEST_PLUGIN_MODULES_DIRECTORY);
+				return checkDirectory.default("update/execute", TEST_PLUGIN_MODULES_DIRECTORY);
 
 			});
 
@@ -207,7 +207,7 @@ describe("pluginsmanager / update via github", () => {
 
 			}).then(() => {
 
-				return isDirectory("update/execute", TEST_PLUGIN_MODULES_DIRECTORY);
+				return checkDirectory.default("update/execute", TEST_PLUGIN_MODULES_DIRECTORY);
 
 			});
 

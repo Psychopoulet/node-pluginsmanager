@@ -7,7 +7,7 @@
 	const { strictEqual } = require("assert");
 
 	// locals
-	const PluginsManager = require(join(__dirname, "..", "lib", "main.js"));
+	const PluginsManager = require(join(__dirname, "..", "lib", "cjs", "main.cjs"));
 
 // const
 

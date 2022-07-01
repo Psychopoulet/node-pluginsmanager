@@ -10,7 +10,7 @@
 	const { remove } = require("fs-extra");
 
 	// locals
-	const PluginsManager = require(join(__dirname, "..", "lib", "main.js"));
+	const PluginsManager = require(join(__dirname, "..", "lib", "cjs", "main.cjs"));
 
 // const
 

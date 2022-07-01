@@ -10,7 +10,7 @@
 	const WebSocketServer = require("ws").Server;
 
 	// locals
-	const PluginsManager = require(join(__dirname, "..", "lib", "main.js"));
+	const PluginsManager = require(join(__dirname, "..", "lib", "cjs", "main.cjs"));
 	const httpRequestTest = require(join(__dirname, "utils", "httpRequestTest.js"));
 	const socketRequestTest = require(join(__dirname, "utils", "socketRequestTest.js"));
 
