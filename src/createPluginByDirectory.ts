@@ -22,7 +22,7 @@
 
 // module
 
-export default function createPluginByDirectory (directory: string, externalRessourcesDirectory: string, logger: tLogger | null): Promise<Orchestrator> {
+export default function createPluginByDirectory (directory: string, externalRessourcesDirectory: string, logger: tLogger | null, ...data: any): Promise<Orchestrator> {
 
 	return checkAbsoluteDirectory("createPluginByDirectory/directory", directory).then((): Promise<void> => {
 		return checkAbsoluteDirectory("createPluginByDirectory/externalRessourcesDirectory", externalRessourcesDirectory);
@@ -73,7 +73,7 @@ export default function createPluginByDirectory (directory: string, externalRess
 
 					plugin.name = pluginBaseNameDirectory;
 
-					return plugin.load().then((): Promise<void> => {
+					return plugin.load(...data).then((): Promise<void> => {
 
 						return plugin.name === pluginBaseNameDirectory ? Promise.resolve() : Promise.reject(new Error(
 							"Plugin's name (\"" + plugin.name + "\") does not fit with plugin's directory basename (\"" + pluginBaseNameDirectory + "\")"

@@ -501,7 +501,7 @@ export default class PluginsManager extends EventEmitter {
 				}).then((): Promise<Orchestrator> => {
 
 					// install dependencies & execute install script
-					return createPluginByDirectory(directory, this.externalRessourcesDirectory, this._logger);
+					return createPluginByDirectory(directory, this.externalRessourcesDirectory, this._logger, ...data);
 
 				// check plugin modules versions
 				}).then((plugin: Orchestrator): Promise<Orchestrator> => {
@@ -609,7 +609,7 @@ export default class PluginsManager extends EventEmitter {
 
 				const pluginName: string = plugin.name;
 
-				return plugin.release(data).then((): Promise<void> => {
+				return plugin.release(...data).then((): Promise<void> => {
 
 					this.emit("released", plugin, ...data);
 
@@ -630,7 +630,7 @@ export default class PluginsManager extends EventEmitter {
 
 				return gitUpdate(directory).then((): Promise<Orchestrator> => {
 
-					return createPluginByDirectory(directory, this.externalRessourcesDirectory, this._logger);
+					return createPluginByDirectory(directory, this.externalRessourcesDirectory, this._logger, ...data);
 
 				});
 
@@ -656,7 +656,7 @@ export default class PluginsManager extends EventEmitter {
 
 					this.emit("updated", _plugin, ...data);
 
-					return _plugin.init(data);
+					return _plugin.init(...data);
 
 				// execute init script
 				}).then((): Promise<Orchestrator> => {
@@ -707,7 +707,7 @@ export default class PluginsManager extends EventEmitter {
 			// release plugin
 			}).then((): Promise<void> => {
 
-				return plugin.release(data).then((): Promise<void> => {
+				return plugin.release(...data).then((): Promise<void> => {
 
 					return remove(join(this.externalRessourcesDirectory, pluginName));
 
@@ -715,7 +715,7 @@ export default class PluginsManager extends EventEmitter {
 
 					this.emit("released", plugin, ...data);
 
-					return plugin.destroy();
+					return plugin.destroy(...data);
 
 				}).then((): Promise<void> => {
 
