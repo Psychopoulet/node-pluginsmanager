@@ -34,7 +34,7 @@
 
 				const directory: string = join(globalDirectory, pluginFileName);
 
-				return createPluginByDirectory(directory, externalRessourcesDirectory, logger);
+				return createPluginByDirectory(directory, externalRessourcesDirectory, logger, ...data);
 
 			// emit event
 			}).then((createdPlugin: Orchestrator): Promise<void> => {
