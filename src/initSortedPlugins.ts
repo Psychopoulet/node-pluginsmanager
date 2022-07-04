@@ -13,7 +13,7 @@
 
 			emit("initializing", plugin, ...data);
 
-			return plugin.init(data).then((): Promise<void> => {
+			return plugin.init(...data).then((): Promise<void> => {
 
 				emit("initialized", plugin, ...data);
 
