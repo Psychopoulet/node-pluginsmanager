@@ -12,6 +12,7 @@
 		"alwaysStrict": true,
 		"strict": true,
 		"strictFunctionTypes": true,
+		"strictNullChecks": true,
 		"noImplicitAny": true,
 		"noImplicitThis": true,
 		"noUnusedLocals": true,
