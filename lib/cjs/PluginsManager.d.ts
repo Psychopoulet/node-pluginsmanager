@@ -8,7 +8,7 @@ interface iPluginManagerOptions {
     "externalRessourcesDirectory"?: string;
     "logger"?: tLogger | null;
 }
-declare type tBeforeAllMethodCallback = (...data: any) => Promise<void> | void;
+type tBeforeAllMethodCallback = (...data: any) => Promise<void> | void;
 export default class PluginsManager extends EventEmitter {
     protected _beforeLoadAll: tBeforeAllMethodCallback | null;
     protected _beforeInitAll: tBeforeAllMethodCallback | null;

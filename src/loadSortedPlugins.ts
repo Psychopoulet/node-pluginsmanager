@@ -78,11 +78,18 @@ export default function loadSortedPlugins (
 	// if no files, does not run
 	return !files.length ? Promise.resolve() : Promise.resolve().then((): Promise<void> => {
 
-		const sortedPluginsNames: Array<string> = [
-			...files.filter((pluginName: string): boolean => {
-				return orderedPluginsNames.includes(pluginName);
-			})
-		];
+		const sortedPluginsNames: Array<string> = [];
+		orderedPluginsNames.forEach((pluginName: string): void => {
+
+			const plugin: string | undefined = files.find((p: string): boolean => {
+				return p === pluginName;
+			});
+
+			if (plugin) {
+				sortedPluginsNames.push(pluginName);
+			}
+
+		});
 
 		// first, sorted plugins
 		return sortedPluginsNames.length ?

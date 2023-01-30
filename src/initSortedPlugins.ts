@@ -48,11 +48,18 @@ export default function initSortedPlugins (
 	// if no plugins, does not run
 	return !plugins.length ? Promise.resolve() : Promise.resolve().then((): Promise<void> => {
 
-		const sortedPlugins: Array<Orchestrator> = [
-			...plugins.filter((plugin): boolean => {
-				return orderedPluginsNames.includes(plugin.name);
-			})
-		];
+		const sortedPlugins: Array<Orchestrator> = [];
+		orderedPluginsNames.forEach((pluginName: string): void => {
+
+			const plugin: Orchestrator | undefined = plugins.find((p: Orchestrator): boolean => {
+				return p.name === pluginName;
+			});
+
+			if (plugin) {
+				sortedPlugins.push(plugin);
+			}
+
+		});
 
 		// first, sorted plugins
 		return sortedPlugins.length ?
