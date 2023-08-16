@@ -3,13 +3,13 @@
 // deps
 
 	// natives
-	const { join } = require("path");
-	const { strictEqual } = require("assert");
-	const { mkdir } = require("fs");
+	const { join } = require("node:path");
+	const { strictEqual } = require("node:assert");
+	const { mkdir } = require("node:fs/promises");
 
 	// locals
 	const PluginsManager = require(join(__dirname, "..", "lib", "cjs", "main.cjs"));
-	const checkAbsoluteDirectory = require(require("path").join(__dirname, "..", "lib", "cjs", "checkers", "checkAbsoluteDirectory.js"));
+	const checkAbsoluteDirectory = require(join(__dirname, "..", "lib", "cjs", "checkers", "checkAbsoluteDirectory.js"));
 
 // tests
 
@@ -42,13 +42,7 @@ describe("pluginsmanager / externalRessourcesDirectory", () => {
 
 		}).then(() => {
 
-			return new Promise((resolve, reject) => {
-
-				mkdir(directoryTested, (err) => {
-					return err ? reject(err) : resolve();
-				});
-
-			});
+			return mkdir(directoryTested);
 
 		}).then(() => {
 

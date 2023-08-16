@@ -3,9 +3,9 @@
 // deps
 
 	// natives
-	const { join } = require("path");
-	const { homedir } = require("os");
-	const { deepStrictEqual, strictEqual } = require("assert");
+	const { join } = require("node:path");
+	const { homedir } = require("node:os");
+	const { deepStrictEqual, strictEqual } = require("node:assert");
 
 	// locals
 	const PluginsManager = require(join(__dirname, "..", "lib", "cjs", "main.cjs"));

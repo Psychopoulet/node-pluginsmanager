@@ -3,7 +3,7 @@
 // deps
 
 	// natives
-	import EventEmitter from "events";
+	import EventEmitter from "node:events";
 
 	// locals
 	import checkFunction from "./checkFunction";

@@ -3,15 +3,16 @@
 // deps
 
 	// natives
-	import EventEmitter from "events";
-	import { join } from "path";
-	import { homedir } from "os";
+	import EventEmitter from "node:events";
+	import { join } from "node:path";
+	import { homedir } from "node:os";
+	import { mkdir, readdir } from "node:fs/promises";
 
 	// externals
 	import versionModulesChecker from "check-version-modules";
-	import { mkdirp, readdir, remove } from "fs-extra";
 
 	// locals
+	import rmdirp from "./utils/rmdirp";
 	import checkAbsoluteDirectory from "./checkers/checkAbsoluteDirectory";
 	import checkFunction from "./checkers/checkFunction";
 	import checkNonEmptyArray from "./checkers/checkNonEmptyArray";
@@ -251,7 +252,9 @@ export default class PluginsManager extends EventEmitter {
 			// create dir if not exist
 			return checkNonEmptyString("initAll/directory", this.directory).then((): Promise<void> => {
 
-				return mkdirp(this.directory).then((): Promise<void> => {
+				return mkdir(this.directory, {
+					"recursive": true
+				}).then((): Promise<void> => {
 					return checkAbsoluteDirectory("initAll/directory", this.directory);
 				});
 
@@ -260,7 +263,9 @@ export default class PluginsManager extends EventEmitter {
 
 				return checkNonEmptyString("initAll/externalRessourcesDirectory", this.externalRessourcesDirectory).then((): Promise<void> => {
 
-					return mkdirp(this.externalRessourcesDirectory).then((): Promise<void> => {
+					return mkdir(this.externalRessourcesDirectory, {
+						"recursive": true
+					}).then((): Promise<void> => {
 						return checkAbsoluteDirectory("initAll/externalRessourcesDirectory", this.externalRessourcesDirectory);
 					});
 
@@ -375,7 +380,7 @@ export default class PluginsManager extends EventEmitter {
 			// remove all external resources
 			}).then((): Promise<void> => {
 
-				return remove(this.externalRessourcesDirectory);
+				return rmdirp(this.externalRessourcesDirectory);
 
 			});
 
@@ -548,7 +553,7 @@ export default class PluginsManager extends EventEmitter {
 
 						checkAbsoluteDirectory("installViaGithub/plugindirectory", directory).then((): Promise<void> => {
 
-							return remove(directory).then((): void => {
+							return rmdirp(directory).then((): void => {
 								return err ? reject(err) : resolve();
 							});
 
@@ -709,7 +714,7 @@ export default class PluginsManager extends EventEmitter {
 
 				return plugin.release(...data).then((): Promise<void> => {
 
-					return remove(join(this.externalRessourcesDirectory, pluginName));
+					return rmdirp(join(this.externalRessourcesDirectory));
 
 				}).then((): Promise<void> => {
 
@@ -738,7 +743,7 @@ export default class PluginsManager extends EventEmitter {
 
 					this.emit("uninstalled", pluginName, ...data);
 
-					return remove(directory);
+					return rmdirp(directory);
 
 				});
 

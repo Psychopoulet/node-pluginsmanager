@@ -7,10 +7,8 @@
 // deps
 
 	// natives
-	const { join } = require("path");
-
-	// externals
-	const { mkdir, readdir, copy, readJson, writeJson } = require("fs-extra");
+	const { join } = require("node:path");
+	const { mkdir, readdir, readFile, writeFile, cp } = require("node:fs/promises");
 
 // module
 
@@ -20,42 +18,38 @@ module.exports = function copyPlugin (directory, originName, targetName, package
 	const targetDirectory = join(directory, targetName);
 
 	// create dir
-	return mkdir(targetDirectory).then(() => {
+	return mkdir(targetDirectory, {
+		"recursive": true
+	}).then(() => {
 
 		// copy dir
-		return readdir(originDirectory).then((files) => {
+		return readdir(originDirectory);
 
-			return new Promise((resolve, reject) => {
+	}).then((_files) => {
 
-				let j = 0;
+		/**
+		 * @param {Array<string>} files: files to analyse
+		 * @returns {Promise<void>}: operation result
+		 */
+		function _copyFiles (files) {
 
-				for (let i = 0; i < files.length; ++i) {
+			return 0 >= files.length ? Promise.resolve() : Promise.resolve().then(() => {
 
-					copy(
-						join(originDirectory, files[i]),
-						join(targetDirectory, files[i])
-					).then(() => {
+				const file = files.shift();
 
-						if (-1 < j) {
+				return cp(
+					join(originDirectory, file),
+					join(targetDirectory, file)
+				);
 
-							++j;
-
-							if (j === files.length) {
-								resolve();
-							}
-
-						}
-
-					}).catch((err) => {
-						j = -1;
-						reject(err);
-					});
-
-				}
-
+			// loop
+			}).then(() => {
+				return _copyFiles(files);
 			});
 
-		});
+		}
+
+		return _copyFiles(_files);
 
 	}).then(() => {
 
@@ -63,8 +57,10 @@ module.exports = function copyPlugin (directory, originName, targetName, package
 
 			const pluginPackageFile = join(targetDirectory, "package.json");
 
-			return readJson(pluginPackageFile).then((data) => {
-				return writeJson(pluginPackageFile, Object.assign(data, packageData));
+			return readFile(pluginPackageFile, "utf-8").then((content) => {
+				return JSON.parse(content);
+			}).then((data) => {
+				return writeFile(pluginPackageFile, JSON.stringify(Object.assign(data, packageData)), "utf-8");
 			});
 
 		}).then(() => {
@@ -73,7 +69,9 @@ module.exports = function copyPlugin (directory, originName, targetName, package
 
 				const pluginDescriptorFile = join(targetDirectory, "Descriptor.json");
 
-				return readJson(pluginDescriptorFile).then((data) => {
+				return readFile(pluginDescriptorFile, "utf-8").then((content) => {
+					return JSON.parse(content);
+				}).then((data) => {
 
 					const oldTitle = data.info.title;
 					const newTitle = packageData.name;
@@ -93,7 +91,7 @@ module.exports = function copyPlugin (directory, originName, targetName, package
 
 					data.paths = paths;
 
-					return writeJson(pluginDescriptorFile, data);
+					return writeFile(pluginDescriptorFile, JSON.stringify(data), "utf-8");
 
 				});
 

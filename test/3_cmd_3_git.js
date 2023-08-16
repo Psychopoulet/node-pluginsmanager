@@ -3,12 +3,10 @@
 // deps
 
 	// natives
-	const { strictEqual } = require("assert");
-	const { homedir } = require("os");
-	const { join } = require("path");
-
-	// externals
-	const { mkdirp, remove } = require("fs-extra");
+	const { strictEqual } = require("node:assert");
+	const { homedir } = require("node:os");
+	const { join } = require("node:path");
+	const { mkdir, rm } = require("node:fs/promises");
 
 	// locals
 
@@ -32,11 +30,19 @@
 describe("cmd / git", () => {
 
 	before(() => {
-		return mkdirp(PLUGINS_DIRECTORY);
+
+		return mkdir(PLUGINS_DIRECTORY, {
+			"recursive": true
+		});
+
 	});
 
 	after(() => {
-		return remove(PLUGINS_DIRECTORY);
+
+		return rm(PLUGINS_DIRECTORY, {
+			"recursive": true
+		});
+
 	});
 
 	describe("install", () => {

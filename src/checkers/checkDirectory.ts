@@ -3,7 +3,7 @@
 // deps
 
 	// natives
-	import { lstat, Stats } from "fs";
+	import { lstat, Stats } from "node:fs";
 
 	// locals
 	import checkNonEmptyString from "./checkNonEmptyString";

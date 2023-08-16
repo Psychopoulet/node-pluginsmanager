@@ -1,5 +1,5 @@
 /// <reference types="node" />
-import EventEmitter from "events";
+import EventEmitter from "node:events";
 import { Orchestrator, tLogger, iIncomingMessage, iServerResponse } from "node-pluginsmanager-plugin";
 import { Server as WebSocketServer } from "ws";
 import { Server as SocketIOServer } from "socket.io";

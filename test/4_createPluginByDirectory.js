@@ -3,13 +3,13 @@
 // deps
 
 	// natives
-	const { basename, join } = require("path");
-	const { strictEqual } = require("assert");
-	const { homedir } = require("os");
+	const { basename, join } = require("node:path");
+	const { strictEqual } = require("node:assert");
+	const { homedir } = require("node:os");
+	const { mkdir, writeFile, rm } = require("node:fs/promises");
 
 	// externals
 	const { Orchestrator } = require("node-pluginsmanager-plugin");
-	const { mkdirp, remove, writeFile } = require("fs-extra");
 
 	// locals
 	const copyPlugin = require(join(__dirname, "utils", "copyPlugin.js"));
@@ -31,20 +31,40 @@ describe("createPluginByDirectory", () => {
 
 	before(() => {
 
-		return mkdirp(NOT_PLUGIN).then(() => {
-			return mkdirp(INVALID_NAME_PLUGIN);
+		return mkdir(NOT_PLUGIN, {
+			"recursive": true
 		}).then(() => {
-			return mkdirp(TESTS_EXTERNAL_RESSOURCES_DIRECTORY);
+
+			return mkdir(INVALID_NAME_PLUGIN, {
+				"recursive": true
+			});
+
+		}).then(() => {
+
+			return mkdir(TESTS_EXTERNAL_RESSOURCES_DIRECTORY, {
+				"recursive": true
+			});
+
 		});
 
 	});
 
 	after(() => {
 
-		return remove(NOT_PLUGIN).then(() => {
-			return remove(INVALID_NAME_PLUGIN);
+		return rm(NOT_PLUGIN, {
+			"recursive": true
 		}).then(() => {
-			return remove(TESTS_EXTERNAL_RESSOURCES_DIRECTORY);
+
+			return rm(INVALID_NAME_PLUGIN, {
+				"recursive": true
+			});
+
+		}).then(() => {
+
+			return rm(TESTS_EXTERNAL_RESSOURCES_DIRECTORY, {
+				"recursive": true
+			});
+
 		});
 
 	});

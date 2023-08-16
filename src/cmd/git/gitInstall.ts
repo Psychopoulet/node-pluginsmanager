@@ -3,7 +3,7 @@
 // deps
 
 	// natives
-	import { dirname } from "path";
+	import { dirname } from "node:path";
 
 	// locals
 	import checkDirectory from "../../checkers/checkDirectory";

@@ -3,12 +3,10 @@
 // deps
 
 	// natives
-	const assert = require("assert");
-	const { homedir } = require("os");
-	const { join } = require("path");
-
-	// externals
-	const { mkdirp, remove, writeJson } = require("fs-extra");
+	const assert = require("node:assert");
+	const { homedir } = require("node:os");
+	const { join } = require("node:path");
+	const { mkdir, writeFile, rm } = require("node:fs/promises");
 
 	// locals
 
@@ -30,20 +28,26 @@ describe("cmd / npm", () => {
 
 	before(() => {
 
-		return mkdirp(PLUGINS_DIRECTORY).then(() => {
+		return mkdir(PLUGINS_DIRECTORY, {
+			"recursive": true
+		}).then(() => {
 
-			return writeJson(join(PLUGINS_DIRECTORY, "package.json"), {
+			return writeFile(join(PLUGINS_DIRECTORY, "package.json"), JSON.stringify({
 				"dependencies": {
 					"node-promfs": "3.6.2"
 				}
-			});
+			}), "utf-8");
 
 		});
 
 	});
 
 	after(() => {
-		return remove(PLUGINS_DIRECTORY);
+
+		return rm(PLUGINS_DIRECTORY, {
+			"recursive": true
+		});
+
 	});
 
 	it("should test wrong repository", (done) => {

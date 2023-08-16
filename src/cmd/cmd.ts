@@ -3,7 +3,7 @@
 // deps
 
 	// natives
-	import { spawn } from "child_process";
+	import { spawn } from "node:child_process";
 
 	// locals
 	import checkDirectory from "../checkers/checkDirectory";
@@ -13,7 +13,7 @@
 
 // types & interfaces
 
-	import { ChildProcessWithoutNullStreams } from "child_process";
+	import { ChildProcessWithoutNullStreams } from "node:child_process";
 
 // module
 

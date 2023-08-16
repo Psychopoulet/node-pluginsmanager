@@ -7,10 +7,8 @@
 // deps
 
 	// natives
-	const { join } = require("path");
-
-	// externals
-	const { remove } = require("fs-extra");
+	const { join } = require("node:path");
+	const { rm } = require("node:fs/promises");
 
 	// locals
 	const PluginsManager = require(join(__dirname, "..", "lib", "cjs", "main.cjs"));
@@ -71,7 +69,11 @@ describe("pluginsmanager / checkAllModules", () => {
 		}).then(() => {
 			return pluginsManager.destroyAll();
 		}).then(() => {
-			return remove(pluginDirectory);
+
+			return rm(pluginDirectory, {
+				"recursive": true
+			});
+
 		});
 
 	}).timeout(MAX_TIMOUT);

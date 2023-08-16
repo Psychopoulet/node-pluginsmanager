@@ -3,8 +3,8 @@
 // deps
 
 	// natives
-	const { join } = require("path");
-	const assert = require("assert");
+	const { join } = require("node:path");
+	const { strictEqual } = require("node:assert");
 
 	// locals
 	const PluginsManager = require(join(__dirname, "..", "lib", "cjs", "main.cjs"));
@@ -25,15 +25,15 @@ describe("pluginsmanager / getPluginsNames", () => {
 
 	it("should check plugins names before loading", () => {
 
-		assert.strictEqual(typeof pluginsManager.plugins, "object", "loaded plugins is not an object");
-		assert.strictEqual(pluginsManager.plugins instanceof Array, true, "loaded plugins are incorrects");
-		assert.strictEqual(pluginsManager.plugins.length, 0, "loaded plugins are incorrects");
+		strictEqual(typeof pluginsManager.plugins, "object", "loaded plugins is not an object");
+		strictEqual(pluginsManager.plugins instanceof Array, true, "loaded plugins are incorrects");
+		strictEqual(pluginsManager.plugins.length, 0, "loaded plugins are incorrects");
 
 		const pluginsNames = pluginsManager.getPluginsNames();
 
-		assert.strictEqual(typeof pluginsNames, "object", "plugins names is not an object");
-		assert.strictEqual(pluginsNames instanceof Array, true, "plugins names is not an Array");
-		assert.strictEqual(pluginsNames.length, 0, "plugins names length is incorrect");
+		strictEqual(typeof pluginsNames, "object", "plugins names is not an object");
+		strictEqual(pluginsNames instanceof Array, true, "plugins names is not an Array");
+		strictEqual(pluginsNames.length, 0, "plugins names length is incorrect");
 
 	});
 
@@ -41,15 +41,15 @@ describe("pluginsmanager / getPluginsNames", () => {
 
 		return pluginsManager.loadAll().then(() => {
 
-			assert.strictEqual(typeof pluginsManager.plugins, "object", "loaded plugins is not an object");
-			assert.strictEqual(pluginsManager.plugins instanceof Array, true, "loaded plugins are incorrects");
-			assert.strictEqual(pluginsManager.plugins.length, 3, "loaded plugins are incorrects");
+			strictEqual(typeof pluginsManager.plugins, "object", "loaded plugins is not an object");
+			strictEqual(pluginsManager.plugins instanceof Array, true, "loaded plugins are incorrects");
+			strictEqual(pluginsManager.plugins.length, 3, "loaded plugins are incorrects");
 
 			const pluginsNames = pluginsManager.getPluginsNames();
 
-			assert.strictEqual(typeof pluginsNames, "object", "plugins names is not an object");
-			assert.strictEqual(pluginsNames instanceof Array, true, "plugins names is not an Array");
-			assert.strictEqual(pluginsNames.length, 3, "plugins names length is incorrect");
+			strictEqual(typeof pluginsNames, "object", "plugins names is not an object");
+			strictEqual(pluginsNames instanceof Array, true, "plugins names is not an Array");
+			strictEqual(pluginsNames.length, 3, "plugins names length is incorrect");
 
 		});
 

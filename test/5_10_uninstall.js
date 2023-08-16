@@ -3,14 +3,14 @@
 // deps
 
 	// natives
-	const { basename, join } = require("path");
-	const { strictEqual } = require("assert");
+	const { basename, join } = require("node:path");
+	const { strictEqual } = require("node:assert");
 
 	// externals
-	const { remove } = require("fs-extra");
 	const { Orchestrator } = require("node-pluginsmanager-plugin");
 
 	// locals
+	const rmdirp = require(join(__dirname, "..", "lib", "cjs", "utils", "rmdirp.js")).default;
 	const PluginsManager = require(join(__dirname, "..", "lib", "cjs", "main.cjs"));
 	const copyPlugin = require(join(__dirname, "utils", "copyPlugin.js"));
 
@@ -94,7 +94,7 @@ describe("pluginsmanager / uninstall", () => {
 			return pluginsManager.releaseAll().then(() => {
 				return pluginsManager.destroyAll();
 			}).then(() => {
-				return remove(TEST_PLUGIN_DIRECTORY);
+				return rmdirp(TEST_PLUGIN_DIRECTORY);
 			});
 
 		});

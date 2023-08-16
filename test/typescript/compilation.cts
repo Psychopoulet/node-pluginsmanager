@@ -3,11 +3,11 @@
 // deps
 
 	// natives
-	import { join } from "path"
-	import { homedir } from "os"
+	import { join } from "node:path"
+	import { homedir } from "node:os"
+	import { mkdir, rm } from "node:fs/promises"
 
 	// externals
-	import { mkdirp, remove } from "fs-extra";
 	import { Orchestrator } from "node-pluginsmanager-plugin";
 
 	// locals
@@ -85,12 +85,22 @@ try {
 			return manager.releaseAll(); // just to check beforeInitAll
 		});
 
-	}).then((): Promise<void> => {
+	}).then((): Promise<string | undefined> => {
 
-		return mkdirp(EXTERNAL_DIRECTORY).then((): Promise<void> => {
-			return mkdirp(EXTERNAL_DIRECTORY_PLUGINS);
-		}).then((): Promise<void> => {
-			return mkdirp(EXTERNAL_DIRECTORY_RESSOURCES);
+		return mkdir(EXTERNAL_DIRECTORY, {
+			"recursive": true
+		}).then((): Promise<string | undefined> => {
+
+			return mkdir(EXTERNAL_DIRECTORY_PLUGINS, {
+				"recursive": true
+			});
+
+		}).then((): Promise<string | undefined> => {
+
+			return mkdir(EXTERNAL_DIRECTORY_RESSOURCES, {
+				"recursive": true
+			});
+
 		});
 
 	}).then((): Promise<void> => {
@@ -134,10 +144,20 @@ try {
 
 	}).then((): Promise<void> => {
 
-		return remove(EXTERNAL_DIRECTORY_RESSOURCES).then((): Promise<void> => {
-			return remove(EXTERNAL_DIRECTORY_PLUGINS);
+		return rm(EXTERNAL_DIRECTORY_RESSOURCES, {
+			"recursive": true
 		}).then((): Promise<void> => {
-			return remove(EXTERNAL_DIRECTORY);
+
+			return rm(EXTERNAL_DIRECTORY_PLUGINS, {
+				"recursive": true
+			});
+
+		}).then((): Promise<void> => {
+
+			return rm(EXTERNAL_DIRECTORY, {
+				"recursive": true
+			});
+
 		});
 
 	}).catch((err: Error): void => {
