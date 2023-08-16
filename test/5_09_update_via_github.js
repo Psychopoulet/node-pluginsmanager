@@ -5,12 +5,12 @@
 	// natives
 	const { basename, join } = require("node:path");
 	const { strictEqual } = require("node:assert");
-	const { rm } = require("node:fs/promises");
 
 	// externals
 	const { Orchestrator } = require("node-pluginsmanager-plugin");
 
 	// locals
+	const rmdirp = require(join(__dirname, "..", "lib", "cjs", "utils", "rmdirp.js")).default;
 	const PluginsManager = require(join(__dirname, "..", "lib", "cjs", "main.cjs"));
 	const checkDirectory = require(join(__dirname, "..", "lib", "cjs", "checkers", "checkDirectory.js"));
 	const copyPlugin = require(join(__dirname, "utils", "copyPlugin.js"));
@@ -116,16 +116,9 @@ describe("pluginsmanager / update via github", () => {
 			return pluginsManager.releaseAll().then(() => {
 				return pluginsManager.destroyAll();
 			}).then(() => {
-
-				return rm(TEST_PLUGIN_MODULES_DIRECTORY, {
-					"recursive": true
-				});
+				return rmdirp(TEST_PLUGIN_MODULES_DIRECTORY);
 			}).then(() => {
-
-				return rm(TEST_PLUGIN_DIRECTORY, {
-					"recursive": true
-				});
-
+				return rmdirp(TEST_PLUGIN_DIRECTORY);
 			});
 
 		});

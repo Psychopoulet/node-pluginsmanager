@@ -5,10 +5,10 @@
 	// natives
 	const { join } = require("node:path");
 	const { strictEqual } = require("node:assert");
-	const { rm } = require("node:fs/promises");
 
 	// locals
 	const PluginsManager = require(join(__dirname, "..", "lib", "cjs", "main.cjs"));
+	const rmdirp = require(join(__dirname, "..", "lib", "cjs", "utils", "rmdirp.js")).default;
 
 // const
 
@@ -39,17 +39,9 @@ describe("pluginsmanager / install via github", () => {
 		return pluginsManager.releaseAll().then(() => {
 			return pluginsManager.destroyAll();
 		}).then(() => {
-
-			return rm(join(PLUGINS_DIRECTORY, GITHUB_REPO), {
-				"recursive": true
-			});
-
+			return rmdirp(join(PLUGINS_DIRECTORY, GITHUB_REPO));
 		}).then(() => {
-
-			return rm(join(PLUGINS_DIRECTORY, GITHUB_WRONG_REPO), {
-				"recursive": true
-			});
-
+			return rmdirp(join(PLUGINS_DIRECTORY, GITHUB_WRONG_REPO));
 		});
 
 	});
