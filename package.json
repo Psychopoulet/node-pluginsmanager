@@ -19,7 +19,7 @@
 
   "scripts": {
 
-    "build": "npx tsc --project \"./tsconfig.json\"",
+    "build": "node ./removeOldBuild.js && npx tsc --project \"./tsconfig.json\"",
 
     "lint": "npx eslint ./test/**/*.js",
     "check-requires": "npx used-deps-analyzer \"./package.json\" \"./src\" --no-dev --overkill \"fs-extra\" \"node-promfs\"",
