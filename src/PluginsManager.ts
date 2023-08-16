@@ -6,12 +6,13 @@
 	import EventEmitter from "node:events";
 	import { join } from "node:path";
 	import { homedir } from "node:os";
-	import { mkdir, readdir, rm } from "node:fs/promises";
+	import { mkdir, readdir } from "node:fs/promises";
 
 	// externals
 	import versionModulesChecker from "check-version-modules";
 
 	// locals
+	import rmdirp from "./utils/rmdirp";
 	import checkAbsoluteDirectory from "./checkers/checkAbsoluteDirectory";
 	import checkFunction from "./checkers/checkFunction";
 	import checkNonEmptyArray from "./checkers/checkNonEmptyArray";
@@ -379,9 +380,7 @@ export default class PluginsManager extends EventEmitter {
 			// remove all external resources
 			}).then((): Promise<void> => {
 
-				return rm(this.externalRessourcesDirectory, {
-					"recursive": true
-				});
+				return rmdirp(this.externalRessourcesDirectory);
 
 			});
 
@@ -554,9 +553,7 @@ export default class PluginsManager extends EventEmitter {
 
 						checkAbsoluteDirectory("installViaGithub/plugindirectory", directory).then((): Promise<void> => {
 
-							return rm(directory, {
-								"recursive": true
-							}).then((): void => {
+							return rmdirp(directory).then((): void => {
 								return err ? reject(err) : resolve();
 							});
 
@@ -717,9 +714,7 @@ export default class PluginsManager extends EventEmitter {
 
 				return plugin.release(...data).then((): Promise<void> => {
 
-					return rm(join(this.externalRessourcesDirectory, pluginName), {
-						"recursive": true
-					});
+					return rmdirp(join(this.externalRessourcesDirectory));
 
 				}).then((): Promise<void> => {
 
@@ -748,9 +743,7 @@ export default class PluginsManager extends EventEmitter {
 
 					this.emit("uninstalled", pluginName, ...data);
 
-					return rm(directory, {
-						"recursive": true
-					});
+					return rmdirp(directory);
 
 				});
 
