@@ -25,8 +25,12 @@ module.exports = function copyPlugin (directory, originName, targetName, package
 		// copy dir
 		return readdir(originDirectory);
 
-	}).then((files) => {
+	}).then((_files) => {
 
+		/**
+		 * @param {Array<string>} files: files to analyse
+		 * @returns {Promise<void>}: operation result
+		 */
 		function _copyFiles (files) {
 
 			return 0 >= files.length ? Promise.resolve() : Promise.resolve().then(() => {
@@ -45,7 +49,7 @@ module.exports = function copyPlugin (directory, originName, targetName, package
 
 		}
 
-		return _copyFiles(files);
+		return _copyFiles(_files);
 
 	}).then(() => {
 
