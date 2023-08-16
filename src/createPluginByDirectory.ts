@@ -3,7 +3,7 @@
 // deps
 
 	// natives
-	import { join, basename } from "path";
+	import { join, basename } from "node:path";
 
 	// locals
 	import checkAbsoluteDirectory from "./checkers/checkAbsoluteDirectory";

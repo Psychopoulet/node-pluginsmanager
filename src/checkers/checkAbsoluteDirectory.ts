@@ -3,7 +3,7 @@
 // deps
 
 	// natives
-	import { isAbsolute } from "path";
+	import { isAbsolute } from "node:path";
 
 	// locals
 	import checkDirectory from "./checkDirectory";

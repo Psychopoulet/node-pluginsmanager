@@ -3,7 +3,7 @@
 // deps
 
 	// natives
-	import { join } from "path";
+	import { join } from "node:path";
 
 	// locals
 	import createPluginByDirectory from "./createPluginByDirectory";
