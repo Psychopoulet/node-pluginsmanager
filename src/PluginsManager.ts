@@ -3,13 +3,13 @@
 // deps
 
 	// natives
-	import EventEmitter from "events";
-	import { join } from "path";
-	import { homedir } from "os";
+	import EventEmitter from "node:events";
+	import { join } from "node:path";
+	import { homedir } from "node:os";
+	import { mkdir, readdir, rm } from "node:fs/promises";
 
 	// externals
 	import versionModulesChecker from "check-version-modules";
-	import { mkdirp, readdir, remove } from "fs-extra";
 
 	// locals
 	import checkAbsoluteDirectory from "./checkers/checkAbsoluteDirectory";
@@ -251,7 +251,9 @@ export default class PluginsManager extends EventEmitter {
 			// create dir if not exist
 			return checkNonEmptyString("initAll/directory", this.directory).then((): Promise<void> => {
 
-				return mkdirp(this.directory).then((): Promise<void> => {
+				return mkdir(this.directory, {
+					"recursive": true
+				}).then((): Promise<void> => {
 					return checkAbsoluteDirectory("initAll/directory", this.directory);
 				});
 
@@ -260,7 +262,9 @@ export default class PluginsManager extends EventEmitter {
 
 				return checkNonEmptyString("initAll/externalRessourcesDirectory", this.externalRessourcesDirectory).then((): Promise<void> => {
 
-					return mkdirp(this.externalRessourcesDirectory).then((): Promise<void> => {
+					return mkdir(this.externalRessourcesDirectory, {
+						"recursive": true
+					}).then((): Promise<void> => {
 						return checkAbsoluteDirectory("initAll/externalRessourcesDirectory", this.externalRessourcesDirectory);
 					});
 
@@ -375,7 +379,9 @@ export default class PluginsManager extends EventEmitter {
 			// remove all external resources
 			}).then((): Promise<void> => {
 
-				return remove(this.externalRessourcesDirectory);
+				return rm(this.externalRessourcesDirectory, {
+					"recursive": true
+				});
 
 			});
 
@@ -548,7 +554,9 @@ export default class PluginsManager extends EventEmitter {
 
 						checkAbsoluteDirectory("installViaGithub/plugindirectory", directory).then((): Promise<void> => {
 
-							return remove(directory).then((): void => {
+							return rm(directory, {
+								"recursive": true
+							}).then((): void => {
 								return err ? reject(err) : resolve();
 							});
 
@@ -709,7 +717,9 @@ export default class PluginsManager extends EventEmitter {
 
 				return plugin.release(...data).then((): Promise<void> => {
 
-					return remove(join(this.externalRessourcesDirectory, pluginName));
+					return rm(join(this.externalRessourcesDirectory, pluginName), {
+						"recursive": true
+					});
 
 				}).then((): Promise<void> => {
 
@@ -738,7 +748,9 @@ export default class PluginsManager extends EventEmitter {
 
 					this.emit("uninstalled", pluginName, ...data);
 
-					return remove(directory);
+					return rm(directory, {
+						"recursive": true
+					});
 
 				});
 
