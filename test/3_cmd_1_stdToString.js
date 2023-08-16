@@ -3,10 +3,11 @@
 // deps
 
 	// natives
+	const { join } = require("node:path");
 	const { strictEqual } = require("node:assert");
 
 	// locals
-	const stdToString = require(require("path").join(__dirname, "..", "lib", "cjs", "cmd", "stdToString.js"));
+	const stdToString = require(join(__dirname, "..", "lib", "cjs", "cmd", "stdToString.js"));
 
 // tests
 

@@ -9,7 +9,7 @@
 
 	// locals
 	const PluginsManager = require(join(__dirname, "..", "lib", "cjs", "main.cjs"));
-	const checkAbsoluteDirectory = require(require("path").join(__dirname, "..", "lib", "cjs", "checkers", "checkAbsoluteDirectory.js"));
+	const checkAbsoluteDirectory = require(join(__dirname, "..", "lib", "cjs", "checkers", "checkAbsoluteDirectory.js"));
 
 // tests
 
