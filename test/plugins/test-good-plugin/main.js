@@ -4,7 +4,7 @@
 // deps
 
 	// natives
-	const { join } = require("path");
+	const { join } = require("node:path");
 
 	// externals
 	const Mediator = require(join(__dirname, "Mediator.js"));

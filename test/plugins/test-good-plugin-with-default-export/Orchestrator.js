@@ -4,7 +4,7 @@
 // deps
 
 	// natives
-	const { join } = require("path");
+	const { join } = require("node:path");
 
 	// externals
 	const { Orchestrator } = require("node-pluginsmanager-plugin");

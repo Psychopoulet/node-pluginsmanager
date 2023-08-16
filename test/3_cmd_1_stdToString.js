@@ -3,7 +3,7 @@
 // deps
 
 	// natives
-	const { strictEqual } = require("assert");
+	const { strictEqual } = require("node:assert");
 
 	// locals
 	const stdToString = require(require("path").join(__dirname, "..", "lib", "cjs", "cmd", "stdToString.js"));

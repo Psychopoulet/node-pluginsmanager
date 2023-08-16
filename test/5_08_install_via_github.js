@@ -3,11 +3,9 @@
 // deps
 
 	// natives
-	const { join } = require("path");
-	const { strictEqual } = require("assert");
-
-	// externals
-	const { remove } = require("fs-extra");
+	const { join } = require("node:path");
+	const { strictEqual } = require("node:assert");
+	const { rm } = require("node:fs/promises");
 
 	// locals
 	const PluginsManager = require(join(__dirname, "..", "lib", "cjs", "main.cjs"));
@@ -41,9 +39,17 @@ describe("pluginsmanager / install via github", () => {
 		return pluginsManager.releaseAll().then(() => {
 			return pluginsManager.destroyAll();
 		}).then(() => {
-			return remove(join(PLUGINS_DIRECTORY, GITHUB_REPO));
+
+			return rm(join(PLUGINS_DIRECTORY, GITHUB_REPO), {
+				"recursive": true
+			});
+
 		}).then(() => {
-			return remove(join(PLUGINS_DIRECTORY, GITHUB_WRONG_REPO));
+
+			return rm(join(PLUGINS_DIRECTORY, GITHUB_WRONG_REPO), {
+				"recursive": true
+			});
+
 		});
 
 	});

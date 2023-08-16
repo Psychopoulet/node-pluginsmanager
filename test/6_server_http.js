@@ -3,8 +3,8 @@
 // deps
 
 	// natives
-	const { join } = require("path");
-	const { createServer } = require("http");
+	const { join } = require("node:path");
+	const { createServer } = require("node:http");
 
 	// externals
 	const WebSocketServer = require("ws").Server;

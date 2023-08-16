@@ -3,8 +3,8 @@
 // deps
 
 	// natives
-	const { join } = require("path");
-	const { strictEqual } = require("assert");
+	const { join } = require("node:path");
+	const { strictEqual } = require("node:assert");
 
 	// externals
 	const { Orchestrator } = require("node-pluginsmanager-plugin");

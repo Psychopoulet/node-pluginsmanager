@@ -3,8 +3,8 @@
 // deps
 
 	// natives
-	const { join } = require("path");
-	const { strictEqual } = require("assert");
+	const { join } = require("node:path");
+	const { strictEqual } = require("node:assert");
 
 	// locals
 	const PluginsManager = require(join(__dirname, "..", "lib", "cjs", "main.cjs"));

@@ -3,8 +3,10 @@
 // deps
 
 	// natives
+	const { strictEqual } = require("node:assert");
+
+	// externals
 	const WebSocket = require("ws");
-	const { strictEqual } = require("assert");
 
 // consts
 

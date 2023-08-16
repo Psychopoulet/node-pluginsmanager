@@ -7,9 +7,9 @@
 // deps
 
 	// natives
-	const { request } = require("http");
-	const { parse } = require("url");
-	const { strictEqual } = require("assert");
+	const { request } = require("node:http");
+	const { parse } = require("node:url");
+	const { strictEqual } = require("node:assert");
 
 // consts
 

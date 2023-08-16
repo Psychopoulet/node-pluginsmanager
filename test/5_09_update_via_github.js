@@ -3,11 +3,11 @@
 // deps
 
 	// natives
-	const { basename, join } = require("path");
-	const { strictEqual } = require("assert");
+	const { basename, join } = require("node:path");
+	const { strictEqual } = require("node:assert");
+	const { rm } = require("node:fs/promises");
 
 	// externals
-	const { remove } = require("fs-extra");
 	const { Orchestrator } = require("node-pluginsmanager-plugin");
 
 	// locals
@@ -116,9 +116,16 @@ describe("pluginsmanager / update via github", () => {
 			return pluginsManager.releaseAll().then(() => {
 				return pluginsManager.destroyAll();
 			}).then(() => {
-				return remove(TEST_PLUGIN_MODULES_DIRECTORY);
+
+				return rm(TEST_PLUGIN_MODULES_DIRECTORY, {
+					"recursive": true
+				});
 			}).then(() => {
-				return remove(TEST_PLUGIN_DIRECTORY);
+
+				return rm(TEST_PLUGIN_DIRECTORY, {
+					"recursive": true
+				});
+
 			});
 
 		});
