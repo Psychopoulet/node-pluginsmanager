@@ -6,11 +6,26 @@
 	// natives
 	const { join } = require("node:path");
 	const { rm } = require("node:fs/promises");
+	const { lstat } = require("node:fs");
+
+// consts
+
+	const BUILD_DIR = join(__dirname, "lib");
 
 // exec
 
-rm(join(__dirname, "lib"), {
-	"recursive": true
+return new Promise((resolve) => {
+
+	lstat(BUILD_DIR, (err, stats) => {
+		return resolve(Boolean(!err && stats.isDirectory()));
+	});
+
+}).then((exists) => {
+
+	return exists ? rm(BUILD_DIR, {
+		"recursive": true
+	}) : Promise.resolve();
+
 }).then(() => {
 
 	process.exitCode = 0;
