@@ -19,43 +19,48 @@
 
   "scripts": {
 
-    "build": "node ./removeOldBuild.js && npx tsc --project \"./tsconfig.json\"",
+    "prepare": "npx husky install",
 
-    "lint": "npx eslint ./test/**/*.js",
+    "clean": "npx rimraf lib/*",
+    "build": "npm run-script clean && npx tsc --project \"./tsconfig.json\"",
+
+    "lint": "npx eslint --config .eslintrc-src.js --ext .cts,.ts ./src/**/* && npx eslint --config .eslintrc-tests.js ./bin/*.js ./test/**/*.js",
     "check-requires": "npx used-deps-analyzer \"./package.json\" \"./src\" --no-dev --overkill \"fs-extra\" \"node-promfs\"",
     "check-updates": "npx check-version-modules",
-    "unit-tests": "npm run build && npx nyc --reporter=html --reporter=text mocha",
+    "unit-tests": "npm run-script build && npx nyc --reporter=html --reporter=text mocha",
 
-    "tests": "npm run-script lint && npm run check-requires && npm run-script check-updates && npm run-script unit-tests",
-    "ci": "npm run-script tests && npx nyc report --reporter=text-lcov | coveralls"
+    "tests": "npm run-script lint && npm run-script check-requires && npm run-script check-updates && npm run-script unit-tests"
 
   },
 
   "files": [
-    "/lib"
+    "/bin",
+    "/lib",
+    "/public"
   ],
   "engines": {
     "node": ">=16.0.0"
   },
 
   "dependencies": {
-    "check-version-modules": "1.4.1"
+    "check-version-modules": "2.0.0"
   },
   "devDependencies": {
-    "@types/express": "4.17.17",
-    "@types/node": "20.5.0",
+    "@types/express": "4.17.21",
+    "@types/node": "20.11.0",
     "@types/socket.io": "3.0.2",
-    "@types/ws": "8.5.5",
-    "coveralls": "3.1.1",
+    "@types/ws": "8.5.10",
+    "eslint-plugin-personnallinter": "git+ssh://git@github.com/Psychopoulet/eslint-plugin-personnallinter",
     "express": "4.18.2",
     "husky": "8.0.3",
     "mocha": "10.2.0",
-    "node-pluginsmanager-plugin": "5.0.14",
+    "node-pluginsmanager-plugin": "6.0.4",
     "nyc": "15.1.0",
-    "socket.io": "4.7.2",
-    "typescript": "5.1.6",
-    "used-deps-analyzer": "0.1.6",
-    "ws": "8.13.0"
+    "rimraf": "5.0.5",
+    "socket.io": "4.7.4",
+    "typescript": "5.3.3",
+    "used-deps-analyzer": "0.1.8",
+    "ws": "8.16.0"
   },
   "optionalDependencies": {},
 
