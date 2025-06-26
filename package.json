@@ -39,7 +39,7 @@
   },
 
   "dependencies": {
-    "check-version-modules": "1.4.1"
+    "check-version-modules": "1.5.2"
   },
   "devDependencies": {
     "@types/express": "4.17.17",
