@@ -19,7 +19,7 @@
 
   "scripts": {
 
-    "prepare": "npx husky install",
+    "prepare": "npx husky",
 
     "clean": "npx rimraf ./lib/cjs",
     "build": "npm run-script clean && npx tsc --project \"./tsconfig.json\"",
@@ -35,7 +35,7 @@
 
   "files": [
     "/bin",
-    "/lib",
+    "/lib/cjs",
     "/public"
   ],
   "engines": {
