@@ -6,7 +6,7 @@
   "author": "Sébastien VIDAL",
   "core": true,
   "dependencies": {
-    "simpletts": "2.5.0"
+    "simpletts": "2.6.0"
   },
   "license": "ISC"
 }
