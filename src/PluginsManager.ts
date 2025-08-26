@@ -37,7 +37,7 @@
     import type { IncomingMessage, ServerResponse } from "node:http";
 
     // externals
-    import type { Orchestrator, tLogger } from "node-pluginsmanager-plugin";
+    import type { Orchestrator, tLogger, iIncomingMessage, iServerResponse } from "node-pluginsmanager-plugin";
     import type { Server as WebSocketServer } from "ws";
     import type { Server as SocketIOServer } from "socket.io";
 
@@ -182,11 +182,12 @@ export default class PluginsManager extends EventEmitter {
                     "failAtMajor": true,
                     "failAtMinor": true,
                     "failAtPatch": false,
-                    "dev": false,
-                    "console": false
-                }).then((valid: boolean): Promise<void> => {
+                    "dev": false
+                }).then((analyze: {
+					"result": boolean;
+				}): Promise<void> => {
 
-                    return valid ? Promise.resolve() : Promise.reject(new Error("\"" + plugin.name + "\" plugin has obsoletes modules"));
+                    return analyze.result ? Promise.resolve() : Promise.reject(new Error("\"" + plugin.name + "\" plugin has obsoletes modules"));
 
                 });
 
@@ -195,7 +196,7 @@ export default class PluginsManager extends EventEmitter {
         }
 
         // used for execute all plugins' middlewares in app (express or other)
-        public appMiddleware (req: IncomingMessage, res: ServerResponse, next: Function): void {
+        public appMiddleware (req: IncomingMessage, res: ServerResponse, next: () => void): void {
 
             const plugins: Orchestrator[] = this.plugins.filter((plugin: Orchestrator): boolean => {
                 return "function" === typeof plugin.appMiddleware;
@@ -206,22 +207,22 @@ export default class PluginsManager extends EventEmitter {
             }
             else {
 
-                const _recursiveNext: (i?: number) => Function = (i: number = 1): Function => {
+                const _recursiveNext: (i?: number) => () => void = (i: number = 1): () => void => {
 
                     if (i >= plugins.length) {
                         return next;
                     }
                     else {
 
-                        return () => {
-                            return plugins[i].appMiddleware(req, res, _recursiveNext(i + 1));
+                        return (): void => {
+                            return plugins[i].appMiddleware(req as iIncomingMessage, res as iServerResponse, _recursiveNext(i + 1));
                         };
 
                     }
 
                 };
 
-                return plugins[0].appMiddleware(req, res, _recursiveNext());
+                return plugins[0].appMiddleware(req as iIncomingMessage, res as iServerResponse, _recursiveNext());
 
             }
 
