@@ -225,7 +225,7 @@ export default class PluginsManager extends EventEmitter {
 
                 };
 
-                return plugins[0].appMiddleware(req, res as iServerResponse, _recursiveNext(0));
+                return plugins[0].appMiddleware(req, res as iServerResponse, _recursiveNext(1)); // must start at index "1", cause the "0" is executed here
 
             }
 
