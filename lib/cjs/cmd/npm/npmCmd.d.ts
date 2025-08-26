@@ -1,1 +1,1 @@
-export default function npmCmd(directory: string, params: Array<string>): Promise<void>;
+export default function npmCmd(directory: string, params: string[]): Promise<void>;
