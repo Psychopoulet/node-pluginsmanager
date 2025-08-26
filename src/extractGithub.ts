@@ -1,6 +1,18 @@
+// types & interfaces
+
+    // externals
+    import type { Orchestrator } from "node-pluginsmanager-plugin";
+
+    // locals
+
+    interface OrchestratorExtended extends Orchestrator {
+        "github"?: string;
+        "repository"?: string | Record<string, string>;
+    }
+
 // module
 
-export default function extractGithub (plugin: any): string {
+export default function extractGithub (plugin: OrchestratorExtended): string {
 
     let github: string = "";
 
@@ -12,7 +24,7 @@ export default function extractGithub (plugin: any): string {
         else if ("string" === typeof plugin.repository) {
             github = plugin.repository;
         }
-        else if (plugin.repository && "string" === typeof plugin.repository.url) {
+        else if ("object" === typeof plugin.repository && "string" === typeof plugin.repository.url) {
             github = plugin.repository.url;
         }
 

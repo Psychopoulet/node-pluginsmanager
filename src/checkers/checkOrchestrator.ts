@@ -6,9 +6,14 @@
     // locals
     import checkFunction from "./checkFunction";
 
+// types & interfaces
+
+    // externals
+    import type { Orchestrator } from "node-pluginsmanager-plugin";
+
 // module
 
-export default function checkOrchestrator (dataName: string, data: any): Promise<void> {
+export default function checkOrchestrator (dataName: string, data: Orchestrator): Promise<void> {
 
     if ("undefined" === typeof data) {
         return Promise.reject(new ReferenceError("\"" + dataName + "\" parameter is missing"));
@@ -19,18 +24,18 @@ export default function checkOrchestrator (dataName: string, data: any): Promise
 
     else {
 
-        return checkFunction("isOrchestrator/load", (data as any).load).then((): Promise<void> => {
-            return checkFunction("isOrchestrator/destroy", (data as any).destroy);
+        return checkFunction("isOrchestrator/load", data.load).then((): Promise<void> => {
+            return checkFunction("isOrchestrator/destroy", data.destroy);
         }).then((): Promise<void> => {
-            return checkFunction("isOrchestrator/init", (data as any).init);
+            return checkFunction("isOrchestrator/init", data.init);
         }).then((): Promise<void> => {
-            return checkFunction("isOrchestrator/release", (data as any).release);
+            return checkFunction("isOrchestrator/release", data.release);
         }).then((): Promise<void> => {
-            return checkFunction("isOrchestrator/install", (data as any).install);
+            return checkFunction("isOrchestrator/install", data.install);
         }).then((): Promise<void> => {
-            return checkFunction("isOrchestrator/update", (data as any).update);
+            return checkFunction("isOrchestrator/update", data.update);
         }).then((): Promise<void> => {
-            return checkFunction("isOrchestrator/uninstall", (data as any).uninstall);
+            return checkFunction("isOrchestrator/uninstall", data.uninstall);
         });
 
     }

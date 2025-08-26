@@ -15,8 +15,13 @@
 
     // locals
 
-    interface tMultiExportPlugin { "Orchestrator": typeof Orchestrator; }
-    interface tDefaultExportPlugin { "default": typeof Orchestrator; }
+    interface tMultiExportPlugin {
+        "Orchestrator": typeof Orchestrator;
+    }
+
+    interface tDefaultExportPlugin {
+        "default": typeof Orchestrator;
+    }
 
 // module
 
