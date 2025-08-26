@@ -37,7 +37,7 @@
     import type { IncomingMessage, ServerResponse } from "node:http";
 
     // externals
-    import type { Orchestrator, tLogger, iIncomingMessage, iServerResponse } from "node-pluginsmanager-plugin";
+    import type { Orchestrator, tLogger, iServerResponse } from "node-pluginsmanager-plugin";
     import type { Server as WebSocketServer } from "ws";
     import type { Server as SocketIOServer } from "socket.io";
 
@@ -198,31 +198,34 @@ export default class PluginsManager extends EventEmitter {
         // used for execute all plugins' middlewares in app (express or other)
         public appMiddleware (req: IncomingMessage, res: ServerResponse, next: () => void): void {
 
+            // limit to plugins which has registered middleware
             const plugins: Orchestrator[] = this.plugins.filter((plugin: Orchestrator): boolean => {
                 return "function" === typeof plugin.appMiddleware;
             });
 
-            if (!plugins.length) {
+            if (0 >= plugins.length) {
                 return next();
             }
             else {
 
-                const _recursiveNext: (i?: number) => () => void = (i: number = 1): () => void => {
+                const _recursiveNext: (i: number) => () => void = (i: number): () => void => {
 
-                    if (i >= plugins.length) {
-                        return next;
-                    }
-                    else {
+                    if (i < plugins.length) {
 
                         return (): void => {
-                            return plugins[i].appMiddleware(req as iIncomingMessage, res as iServerResponse, _recursiveNext(i + 1));
+                            return plugins[i].appMiddleware(req, res as iServerResponse, _recursiveNext(i + 1));
                         };
 
                     }
 
+                    // if no more plugin to try, pass the lead to the application
+                    else {
+                        return next;
+                    }
+
                 };
 
-                return plugins[0].appMiddleware(req as iIncomingMessage, res as iServerResponse, _recursiveNext());
+                return plugins[0].appMiddleware(req, res as iServerResponse, _recursiveNext(0));
 
             }
 
