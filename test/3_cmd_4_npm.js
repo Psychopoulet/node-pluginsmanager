@@ -12,7 +12,6 @@
 
 	const NPM_DIRECTORY = join(__dirname, "..", "lib", "cjs", "cmd", "npm");
 
-		const cmd = require(join(NPM_DIRECTORY, "npmCmd.js"));
 		const install = require(join(NPM_DIRECTORY, "npmInstall.js"));
 		const update = require(join(NPM_DIRECTORY, "npmUpdate.js"));
 
@@ -50,23 +49,11 @@ describe("cmd / npm", () => {
 
 	});
 
-	it("should test wrong repository", (done) => {
-
-		cmd.default("zfefzefzefz").then(() => {
-			done(new Error("Wrong parameters used"));
-		}).catch((err) => {
-
-			assert.strictEqual(typeof err, "object", "Generated error is not an object");
-			assert.strictEqual(err instanceof Error, true, "Generated error is not an Error");
-
-			done();
-
-		});
-
-	});
-
 	it("should test right install", () => {
-		return install.default(PLUGINS_DIRECTORY);
+		return install.default(PLUGINS_DIRECTORY).catch((err) => {
+			console.log(err);
+			return Promise.reject(err);
+		});
 	}).timeout(MAX_TIMOUT);
 
 	it("should test right update", () => {

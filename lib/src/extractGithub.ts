@@ -1,11 +1,23 @@
-"use strict";
 // types & interfaces
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.default = extractGithub;
+
+    // externals
+    import type { Orchestrator } from "node-pluginsmanager-plugin";
+
+    // locals
+
+    interface OrchestratorExtended extends Orchestrator {
+        "github"?: string;
+        "repository"?: string | Record<string, string>;
+    }
+
 // module
-function extractGithub(plugin) {
-    let github = "";
+
+export default function extractGithub (plugin: OrchestratorExtended): string {
+
+    let github: string = "";
+
     if ("object" === typeof plugin) {
+
         if ("string" === typeof plugin.github) {
             github = plugin.github;
         }
@@ -15,6 +27,9 @@ function extractGithub(plugin) {
         else if ("object" === typeof plugin.repository && "string" === typeof plugin.repository.url) {
             github = plugin.repository.url;
         }
+
     }
+
     return github;
+
 }

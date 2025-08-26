@@ -1,8 +1,7 @@
-"use strict";
 // module
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.default = stdToString;
-function stdToString(msg) {
+
+export default function stdToString (msg: any): string {
+
     if ("object" !== typeof msg) {
         return String(msg);
     }
@@ -12,4 +11,5 @@ function stdToString(msg) {
     else {
         return msg.message ? msg.message : String(msg);
     }
+
 }

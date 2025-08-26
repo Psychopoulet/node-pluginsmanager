@@ -1,8 +1,8 @@
-/// <reference types="node" />
 import EventEmitter from "node:events";
-import { Orchestrator, tLogger, iIncomingMessage, iServerResponse } from "node-pluginsmanager-plugin";
-import { Server as WebSocketServer } from "ws";
-import { Server as SocketIOServer } from "socket.io";
+import type { IncomingMessage, ServerResponse } from "node:http";
+import type { Orchestrator, tLogger } from "node-pluginsmanager-plugin";
+import type { Server as WebSocketServer } from "ws";
+import type { Server as SocketIOServer } from "socket.io";
 interface iPluginManagerOptions {
     "directory"?: string;
     "externalRessourcesDirectory"?: string;
@@ -13,17 +13,17 @@ export default class PluginsManager extends EventEmitter {
     protected _beforeLoadAll: tBeforeAllMethodCallback | null;
     protected _beforeInitAll: tBeforeAllMethodCallback | null;
     protected _logger: tLogger | null;
-    protected _orderedPluginsNames: Array<string>;
+    protected _orderedPluginsNames: string[];
     directory: string;
     externalRessourcesDirectory: string;
-    plugins: Array<Orchestrator>;
+    plugins: Orchestrator[];
     constructor(options: iPluginManagerOptions);
-    getPluginsNames(): Array<string>;
-    setOrder(pluginsNames: Array<string>): Promise<void>;
-    getOrder(): Array<string>;
+    getPluginsNames(): string[];
+    setOrder(pluginsNames: string[]): Promise<void>;
+    getOrder(): string[];
     checkAllModules(): Promise<void>;
     checkModules(plugin: Orchestrator): Promise<void>;
-    appMiddleware(req: iIncomingMessage, res: iServerResponse, next: Function): void;
+    appMiddleware(req: IncomingMessage, res: ServerResponse, next: () => void): void;
     socketMiddleware(server: WebSocketServer | SocketIOServer): void;
     beforeLoadAll(callback: tBeforeAllMethodCallback): Promise<void>;
     loadAll(...data: any): Promise<void>;
