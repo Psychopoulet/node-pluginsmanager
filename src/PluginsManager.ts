@@ -1,758 +1,763 @@
-"use strict";
-
 // deps
 
-	// natives
-	import EventEmitter from "node:events";
-	import { join } from "node:path";
-	import { homedir } from "node:os";
-	import { mkdir, readdir } from "node:fs/promises";
+    // natives
+    import EventEmitter from "node:events";
+    import { join } from "node:path";
+    import { homedir } from "node:os";
+    import { mkdir, readdir } from "node:fs/promises";
 
-	// externals
-	import versionModulesChecker from "check-version-modules";
+    // externals
+    import versionModulesChecker from "check-version-modules";
 
-	// locals
-	import rmdirp from "./utils/rmdirp";
-	import checkAbsoluteDirectory from "./checkers/checkAbsoluteDirectory";
-	import checkFunction from "./checkers/checkFunction";
-	import checkNonEmptyArray from "./checkers/checkNonEmptyArray";
-	import checkNonEmptyString from "./checkers/checkNonEmptyString";
-	import checkOrchestrator from "./checkers/checkOrchestrator";
-	import createPluginByDirectory from "./createPluginByDirectory";
+    // locals
+    import rmdirp from "./utils/rmdirp";
+    import checkAbsoluteDirectory from "./checkers/checkAbsoluteDirectory";
+    import checkFunction from "./checkers/checkFunction";
+    import checkNonEmptyArray from "./checkers/checkNonEmptyArray";
+    import checkNonEmptyString from "./checkers/checkNonEmptyString";
+    import checkOrchestrator from "./checkers/checkOrchestrator";
+    import createPluginByDirectory from "./createPluginByDirectory";
 
-	import loadSortedPlugins from "./loadSortedPlugins";
-	import initSortedPlugins from "./initSortedPlugins";
+    import loadSortedPlugins from "./loadSortedPlugins";
+    import initSortedPlugins from "./initSortedPlugins";
 
-	import extractGithub from "./extractGithub";
+    import extractGithub from "./extractGithub";
 
-		// git
-		import gitInstall from "./cmd/git/gitInstall";
-		import gitUpdate from "./cmd/git/gitUpdate";
+        // git
+        import gitInstall from "./cmd/git/gitInstall";
+        import gitUpdate from "./cmd/git/gitUpdate";
 
-		// npm
-		import npmInstall from "./cmd/npm/npmInstall";
-		import npmUpdate from "./cmd/npm/npmUpdate";
+        // npm
+        import npmInstall from "./cmd/npm/npmInstall";
+        import npmUpdate from "./cmd/npm/npmUpdate";
 
 // types & interfaces
 
-	import { Orchestrator, tLogger, iIncomingMessage, iServerResponse } from "node-pluginsmanager-plugin";
-	import { Server as WebSocketServer } from "ws";
-	import { Server as SocketIOServer } from "socket.io";
+    // natives
+    import type { IncomingMessage, ServerResponse } from "node:http";
 
-	interface iPluginManagerOptions {
-		"directory"?: string;
-		"externalRessourcesDirectory"?: string;
-		"logger"?: tLogger | null;
-	}
+    // externals
+    import type { Orchestrator, tLogger } from "node-pluginsmanager-plugin";
+    import type { Server as WebSocketServer } from "ws";
+    import type { Server as SocketIOServer } from "socket.io";
 
-	type tBeforeAllMethodCallback = (...data: any) => Promise<void> | void;
+    interface iPluginManagerOptions {
+        "directory"?: string;
+        "externalRessourcesDirectory"?: string;
+        "logger"?: tLogger | null;
+    }
+
+    type tBeforeAllMethodCallback = (...data: any) => Promise<void> | void;
 
 // consts
 
-	const DEFAULT_PLUGINS_DIRECTORY: string = join(homedir(), "node-pluginsmanager-plugins");
-	const DEFAULT_RESSOURCES_DIRECTORY: string = join(homedir(), "node-pluginsmanager-resources");
+    const DEFAULT_PLUGINS_DIRECTORY: string = join(homedir(), "node-pluginsmanager-plugins");
+    const DEFAULT_RESSOURCES_DIRECTORY: string = join(homedir(), "node-pluginsmanager-resources");
 
 // module
 
 export default class PluginsManager extends EventEmitter {
 
-	// attributes
+    // attributes
 
-		// protected
+        // protected
 
-		protected _beforeLoadAll: tBeforeAllMethodCallback | null;
-		protected _beforeInitAll: tBeforeAllMethodCallback | null;
+        protected _beforeLoadAll: tBeforeAllMethodCallback | null;
+        protected _beforeInitAll: tBeforeAllMethodCallback | null;
 
-		protected _logger: tLogger | null;
+        protected _logger: tLogger | null;
 
-		protected _orderedPluginsNames: Array<string>;
+        protected _orderedPluginsNames: string[];
 
-	// public
+    // public
 
-		public directory: string; // plugins location (must be writable). default : join(homedir(), "node-pluginsmanager-plugins")
-		public externalRessourcesDirectory: string; // external resources locations (sqlite, files, cache, etc...) (must be writable). default : join(homedir(), "node-pluginsmanager-resources")
-		public plugins: Array<Orchestrator>; // plugins' Orchestrators
+        public directory: string; // plugins location (must be writable). default : join(homedir(), "node-pluginsmanager-plugins")
+        public externalRessourcesDirectory: string; // external resources locations (sqlite, files, cache, etc...) (must be writable). default : join(homedir(), "node-pluginsmanager-resources")
+        public plugins: Orchestrator[]; // plugins' Orchestrators
 
-	// constructor
+    // constructor
 
-	public constructor (options: iPluginManagerOptions) {
+    public constructor (options: iPluginManagerOptions) {
 
-		super();
+        super();
 
-		// protected
+        // protected
 
-			this._beforeLoadAll = null;
-			this._beforeInitAll = null;
+            this._beforeLoadAll = null;
+            this._beforeInitAll = null;
 
-			this._orderedPluginsNames = [];
+            this._orderedPluginsNames = [];
 
-			this._logger = options && "function" === typeof options.logger ?
-				options.logger : null;
+            this._logger = options && "function" === typeof options.logger
+                ? options.logger
+                : null;
 
-		// public
+        // public
 
-			this.plugins = [];
+            this.plugins = [];
 
-			this.directory = options && "undefined" !== typeof options.directory ?
-				options.directory : DEFAULT_PLUGINS_DIRECTORY;
+            this.directory = options && "undefined" !== typeof options.directory
+                ? options.directory
+                : DEFAULT_PLUGINS_DIRECTORY;
 
-			this.externalRessourcesDirectory = options && "undefined" !== typeof options.externalRessourcesDirectory ?
-				options.externalRessourcesDirectory : DEFAULT_RESSOURCES_DIRECTORY;
+            this.externalRessourcesDirectory = options && "undefined" !== typeof options.externalRessourcesDirectory
+                ? options.externalRessourcesDirectory
+                : DEFAULT_RESSOURCES_DIRECTORY;
 
-	}
+    }
 
-	// public
+    // public
 
-		public getPluginsNames (): Array<string> {
+        public getPluginsNames (): string[] {
 
-			return [ ...this.plugins ].map((plugin: Orchestrator): string => {
-				return plugin.name;
-			});
+            return [ ...this.plugins ].map((plugin: Orchestrator): string => {
+                return plugin.name;
+            });
 
-		}
+        }
 
-		// create a forced order to synchronously initialize plugins. not ordered plugins are asynchronously initialized after.
-		public setOrder (pluginsNames: Array<string>): Promise<void> {
+        // create a forced order to synchronously initialize plugins. not ordered plugins are asynchronously initialized after.
+        public setOrder (pluginsNames: string[]): Promise<void> {
 
-			return checkNonEmptyArray("setOrder/pluginsNames", pluginsNames).then((): Promise<void> => {
+            return checkNonEmptyArray("setOrder/pluginsNames", pluginsNames).then((): Promise<void> => {
 
-				const errors: Array<string> = [];
-				for (let i: number = 0; i < pluginsNames.length; ++i) {
+                const errors: string[] = [];
+                for (let i: number = 0; i < pluginsNames.length; ++i) {
 
-					if ("string" !== typeof pluginsNames[i]) {
-						errors.push("The directory at index \"" + i + "\" must be a string");
-					}
-					else if ("" === pluginsNames[i].trim()) {
-						errors.push("The directory at index \"" + i + "\" must be not empty");
-					}
-					else if (1 < pluginsNames.filter((name) => {
-						return name === pluginsNames[i];
-					}).length) {
-						errors.push("The directory at index \"" + i + "\" is given twice or more");
-					}
+                    if ("string" !== typeof pluginsNames[i]) {
+                        errors.push("The directory at index \"" + i + "\" must be a string");
+                    }
+                    else if ("" === pluginsNames[i].trim()) {
+                        errors.push("The directory at index \"" + i + "\" must be not empty");
+                    }
+                    else if (1 < pluginsNames.filter((name) => {
+                        return name === pluginsNames[i];
+                    }).length) {
+                        errors.push("The directory at index \"" + i + "\" is given twice or more");
+                    }
 
-				}
+                }
 
-				return !errors.length ? Promise.resolve() : Promise.reject(new Error(errors.join("\r\n")));
+                return !errors.length ? Promise.resolve() : Promise.reject(new Error(errors.join("\r\n")));
 
-			}).then((): Promise<void> => {
+            }).then((): Promise<void> => {
 
-				this._orderedPluginsNames = pluginsNames;
+                this._orderedPluginsNames = pluginsNames;
 
-				return Promise.resolve();
+                return Promise.resolve();
 
-			});
+            });
 
-		}
+        }
 
-		public getOrder (): Array<string> {
+        public getOrder (): string[] {
 
-			return [ ...this._orderedPluginsNames ];
+            return [ ...this._orderedPluginsNames ];
 
-		}
+        }
 
-		public checkAllModules (): Promise<void> {
+        public checkAllModules (): Promise<void> {
 
-			const _checkPluginsModules: (i?: number) => Promise<void> = (i: number = 0): Promise<void> => {
+            const _checkPluginsModules: (i?: number) => Promise<void> = (i: number = 0): Promise<void> => {
 
-				return i < this.plugins.length ? this.checkModules(this.plugins[i]).then((): Promise<void> => {
+                return i < this.plugins.length ? this.checkModules(this.plugins[i]).then((): Promise<void> => {
 
-					return _checkPluginsModules(i + 1);
+                    return _checkPluginsModules(i + 1);
 
-				}) : Promise.resolve();
+                }) : Promise.resolve();
 
-			};
+            };
 
-			return _checkPluginsModules();
+            return _checkPluginsModules();
 
-		}
+        }
 
-		public checkModules (plugin: Orchestrator): Promise<void> {
+        public checkModules (plugin: Orchestrator): Promise<void> {
 
-			return checkAbsoluteDirectory("checkModules/directory", this.directory).then((): Promise<void> => {
-				return checkOrchestrator("checkModules/plugin", plugin);
-			}).then((): Promise<void> => {
+            return checkAbsoluteDirectory("checkModules/directory", this.directory).then((): Promise<void> => {
+                return checkOrchestrator("checkModules/plugin", plugin);
+            }).then((): Promise<void> => {
 
-				return versionModulesChecker(join(this.directory, plugin.name, "package.json"), {
-					"failAtMajor": true,
-					"failAtMinor": true,
-					"failAtPatch": false,
-					"dev": false,
-					"console": false
-				}).then((valid: boolean): Promise<void> => {
+                return versionModulesChecker(join(this.directory, plugin.name, "package.json"), {
+                    "failAtMajor": true,
+                    "failAtMinor": true,
+                    "failAtPatch": false,
+                    "dev": false,
+                    "console": false
+                }).then((valid: boolean): Promise<void> => {
 
-					return valid ? Promise.resolve() : Promise.reject(new Error("\"" + plugin.name + "\" plugin has obsoletes modules"));
+                    return valid ? Promise.resolve() : Promise.reject(new Error("\"" + plugin.name + "\" plugin has obsoletes modules"));
 
-				});
+                });
 
-			});
+            });
 
-		}
+        }
 
-		// used for execute all plugins' middlewares in app (express or other)
-		public appMiddleware (req: iIncomingMessage, res: iServerResponse, next: Function): void {
+        // used for execute all plugins' middlewares in app (express or other)
+        public appMiddleware (req: IncomingMessage, res: ServerResponse, next: Function): void {
 
-			const plugins: Array<Orchestrator> = this.plugins.filter((plugin: Orchestrator): boolean => {
-				return "function" === typeof plugin.appMiddleware;
-			});
+            const plugins: Orchestrator[] = this.plugins.filter((plugin: Orchestrator): boolean => {
+                return "function" === typeof plugin.appMiddleware;
+            });
 
-			if (!plugins.length) {
-				return next();
-			}
-			else {
+            if (!plugins.length) {
+                return next();
+            }
+            else {
 
-				const _recursiveNext: (i?: number) => Function = (i: number = 1): Function => {
+                const _recursiveNext: (i?: number) => Function = (i: number = 1): Function => {
 
-					if (i >= plugins.length) {
-						return next;
-					}
-					else {
+                    if (i >= plugins.length) {
+                        return next;
+                    }
+                    else {
 
-						return () => {
-							return plugins[i].appMiddleware(req, res, _recursiveNext(i + 1));
-						};
+                        return () => {
+                            return plugins[i].appMiddleware(req, res, _recursiveNext(i + 1));
+                        };
 
-					}
+                    }
 
-				};
+                };
 
-				return plugins[0].appMiddleware(req, res, _recursiveNext());
+                return plugins[0].appMiddleware(req, res, _recursiveNext());
 
-			}
+            }
 
-		}
+        }
 
-		// middleware for socket to add bilateral push events
-		public socketMiddleware (server: WebSocketServer | SocketIOServer): void {
+        // middleware for socket to add bilateral push events
+        public socketMiddleware (server: WebSocketServer | SocketIOServer): void {
 
-			this.plugins.filter((plugin: Orchestrator): boolean => {
-				return "function" === typeof plugin.socketMiddleware;
-			}).forEach((plugin: Orchestrator): void => {
-				plugin.socketMiddleware(server);
-			});
+            this.plugins.filter((plugin: Orchestrator): boolean => {
+                return "function" === typeof plugin.socketMiddleware;
+            }).forEach((plugin: Orchestrator): void => {
+                plugin.socketMiddleware(server);
+            });
 
-		}
+        }
 
-		// add a function executed before loading all plugins
-		public beforeLoadAll (callback: tBeforeAllMethodCallback): Promise<void> {
+        // add a function executed before loading all plugins
+        public beforeLoadAll (callback: tBeforeAllMethodCallback): Promise<void> {
 
-			return checkFunction("beforeLoadAll/callback", callback).then((): Promise<void> => {
+            return checkFunction("beforeLoadAll/callback", callback).then((): Promise<void> => {
 
-				this._beforeLoadAll = callback;
+                this._beforeLoadAll = callback;
 
-				return Promise.resolve();
+                return Promise.resolve();
 
-			});
+            });
 
-		}
+        }
 
-		// load all plugins asynchronously, using "data" in arguments for "load" plugin's Orchestrator method
-		public loadAll (...data: any): Promise<void> {
+        // load all plugins asynchronously, using "data" in arguments for "load" plugin's Orchestrator method
+        public loadAll (...data: any): Promise<void> {
 
-			// create dir if not exist
-			return checkNonEmptyString("initAll/directory", this.directory).then((): Promise<void> => {
+            // create dir if not exist
+            return checkNonEmptyString("initAll/directory", this.directory).then((): Promise<void> => {
 
-				return mkdir(this.directory, {
-					"recursive": true
-				}).then((): Promise<void> => {
-					return checkAbsoluteDirectory("initAll/directory", this.directory);
-				});
+                return mkdir(this.directory, {
+                    "recursive": true
+                }).then((): Promise<void> => {
+                    return checkAbsoluteDirectory("initAll/directory", this.directory);
+                });
 
-			// create dir if not exist
-			}).then((): Promise<void> => {
+            // create dir if not exist
+            }).then((): Promise<void> => {
 
-				return checkNonEmptyString("initAll/externalRessourcesDirectory", this.externalRessourcesDirectory).then((): Promise<void> => {
+                return checkNonEmptyString("initAll/externalRessourcesDirectory", this.externalRessourcesDirectory).then((): Promise<void> => {
 
-					return mkdir(this.externalRessourcesDirectory, {
-						"recursive": true
-					}).then((): Promise<void> => {
-						return checkAbsoluteDirectory("initAll/externalRessourcesDirectory", this.externalRessourcesDirectory);
-					});
+                    return mkdir(this.externalRessourcesDirectory, {
+                        "recursive": true
+                    }).then((): Promise<void> => {
+                        return checkAbsoluteDirectory("initAll/externalRessourcesDirectory", this.externalRessourcesDirectory);
+                    });
 
-				});
+                });
 
-			// ensure loop
-			}).then((): Promise<void> => {
+            // ensure loop
+            }).then((): Promise<void> => {
 
-				return new Promise((resolve: () => void): void => {
-					setImmediate(resolve);
-				});
+                return new Promise((resolve: () => void): void => {
+                    setImmediate(resolve);
+                });
 
-			// execute _beforeLoadAll
-			}).then((): Promise<void> => {
+            // execute _beforeLoadAll
+            }).then((): Promise<void> => {
 
-				return "function" !== typeof this._beforeLoadAll ? Promise.resolve() : new Promise((resolve: () => void, reject: (err: Error) => void): void => {
+                return "function" !== typeof this._beforeLoadAll ? Promise.resolve() : new Promise((resolve: () => void, reject: (err: Error) => void): void => {
 
-					const fn: void | Promise<void> = (this._beforeLoadAll as tBeforeAllMethodCallback)(...data);
+                    const fn: void | Promise<void> = (this._beforeLoadAll as tBeforeAllMethodCallback)(...data);
 
-					if (!(fn instanceof Promise)) {
-						resolve();
-					}
-					else {
-						fn.then(resolve).catch(reject);
-					}
+                    if (!(fn instanceof Promise)) {
+                        resolve();
+                    }
+                    else {
+                        fn.then(resolve).catch(reject);
+                    }
 
-				});
+                });
 
-			// init plugins
-			}).then((): Promise<Array<string>> => {
+            // init plugins
+            }).then((): Promise<string[]> => {
 
-				return readdir(this.directory);
+                return readdir(this.directory);
 
-			// load all
-			}).then((files: Array<string>): Promise<void> => {
+            // load all
+            }).then((files: string[]): Promise<void> => {
 
-				return loadSortedPlugins(
-					this.directory, this.externalRessourcesDirectory, files, this.plugins,
-					this._orderedPluginsNames, this.emit.bind(this), this._logger, ...data
-				);
+                return loadSortedPlugins(
+                    this.directory, this.externalRessourcesDirectory, files, this.plugins,
+                    this._orderedPluginsNames, this.emit.bind(this), this._logger, ...data
+                );
 
-			// sort plugins
-			}).then((): Promise<void> => {
+            // sort plugins
+            }).then((): Promise<void> => {
 
-				this.plugins.sort((a: Orchestrator, b: Orchestrator): -1 | 0 | 1 => {
+                this.plugins.sort((a: Orchestrator, b: Orchestrator): -1 | 0 | 1 => {
 
-					if (a.name < b.name) {
-						return -1;
-					}
-					else if (a.name > b.name) {
-						return 1;
-					}
-					else {
-						return 0;
-					}
+                    if (a.name < b.name) {
+                        return -1;
+                    }
+                    else if (a.name > b.name) {
+                        return 1;
+                    }
+                    else {
+                        return 0;
+                    }
 
-				});
+                });
 
-				return Promise.resolve();
+                return Promise.resolve();
 
-			// end
-			}).then((): Promise<void> => {
+            // end
+            }).then((): Promise<void> => {
 
-				this.emit("allloaded", ...data);
+                this.emit("allloaded", ...data);
 
-				return Promise.resolve();
+                return Promise.resolve();
 
-			});
+            });
 
-		}
+        }
 
-		// after releasing, destroy packages data & free "plugins" list, using "data" in arguments for "destroy" plugin's Orchestrator method
-		public destroyAll (...data: any): Promise<void> {
+        // after releasing, destroy packages data & free "plugins" list, using "data" in arguments for "destroy" plugin's Orchestrator method
+        public destroyAll (...data: any): Promise<void> {
 
-			return Promise.resolve().then((): Promise<void> => {
+            return Promise.resolve().then((): Promise<void> => {
 
-				const _destroyPlugin: (i?: number) => Promise<void> = (i: number = this.plugins.length - 1): Promise<void> => {
+                const _destroyPlugin: (i?: number) => Promise<void> = (i: number = this.plugins.length - 1): Promise<void> => {
 
-					return -1 < i ? Promise.resolve().then((): Promise<void> => {
+                    return -1 < i ? Promise.resolve().then((): Promise<void> => {
 
-						const pluginName: string = this.plugins[i].name;
+                        const pluginName: string = this.plugins[i].name;
 
-						// emit event
-						return this.plugins[i].destroy().then((): Promise<void> => {
+                        // emit event
+                        return this.plugins[i].destroy().then((): Promise<void> => {
 
-							this.emit("destroyed", pluginName, ...data);
+                            this.emit("destroyed", pluginName, ...data);
 
-							return Promise.resolve();
+                            return Promise.resolve();
 
-						// loop
-						}).then((): Promise<void> => {
+                        // loop
+                        }).then((): Promise<void> => {
 
-							return _destroyPlugin(i - 1);
+                            return _destroyPlugin(i - 1);
 
-						});
+                        });
 
-					}) : Promise.resolve();
+                    }) : Promise.resolve();
 
-				};
+                };
 
-				return _destroyPlugin();
+                return _destroyPlugin();
 
-			// end
-			}).then((): Promise<void> => {
+            // end
+            }).then((): Promise<void> => {
 
-				this.plugins = [];
+                this.plugins = [];
 
-				this.emit("alldestroyed", ...data);
+                this.emit("alldestroyed", ...data);
 
-				return Promise.resolve();
+                return Promise.resolve();
 
-			// remove all external resources
-			}).then((): Promise<void> => {
+            // remove all external resources
+            }).then((): Promise<void> => {
 
-				return rmdirp(this.externalRessourcesDirectory);
+                return rmdirp(this.externalRessourcesDirectory);
 
-			});
+            });
 
-		}
+        }
 
-		// add a function executed before initializing all plugins
-		public beforeInitAll (callback: tBeforeAllMethodCallback): Promise<void> {
+        // add a function executed before initializing all plugins
+        public beforeInitAll (callback: tBeforeAllMethodCallback): Promise<void> {
 
-			return checkFunction("beforeInitAll/callback", callback).then((): Promise<void> => {
+            return checkFunction("beforeInitAll/callback", callback).then((): Promise<void> => {
 
-				this._beforeInitAll = callback;
+                this._beforeInitAll = callback;
 
-				return Promise.resolve();
+                return Promise.resolve();
 
-			});
+            });
 
-		}
+        }
 
-		// initialize all plugins asynchronously, using "data" in arguments for "init" plugin's Orchestrator method
-		public initAll (...data: any): Promise<void> {
+        // initialize all plugins asynchronously, using "data" in arguments for "init" plugin's Orchestrator method
+        public initAll (...data: any): Promise<void> {
 
-			return checkAbsoluteDirectory("initAll/directory", this.directory).then((): Promise<void> => {
-				return checkAbsoluteDirectory("initAll/externalRessourcesDirectory", this.externalRessourcesDirectory);
-			}).then((): Promise<void> => {
+            return checkAbsoluteDirectory("initAll/directory", this.directory).then((): Promise<void> => {
+                return checkAbsoluteDirectory("initAll/externalRessourcesDirectory", this.externalRessourcesDirectory);
+            }).then((): Promise<void> => {
 
-				// execute _beforeInitAll
-				return "function" !== typeof this._beforeInitAll ? Promise.resolve() : new Promise((resolve: () => void, reject: (err: Error) => void): void => {
+                // execute _beforeInitAll
+                return "function" !== typeof this._beforeInitAll ? Promise.resolve() : new Promise((resolve: () => void, reject: (err: Error) => void): void => {
 
-					const fn: void | Promise<void> = (this._beforeInitAll as tBeforeAllMethodCallback)(...data);
+                    const fn: void | Promise<void> = (this._beforeInitAll as tBeforeAllMethodCallback)(...data);
 
-					if (!(fn instanceof Promise)) {
-						resolve();
-					}
-					else {
-						fn.then(resolve).catch(reject);
-					}
+                    if (!(fn instanceof Promise)) {
+                        resolve();
+                    }
+                    else {
+                        fn.then(resolve).catch(reject);
+                    }
 
-				});
+                });
 
-			// init plugins
-			}).then((): Promise<void> => {
+            // init plugins
+            }).then((): Promise<void> => {
 
-				return initSortedPlugins(this.plugins, this._orderedPluginsNames, this.emit.bind(this), ...data);
+                return initSortedPlugins(this.plugins, this._orderedPluginsNames, this.emit.bind(this), ...data);
 
-			// end
-			}).then((): Promise<void> => {
+            // end
+            }).then((): Promise<void> => {
 
-				this.emit("allinitialized", ...data);
+                this.emit("allinitialized", ...data);
 
-				return Promise.resolve();
+                return Promise.resolve();
 
-			});
+            });
 
-		}
+        }
 
-		// release a plugin (keep package but destroy Mediator & Server), using "data" in arguments for "release" plugin's Orchestrator method
-		public releaseAll (...data: any): Promise<void> {
+        // release a plugin (keep package but destroy Mediator & Server), using "data" in arguments for "release" plugin's Orchestrator method
+        public releaseAll (...data: any): Promise<void> {
 
-			return Promise.resolve().then((): Promise<void> => {
+            return Promise.resolve().then((): Promise<void> => {
 
-				const _releasePlugin: (i?: number) => Promise<void> = (i: number = this.plugins.length - 1): Promise<void> => {
+                const _releasePlugin: (i?: number) => Promise<void> = (i: number = this.plugins.length - 1): Promise<void> => {
 
-					return -1 < i ? Promise.resolve().then((): Promise<void> => {
+                    return -1 < i ? Promise.resolve().then((): Promise<void> => {
 
-						return this.plugins[i].release(data);
+                        return this.plugins[i].release(data);
 
-					// emit event
-					}).then((): Promise<void> => {
+                    // emit event
+                    }).then((): Promise<void> => {
 
-						this.emit("released", this.plugins[i], ...data);
+                        this.emit("released", this.plugins[i], ...data);
 
-						return Promise.resolve();
+                        return Promise.resolve();
 
-					// loop
-					}).then((): Promise<void> => {
+                    // loop
+                    }).then((): Promise<void> => {
 
-						return _releasePlugin(i - 1);
+                        return _releasePlugin(i - 1);
 
-					}) : Promise.resolve();
+                    }) : Promise.resolve();
 
-				};
+                };
 
-				return _releasePlugin();
+                return _releasePlugin();
 
-			// end
-			}).then((): Promise<void> => {
+            // end
+            }).then((): Promise<void> => {
 
-				this.emit("allreleased", ...data);
+                this.emit("allreleased", ...data);
 
-				return Promise.resolve();
+                return Promise.resolve();
 
-			});
+            });
 
-		}
+        }
 
-		// install a plugin via github repo, using "data" in arguments for "install" and "init" plugin's Orchestrator methods
-		public installViaGithub (user: string, repo: string, ...data: any): Promise<Orchestrator> {
+        // install a plugin via github repo, using "data" in arguments for "install" and "init" plugin's Orchestrator methods
+        public installViaGithub (user: string, repo: string, ...data: any): Promise<Orchestrator> {
 
-			return checkAbsoluteDirectory("installViaGithub/directory", this.directory).then((): Promise<void> => {
-				return checkNonEmptyString("installViaGithub/user", user);
-			}).then((): Promise<void> => {
-				return checkNonEmptyString("installViaGithub/repo", repo);
-			}).then((): Promise<string> => {
+            return checkAbsoluteDirectory("installViaGithub/directory", this.directory).then((): Promise<void> => {
+                return checkNonEmptyString("installViaGithub/user", user);
+            }).then((): Promise<void> => {
+                return checkNonEmptyString("installViaGithub/repo", repo);
+            }).then((): Promise<string> => {
 
-				const directory: string = join(this.directory, repo);
+                const directory: string = join(this.directory, repo);
 
-				return new Promise((resolve: (dir: string) => void, reject: (err: Error) => void): void => {
+                return new Promise((resolve: (dir: string) => void, reject: (err: Error) => void): void => {
 
-					checkAbsoluteDirectory("installViaGithub/plugindirectory", directory).then((): void => {
-						return reject(new Error("\"" + repo + "\" plugin already exists"));
-					}).catch((): void => {
-						return resolve(directory);
-					});
+                    checkAbsoluteDirectory("installViaGithub/plugindirectory", directory).then((): void => {
+                        return reject(new Error("\"" + repo + "\" plugin already exists"));
+                    }).catch((): void => {
+                        return resolve(directory);
+                    });
 
-				});
+                });
 
-			}).then((directory: string): Promise<Orchestrator> => {
+            }).then((directory: string): Promise<Orchestrator> => {
 
-				return Promise.resolve().then((): Promise<void> => {
+                return Promise.resolve().then((): Promise<void> => {
 
-					return gitInstall(directory, user, repo);
+                    return gitInstall(directory, user, repo);
 
-				}).then((): Promise<Orchestrator> => {
+                }).then((): Promise<Orchestrator> => {
 
-					// install dependencies & execute install script
-					return createPluginByDirectory(directory, this.externalRessourcesDirectory, this._logger, ...data);
+                    // install dependencies & execute install script
+                    return createPluginByDirectory(directory, this.externalRessourcesDirectory, this._logger, ...data);
 
-				// check plugin modules versions
-				}).then((plugin: Orchestrator): Promise<Orchestrator> => {
+                // check plugin modules versions
+                }).then((plugin: Orchestrator): Promise<Orchestrator> => {
 
-					return this.checkModules(plugin).then((): Promise<Orchestrator> => {
-						return Promise.resolve(plugin);
-					});
+                    return this.checkModules(plugin).then((): Promise<Orchestrator> => {
+                        return Promise.resolve(plugin);
+                    });
 
-				}).then((plugin: Orchestrator): Promise<Orchestrator> => {
+                }).then((plugin: Orchestrator): Promise<Orchestrator> => {
 
-					return Promise.resolve().then((): Promise<void> => {
+                    return Promise.resolve().then((): Promise<void> => {
 
-						return !plugin.dependencies ? Promise.resolve() : npmInstall(directory);
+                        return !plugin.dependencies ? Promise.resolve() : npmInstall(directory);
 
-					}).then((): Promise<void> => {
+                    }).then((): Promise<void> => {
 
-						return plugin.install(...data);
+                        return plugin.install(...data);
 
-					// execute init script
-					}).then((): Promise<void> => {
+                    // execute init script
+                    }).then((): Promise<void> => {
 
-						this.emit("installed", plugin, ...data);
+                        this.emit("installed", plugin, ...data);
 
-						return plugin.init(...data);
+                        return plugin.init(...data);
 
-					}).then((): Promise<Orchestrator> => {
+                    }).then((): Promise<Orchestrator> => {
 
-						this.emit("initialized", plugin, ...data);
-						this.plugins.push(plugin);
+                        this.emit("initialized", plugin, ...data);
+                        this.plugins.push(plugin);
 
-						return Promise.resolve(plugin);
+                        return Promise.resolve(plugin);
 
-					}).catch((err: Error) => {
+                    }).catch((err: Error) => {
 
-						return this.uninstall(plugin, ...data).then(() => {
-							return Promise.reject(err);
-						});
+                        return this.uninstall(plugin, ...data).then(() => {
+                            return Promise.reject(err);
+                        });
 
-					});
+                    });
 
-				}).catch((err: Error) => {
+                }).catch((err: Error) => {
 
-					return new Promise((resolve: Function, reject: (err: Error) => void): void => {
+                    return new Promise((resolve: Function, reject: (err: Error) => void): void => {
 
-						checkAbsoluteDirectory("installViaGithub/plugindirectory", directory).then((): Promise<void> => {
+                        checkAbsoluteDirectory("installViaGithub/plugindirectory", directory).then((): Promise<void> => {
 
-							return rmdirp(directory).then((): void => {
-								return err ? reject(err) : resolve();
-							});
+                            return rmdirp(directory).then((): void => {
+                                return err ? reject(err) : resolve();
+                            });
 
-						}).catch((): void => {
-							return err ? reject(err) : resolve();
-						});
+                        }).catch((): void => {
+                            return err ? reject(err) : resolve();
+                        });
 
-					});
+                    });
 
-				});
+                });
 
-			});
+            });
 
-		}
+        }
 
-		// update a plugin via its github repo, using "data" in arguments for "release", "update" and "init" plugin's methods
-		public updateViaGithub (plugin: Orchestrator, ...data: any): Promise<Orchestrator> {
+        // update a plugin via its github repo, using "data" in arguments for "release", "update" and "init" plugin's methods
+        public updateViaGithub (plugin: Orchestrator, ...data: any): Promise<Orchestrator> {
 
-			let directory: string = "";
-			let key: number = -1;
+            let directory: string = "";
+            let key: number = -1;
 
-			// check plugin
-			return Promise.resolve().then((): Promise<void> => {
+            // check plugin
+            return Promise.resolve().then((): Promise<void> => {
 
-				return checkOrchestrator("updateViaGithub/plugin", plugin).then((): Promise<void> => {
+                return checkOrchestrator("updateViaGithub/plugin", plugin).then((): Promise<void> => {
 
-					return checkNonEmptyString("updateViaGithub/github", extractGithub(plugin)).catch(() => {
+                    return checkNonEmptyString("updateViaGithub/github", extractGithub(plugin)).catch(() => {
 
-						return Promise.reject(new ReferenceError(
-							"Plugin \"" + plugin.name + "\" must be linked in the package to a github project to be updated"
-						));
+                        return Promise.reject(new ReferenceError(
+                            "Plugin \"" + plugin.name + "\" must be linked in the package to a github project to be updated"
+                        ));
 
-					});
+                    });
 
-				}).then((): Promise<void> => {
+                }).then((): Promise<void> => {
 
-					key = this.getPluginsNames().findIndex((pluginName: string): boolean => {
-						return pluginName === plugin.name;
-					});
+                    key = this.getPluginsNames().findIndex((pluginName: string): boolean => {
+                        return pluginName === plugin.name;
+                    });
 
-					return -1 < key ? Promise.resolve() : Promise.reject(new Error("Plugin \"" + plugin.name + "\" is not registered"));
+                    return -1 < key ? Promise.resolve() : Promise.reject(new Error("Plugin \"" + plugin.name + "\" is not registered"));
 
-				});
+                });
 
-			// check plugin directory
-			}).then((): Promise<void> => {
+            // check plugin directory
+            }).then((): Promise<void> => {
 
-				return checkAbsoluteDirectory("updateViaGithub/directory", this.directory).then((): Promise<void> => {
+                return checkAbsoluteDirectory("updateViaGithub/directory", this.directory).then((): Promise<void> => {
 
-					directory = join(this.directory, plugin.name);
+                    directory = join(this.directory, plugin.name);
 
-					return checkAbsoluteDirectory("updateViaGithub/plugindirectory", directory);
+                    return checkAbsoluteDirectory("updateViaGithub/plugindirectory", directory);
 
-				});
+                });
 
-			// release plugin
-			}).then((): Promise<void> => {
+            // release plugin
+            }).then((): Promise<void> => {
 
-				const pluginName: string = plugin.name;
+                const pluginName: string = plugin.name;
 
-				return plugin.release(...data).then((): Promise<void> => {
+                return plugin.release(...data).then((): Promise<void> => {
 
-					this.emit("released", plugin, ...data);
+                    this.emit("released", plugin, ...data);
 
-					return plugin.destroy();
+                    return plugin.destroy();
 
-				}).then((): Promise<void> => {
+                }).then((): Promise<void> => {
 
-					this.emit("destroyed", pluginName, ...data);
+                    this.emit("destroyed", pluginName, ...data);
 
-					this.plugins.splice(key, 1);
+                    this.plugins.splice(key, 1);
 
-					return Promise.resolve();
+                    return Promise.resolve();
 
-				});
+                });
 
-			// download plugin
-			}).then((): Promise<Orchestrator> => {
+            // download plugin
+            }).then((): Promise<Orchestrator> => {
 
-				return gitUpdate(directory).then((): Promise<Orchestrator> => {
+                return gitUpdate(directory).then((): Promise<Orchestrator> => {
 
-					return createPluginByDirectory(directory, this.externalRessourcesDirectory, this._logger, ...data);
+                    return createPluginByDirectory(directory, this.externalRessourcesDirectory, this._logger, ...data);
 
-				});
+                });
 
-			// check plugin modules versions
-			}).then((_plugin: Orchestrator): Promise<Orchestrator> => {
+            // check plugin modules versions
+            }).then((_plugin: Orchestrator): Promise<Orchestrator> => {
 
-				return this.checkModules(_plugin).then((): Promise<Orchestrator> => {
-					return Promise.resolve(_plugin);
-				});
+                return this.checkModules(_plugin).then((): Promise<Orchestrator> => {
+                    return Promise.resolve(_plugin);
+                });
 
-			}).then((_plugin: Orchestrator): Promise<Orchestrator> => {
+            }).then((_plugin: Orchestrator): Promise<Orchestrator> => {
 
-				// update dependencies & execute update script
-				return Promise.resolve().then((): Promise<void> => {
+                // update dependencies & execute update script
+                return Promise.resolve().then((): Promise<void> => {
 
-					return !_plugin.dependencies ? Promise.resolve() : npmUpdate(directory);
+                    return !_plugin.dependencies ? Promise.resolve() : npmUpdate(directory);
 
-				}).then((): Promise<void> => {
+                }).then((): Promise<void> => {
 
-					return _plugin.update(...data);
+                    return _plugin.update(...data);
 
-				}).then((): Promise<void> => {
+                }).then((): Promise<void> => {
 
-					this.emit("updated", _plugin, ...data);
+                    this.emit("updated", _plugin, ...data);
 
-					return _plugin.init(...data);
+                    return _plugin.init(...data);
 
-				// execute init script
-				}).then((): Promise<Orchestrator> => {
+                // execute init script
+                }).then((): Promise<Orchestrator> => {
 
-					this.emit("initialized", _plugin, ...data);
-					this.plugins[key] = _plugin;
+                    this.emit("initialized", _plugin, ...data);
+                    this.plugins[key] = _plugin;
 
-					return Promise.resolve(_plugin);
+                    return Promise.resolve(_plugin);
 
-				});
+                });
 
-			});
+            });
 
-		}
+        }
 
-		// uninstall a plugin, using "data" in arguments for "release" and "uninstall" plugin's methods
-		public uninstall(plugin: Orchestrator, ...data: any): Promise<string> {
+        // uninstall a plugin, using "data" in arguments for "release" and "uninstall" plugin's methods
+        public uninstall(plugin: Orchestrator, ...data: any): Promise<string> {
 
-			let directory: string = "";
-			let key: number = -1;
-			let pluginName: string = "";
+            let directory: string = "";
+            let key: number = -1;
+            let pluginName: string = "";
 
-			// check plugin
-			return Promise.resolve().then((): Promise<void> => {
+            // check plugin
+            return Promise.resolve().then((): Promise<void> => {
 
-				return checkOrchestrator("uninstall/plugin", plugin).then((): Promise<void> => {
+                return checkOrchestrator("uninstall/plugin", plugin).then((): Promise<void> => {
 
-					key = this.getPluginsNames().findIndex((name: string): boolean => {
-						return name === plugin.name;
-					});
+                    key = this.getPluginsNames().findIndex((name: string): boolean => {
+                        return name === plugin.name;
+                    });
 
-					return -1 < key ? Promise.resolve() : Promise.reject(new Error("Plugin \"" + plugin.name + "\" is not registered"));
+                    return -1 < key ? Promise.resolve() : Promise.reject(new Error("Plugin \"" + plugin.name + "\" is not registered"));
 
-				});
+                });
 
-			// check plugin directory
-			}).then((): Promise<void> => {
+            // check plugin directory
+            }).then((): Promise<void> => {
 
-				return checkAbsoluteDirectory("uninstall/directory", this.directory).then((): Promise<void> => {
+                return checkAbsoluteDirectory("uninstall/directory", this.directory).then((): Promise<void> => {
 
-					pluginName = plugin.name;
-					directory = join(this.directory, pluginName);
+                    pluginName = plugin.name;
+                    directory = join(this.directory, pluginName);
 
-					return checkAbsoluteDirectory("uninstall/plugindirectory", directory);
+                    return checkAbsoluteDirectory("uninstall/plugindirectory", directory);
 
-				});
+                });
 
-			// release plugin
-			}).then((): Promise<void> => {
+            // release plugin
+            }).then((): Promise<void> => {
 
-				return plugin.release(...data).then((): Promise<void> => {
+                return plugin.release(...data).then((): Promise<void> => {
 
-					return rmdirp(join(this.externalRessourcesDirectory));
+                    return rmdirp(join(this.externalRessourcesDirectory));
 
-				}).then((): Promise<void> => {
+                }).then((): Promise<void> => {
 
-					this.emit("released", plugin, ...data);
+                    this.emit("released", plugin, ...data);
 
-					return plugin.destroy(...data);
+                    return plugin.destroy(...data);
 
-				}).then((): Promise<void> => {
+                }).then((): Promise<void> => {
 
-					this.emit("destroyed", pluginName, ...data);
+                    this.emit("destroyed", pluginName, ...data);
 
-					this.plugins.splice(key, 1);
+                    this.plugins.splice(key, 1);
 
-					return Promise.resolve();
+                    return Promise.resolve();
 
-				});
+                });
 
-			// update dependencies & execute update script
-			}).then((): Promise<void> => {
+            // update dependencies & execute update script
+            }).then((): Promise<void> => {
 
-				return Promise.resolve().then((): Promise<void> => {
+                return Promise.resolve().then((): Promise<void> => {
 
-					return plugin.uninstall(...data);
+                    return plugin.uninstall(...data);
 
-				}).then((): Promise<void> => {
+                }).then((): Promise<void> => {
 
-					this.emit("uninstalled", pluginName, ...data);
+                    this.emit("uninstalled", pluginName, ...data);
 
-					return rmdirp(directory);
+                    return rmdirp(directory);
 
-				});
+                });
 
-			}).then((): Promise<string> => {
+            }).then((): Promise<string> => {
 
-				return Promise.resolve(pluginName);
+                return Promise.resolve(pluginName);
 
-			});
+            });
 
-		}
+        }
 
 };
