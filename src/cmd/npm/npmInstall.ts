@@ -1,10 +1,10 @@
 // deps
 
     // locals
-    import npmCmd from "./npmCmd";
+    import cmd from "../cmd";
 
 // module
 
 export default function npmInstall (directory: string): Promise<void> {
-    return npmCmd(directory, [ "install", "--prod" ]);
+    return cmd(directory, "npm", [ "install", "--omit=dev", "--no-optional" ]);
 }

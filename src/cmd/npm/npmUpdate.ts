@@ -1,10 +1,10 @@
 // deps
 
     // locals
-    import npmCmd from "./npmCmd";
+    import cmd from "../cmd";
 
 // module
 
 export default function npmUpdate (directory: string): Promise<void> {
-    return npmCmd(directory, [ "update", "--prod" ]);
+    return cmd(directory, "npm", [ "update", "--omit=dev", "--no-optional" ]);
 }

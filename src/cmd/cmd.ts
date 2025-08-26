@@ -16,7 +16,7 @@
 
 // module
 
-export default function cmd (directory: string, command: string, params: Array<string>): Promise<void> {
+export default function cmd (directory: string, command: string, params: string[]): Promise<void> {
 
     return checkDirectory("cmd/directory", directory).then((): Promise<void> => {
         return checkNonEmptyString("cmd/command", command);
@@ -28,7 +28,9 @@ export default function cmd (directory: string, command: string, params: Array<s
 
             let result: string = "";
             const mySpawn: ChildProcessWithoutNullStreams = spawn(command, params, {
-                "cwd": directory
+                "cwd": directory,
+                "windowsHide": true,
+                "shell": true
             }).on("error", (err: Error): void => {
                 result += stdToString(err);
             }).on("close", (code: number): void => {
