@@ -51,7 +51,7 @@
     "@types/socket.io": "3.0.2",
     "@types/ws": "8.18.1",
     "eslint-plugin-personnallinter": "git+ssh://git@github.com/Psychopoulet/eslint-plugin-personnallinter",
-    "express": "5.1.0",
+    "express": "5.2.0",
     "husky": "9.1.7",
     "mocha": "11.7.1",
     "node-pluginsmanager-plugin": "6.4.5",
