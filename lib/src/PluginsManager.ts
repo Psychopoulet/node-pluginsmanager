@@ -723,7 +723,7 @@ export default class PluginsManager extends EventEmitter {
 
                 return plugin.release(...data).then((): Promise<void> => {
 
-                    return rmdirp(join(this.externalRessourcesDirectory));
+                    return rmdirp(join(this.externalRessourcesDirectory, pluginName));
 
                 }).then((): Promise<void> => {
 
