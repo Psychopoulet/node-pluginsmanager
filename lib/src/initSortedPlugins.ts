@@ -7,7 +7,7 @@
 
     // methods
 
-        function _initPlugin (plugin: Orchestrator, emit: (eventName: string, ...subdata: any) => void, ...data: any): Promise<void> {
+        function _initPlugin (plugin: Orchestrator, emit: (eventName: string, ...subdata: any) => void, ...data: unknown[]): Promise<void> {
 
             emit("initializing", plugin, ...data);
 
@@ -40,7 +40,7 @@
 
 export default function initSortedPlugins (
     plugins: Orchestrator[], orderedPluginsNames: string[],
-    emit: (eventName: string, ...subdata: any) => void, ...data: any
+    emit: (eventName: string, ...subdata: any) => void, ...data: unknown[]
 ): Promise<void> {
 
     // if no plugins, does not run

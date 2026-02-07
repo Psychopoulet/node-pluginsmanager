@@ -16,9 +16,13 @@
     // methods
 
         function _loadPlugin (
-            globalDirectory: string, externalRessourcesDirectory: string,
-            pluginFileName: string, loadedPlugins: Orchestrator[],
-            emit: (eventName: string, ...subdata: any) => void, logger: tLogger | null, ...data: any
+            globalDirectory: string,
+            externalResourcesDirectory: string,
+            pluginFileName: string,
+            loadedPlugins: Orchestrator[],
+            emit: (eventName: string, ...subdata: unknown[]) => void,
+            logger: tLogger | null,
+            ...data: unknown[]
         ): Promise<void> {
 
             // is already loaded ?
@@ -33,7 +37,7 @@
 
                 const directory: string = join(globalDirectory, pluginFileName);
 
-                return createPluginByDirectory(directory, externalRessourcesDirectory, logger, ...data);
+                return createPluginByDirectory(directory, externalResourcesDirectory, logger, ...data);
 
             // emit event
             }).then((createdPlugin: Orchestrator): Promise<void> => {
@@ -48,19 +52,22 @@
         }
 
         function _loadPlugins (
-            globalDirectory: string, externalRessourcesDirectory: string,
+            globalDirectory: string, externalResourcesDirectory: string,
             pluginsToLoad: string[], loadedPlugins: Orchestrator[],
-            emit: (eventName: string, ...subdata: any) => void, logger: tLogger | null, data: any[], i: number = 0
+            emit: (eventName: string, ...subdata: unknown[]) => void,
+            logger: tLogger | null,
+            i: number,
+            ...data: unknown[]
         ): Promise<void> {
 
             return i < pluginsToLoad.length ? Promise.resolve().then((): Promise<void> => {
 
-                return _loadPlugin(globalDirectory, externalRessourcesDirectory, pluginsToLoad[i], loadedPlugins, emit, logger, ...data);
+                return _loadPlugin(globalDirectory, externalResourcesDirectory, pluginsToLoad[i], loadedPlugins, emit, logger, ...data);
 
             // loop
             }).then((): Promise<void> => {
 
-                return _loadPlugins(globalDirectory, externalRessourcesDirectory, pluginsToLoad, loadedPlugins, emit, logger, data, i + 1);
+                return _loadPlugins(globalDirectory, externalResourcesDirectory, pluginsToLoad, loadedPlugins, emit, logger, i + 1, ...data);
 
             }) : Promise.resolve();
 
@@ -69,9 +76,9 @@
 // module
 
 export default function loadSortedPlugins (
-    globalDirectory: string, externalRessourcesDirectory: string,
+    globalDirectory: string, externalResourcesDirectory: string,
     files: string[], loadedPlugins: Orchestrator[], orderedPluginsNames: string[],
-    emit: (eventName: string, ...subdata: any) => void, logger: tLogger | null, ...data: any
+    emit: (eventName: string, ...subdata: unknown[]) => void, logger: tLogger | null, ...data: unknown[]
 ): Promise<void> {
 
     // if no files, does not run
@@ -92,7 +99,7 @@ export default function loadSortedPlugins (
 
         // first, sorted plugins
         return sortedPluginsNames.length
-            ? _loadPlugins(globalDirectory, externalRessourcesDirectory, sortedPluginsNames, loadedPlugins, emit, logger, data)
+            ? _loadPlugins(globalDirectory, externalResourcesDirectory, sortedPluginsNames, loadedPlugins, emit, logger, 0, ...data)
             : Promise.resolve();
 
     }).then((): Promise<void> => {
@@ -117,7 +124,7 @@ export default function loadSortedPlugins (
 
         // then, all other plugins, asynchronously
         return unsortedPluginsNames.length
-            ? _loadPlugins(globalDirectory, externalRessourcesDirectory, unsortedPluginsNames, loadedPlugins, emit, logger, data)
+            ? _loadPlugins(globalDirectory, externalResourcesDirectory, unsortedPluginsNames, loadedPlugins, emit, logger, 0, ...data)
             : Promise.resolve();
 
     });
