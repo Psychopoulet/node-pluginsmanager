@@ -110,7 +110,7 @@ export default class PluginsManager extends EventEmitter {
 
         public getPluginsNames (): string[] {
 
-            return [ ...this.plugins ].map((plugin: Orchestrator): string => {
+            return this.plugins.map((plugin: Orchestrator): string => {
                 return plugin.name;
             });
 
@@ -156,17 +156,11 @@ export default class PluginsManager extends EventEmitter {
 
         public checkAllModules (): Promise<void> {
 
-            const _checkPluginsModules: (i?: number) => Promise<void> = (i: number = 0): Promise<void> => {
-
-                return i < this.plugins.length ? this.checkModules(this.plugins[i]).then((): Promise<void> => {
-
-                    return _checkPluginsModules(i + 1);
-
-                }) : Promise.resolve();
-
-            };
-
-            return _checkPluginsModules();
+            return Promise.all(this.plugins.map((plugin: Orchestrator): Promise<void> => {
+                return this.checkModules(plugin);
+            })).then((): Promise<void> => {
+                return Promise.resolve();
+            });
 
         }
 
