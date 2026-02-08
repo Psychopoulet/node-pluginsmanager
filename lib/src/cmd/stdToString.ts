@@ -1,6 +1,6 @@
 // module
 
-export default function stdToString (msg: any): string {
+export default function stdToString (msg: unknown): string {
 
     if ("object" !== typeof msg) {
         return String(msg);
@@ -9,7 +9,7 @@ export default function stdToString (msg: any): string {
         return msg.toString("utf8");
     }
     else {
-        return msg.message ? msg.message : String(msg);
+        return (msg as Record<string, string>).message ? (msg as Record<string, string>).message : String(msg);
     }
 
 }

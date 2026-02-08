@@ -7,7 +7,7 @@
 
     // methods
 
-        function _initPlugin (plugin: Orchestrator, emit: (eventName: string, ...subdata: any) => void, ...data: unknown[]): Promise<void> {
+        function _initPlugin (plugin: Orchestrator, emit: (eventName: string, ...subdata: unknown[]) => void, ...data: unknown[]): Promise<void> {
 
             emit("initializing", plugin, ...data);
 
@@ -21,7 +21,7 @@
 
         }
 
-        function _initPlugins (pluginsToInit: Orchestrator[], emit: (eventName: string, ...subdata: any) => void, data: any[], i: number = 0): Promise<void> {
+        function _initPlugins (pluginsToInit: Orchestrator[], emit: (eventName: string, ...subdata: unknown[]) => void, data: unknown[], i: number = 0): Promise<void> {
 
             return i < pluginsToInit.length ? Promise.resolve().then((): Promise<void> => {
 
@@ -40,7 +40,7 @@
 
 export default function initSortedPlugins (
     plugins: Orchestrator[], orderedPluginsNames: string[],
-    emit: (eventName: string, ...subdata: any) => void, ...data: unknown[]
+    emit: (eventName: string, ...subdata: unknown[]) => void, ...data: unknown[]
 ): Promise<void> {
 
     // if no plugins, does not run
