@@ -13,7 +13,7 @@
 
 // tests
 
-describe("pluginsmanager / externalRessourcesDirectory", () => {
+describe("pluginsmanager / externalResourcesDirectory", () => {
 
 	const pluginsManager = new PluginsManager({
 		"directory": join(__dirname, "plugins")
@@ -25,20 +25,20 @@ describe("pluginsmanager / externalRessourcesDirectory", () => {
 
 		return pluginsManager.loadAll().then(() => {
 
-			return checkAbsoluteDirectory.default("externalRessourcesDirectory", pluginsManager.externalRessourcesDirectory);
+			return checkAbsoluteDirectory.default("externalResourcesDirectory", pluginsManager.externalResourcesDirectory);
 
 		}).then(() => {
 
 			pluginsManager.plugins.forEach((plugin) => {
 
 				strictEqual(
-					join(pluginsManager.externalRessourcesDirectory, plugin.name), plugin._externalRessourcesDirectory,
-					"plugin's externalRessourcesDirectory is not valid"
+					join(pluginsManager.externalResourcesDirectory, plugin.name), plugin._externalResourcesDirectory,
+					"plugin's externalResourcesDirectory is not valid"
 				);
 
 			});
 
-			directoryTested = pluginsManager.plugins[0]._externalRessourcesDirectory;
+			directoryTested = pluginsManager.plugins[0]._externalResourcesDirectory;
 
 		}).then(() => {
 

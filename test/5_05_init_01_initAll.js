@@ -119,15 +119,15 @@ describe("pluginsmanager / initAll", () => {
 
 		});
 
-		describe("externalRessourcesDirectory", () => {
+		describe("externalResourcesDirectory", () => {
 
-			it("should test without externalRessourcesDirectory", (done) => {
+			it("should test without externalResourcesDirectory", (done) => {
 
 				const pluginsManager = new PluginsManager({
 					"directory": PLUGINS_DIRECTORY
 				});
 
-					delete pluginsManager.externalRessourcesDirectory;
+					delete pluginsManager.externalResourcesDirectory;
 
 				pluginsManager.initAll().then(() => {
 					done(new Error("Does not generate Error"));
@@ -142,11 +142,11 @@ describe("pluginsmanager / initAll", () => {
 
 			});
 
-			it("should test with wrong externalRessourcesDirectory", (done) => {
+			it("should test with wrong externalResourcesDirectory", (done) => {
 
 				const pluginsManager = new PluginsManager({
 					"directory": PLUGINS_DIRECTORY,
-					"externalRessourcesDirectory": false
+					"externalResourcesDirectory": false
 				});
 
 				pluginsManager.initAll().then(() => {
@@ -162,11 +162,11 @@ describe("pluginsmanager / initAll", () => {
 
 			});
 
-			it("should test with empty externalRessourcesDirectory", (done) => {
+			it("should test with empty externalResourcesDirectory", (done) => {
 
 				const pluginsManager = new PluginsManager({
 					"directory": PLUGINS_DIRECTORY,
-					"externalRessourcesDirectory": ""
+					"externalResourcesDirectory": ""
 				});
 
 				pluginsManager.initAll().then(() => {
@@ -182,11 +182,11 @@ describe("pluginsmanager / initAll", () => {
 
 			});
 
-			it("should test with relative externalRessourcesDirectory", (done) => {
+			it("should test with relative externalResourcesDirectory", (done) => {
 
 				const pluginsManager = new PluginsManager({
 					"directory": PLUGINS_DIRECTORY,
-					"externalRessourcesDirectory": "."
+					"externalResourcesDirectory": "."
 				});
 
 				pluginsManager.initAll().then(() => {

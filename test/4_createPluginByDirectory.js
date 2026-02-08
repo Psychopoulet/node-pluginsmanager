@@ -150,7 +150,7 @@ describe("createPluginByDirectory", () => {
 
 		});
 
-		describe("externalRessourcesDirectory", () => {
+		describe("externalResourcesDirectory", () => {
 
 			it("should test no directory", (done) => {
 
