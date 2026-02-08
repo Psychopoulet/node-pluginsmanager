@@ -200,7 +200,7 @@ export default class PluginsManager extends EventEmitter {
             }
             else {
 
-                const _recursiveNext: (i: number) => () => void = (i: number): () => void => {
+                const _recursiveNext: (i: number) => () => void = (i: number): (err?: unknown) => void => {
 
                     if (i < plugins.length) {
 
@@ -486,7 +486,7 @@ export default class PluginsManager extends EventEmitter {
                         return rmdirp(directory);
                     }).then(() => { // if delete succeed, still reject with the original error
                         return Promise.reject(err);
-                    }).catch(() => { // whatever happpened, reject with the original error
+                    }).catch(() => { // whatever happened, reject with the original error
                         return Promise.reject(err);
                     });
 
