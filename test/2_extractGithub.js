@@ -17,8 +17,8 @@ describe("extractGithub", () => {
 
 		const github = extractGithub.default();
 
-		strictEqual(typeof github, "string", "generated github type is not as expected");
-		strictEqual(github, "", "generated github is not as expected");
+		strictEqual(typeof github, "object", "generated github type is not as expected");
+		strictEqual(github, null, "generated github is not as expected");
 
 	});
 

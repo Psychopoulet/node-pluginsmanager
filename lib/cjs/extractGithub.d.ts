@@ -3,5 +3,5 @@ interface OrchestratorExtended extends Orchestrator {
     "github"?: string;
     "repository"?: string | Record<string, string>;
 }
-export default function extractGithub(plugin: OrchestratorExtended): string;
+export default function extractGithub(plugin: OrchestratorExtended): string | null;
 export {};
