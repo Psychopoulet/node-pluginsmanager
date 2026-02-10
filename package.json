@@ -39,7 +39,7 @@
     "/public"
   ],
   "engines": {
-    "node": ">=16.0.0"
+    "node": ">=22.22.0"
   },
 
   "dependencies": {
