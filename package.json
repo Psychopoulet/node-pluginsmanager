@@ -19,7 +19,7 @@
 
   "scripts": {
 
-    "prepare": "npx husky",
+    "prepare": "npx husky || true",
 
     "clean": "npx rimraf ./lib/cjs",
     "build": "npm run-script clean && npx tsc --project \"./tsconfig.json\"",
@@ -33,6 +33,7 @@
 
   },
 
+  "bin": {},
   "files": [
     "/bin",
     "/lib/cjs",
