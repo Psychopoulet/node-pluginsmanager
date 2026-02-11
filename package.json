@@ -2,7 +2,7 @@
 
   "name": "node-pluginsmanager",
   "version": "2.5.2",
-  "description": "A plugins manager",
+  "description": "A plugins manager.",
 
   "type": "commonjs",
   "typings": "./lib/cjs/main.d.cts",
@@ -21,23 +21,26 @@
 
     "prepare": "npx husky || true",
 
-    "clean": "npx rimraf ./lib/cjs",
-    "build": "npm run-script clean && npx tsc --project \"./tsconfig.json\"",
+    "lint-back": "npx eslint --config .eslintrc-back.js --ext .cts,.ts ./lib/src/**/*",
+    "lint-tests": "npx eslint --config .eslintrc-tests.js --ext .js ./test/**/*.js",
+    "lint": "npm run lint-back && npm run lint-tests",
 
-    "lint": "npx eslint --config .eslintrc-src.js --ext .cts,.ts ./lib/src/**/* && npx eslint --config .eslintrc-tests.js ./bin/*.js ./test/**/*.js",
+    "clean-back": "npx rimraf ./lib/cjs",
+    "clean": "npm run clean-back",
+
+    "build-back": "npm run clean-back && npx tsc --project \"./tsconfig.json\"",
+    "build": "npm run build-back",
+
     "check-requires": "npx used-deps-analyzer \"./package.json\" \"./lib/src\" --no-dev --overkill \"fs-extra\" \"node-promfs\"",
     "check-updates": "npx check-version-modules",
-    "unit-tests": "npm run-script build && npx nyc --reporter=html --reporter=text mocha",
+    "unit-tests": "npm run build && npx nyc --reporter=html --reporter=text mocha",
 
-    "tests": "npm run-script lint && npm run-script check-requires && npm run-script check-updates && npm run-script unit-tests"
+    "tests": "npm run lint && npm run check-requires && npm run check-updates && npm run unit-tests"
 
   },
 
-  "bin": {},
   "files": [
-    "/bin",
-    "/lib/cjs",
-    "/public"
+    "/lib/cjs"
   ],
   "engines": {
     "node": ">=22.22.0"
@@ -63,25 +66,27 @@
     "used-deps-analyzer": "0.1.8",
     "ws": "8.18.3"
   },
-  "optionalDependencies": {},
 
   "husky": {
     "hooks": {
-      "pre-push": "npm run-script tests"
+      "pre-commit": "npm run lint",
+      "pre-push": "npm run tests"
     }
   },
+
   "keywords": [
     "plugin",
     "manage",
     "gestion"
   ],
   "author": "Sébastien VIDAL",
+  "contributors": [],
   "license": "ISC",
 
   "homepage": "https://github.com/Psychopoulet/node-pluginsmanager#readme",
   "repository": {
     "type": "git",
-    "url": "git://github.com/Psychopoulet/node-pluginsmanager"
+    "url": "git://github.com/Psychopoulet/node-pluginsmanager.git"
   },
   "bugs": {
     "url": "https://github.com/Psychopoulet/node-pluginsmanager/issues"
