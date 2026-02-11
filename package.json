@@ -21,8 +21,8 @@
 
     "prepare": "npx husky || true",
 
-    "lint-back": "npx eslint --config .eslintrc-back.js --ext .cts,.ts ./lib/src/**/*",
-    "lint-tests": "npx eslint --config .eslintrc-tests.js --ext .js ./test/**/*.js",
+    "lint-back": "npx eslint --config .eslintrc-back.js --ext .ts,.cts,.mts ./lib/src/**/*",
+    "lint-tests": "npx eslint --config .eslintrc-tests.js --ext .js,.cjs,.mjs ./test/**/*.js",
     "lint": "npm run lint-back && npm run lint-tests",
 
     "clean-back": "npx rimraf ./lib/cjs",
@@ -31,7 +31,7 @@
     "build-back": "npm run clean-back && npx tsc --project ./tsconfig.json",
     "build": "npm run build-back",
 
-    "check-requires": "npx used-deps-analyzer \"./package.json\" \"./lib/src\" --no-dev",
+    "check-requires": "npx used-deps-analyzer ./package.json ./lib/src --no-dev",
     "check-updates": "npx check-version-modules",
     "unit-tests": "npm run build && npx nyc --reporter=html --reporter=text mocha",
 
