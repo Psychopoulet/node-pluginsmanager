@@ -88,21 +88,14 @@ export default class PluginsManager extends EventEmitter {
 
             this._orderedPluginsNames = [];
 
-            this._logger = options && "function" === typeof options.logger
-                ? options.logger
-                : null;
+            this._logger = "function" === typeof options?.logger ? options.logger : null;
 
         // public
 
             this.plugins = [];
 
-            this.directory = options && "undefined" !== typeof options.directory
-                ? options.directory
-                : DEFAULT_PLUGINS_DIRECTORY;
-
-            this.externalResourcesDirectory = options && "undefined" !== typeof options.externalResourcesDirectory
-                ? options.externalResourcesDirectory
-                : DEFAULT_RESOURCES_DIRECTORY;
+            this.directory = options?.directory ?? DEFAULT_PLUGINS_DIRECTORY;
+            this.externalResourcesDirectory = options?.externalResourcesDirectory ?? DEFAULT_RESOURCES_DIRECTORY;
 
     }
 
@@ -176,8 +169,8 @@ export default class PluginsManager extends EventEmitter {
                     "failAtPatch": false,
                     "dev": false
                 }).then((analyze: {
-					"result": boolean;
-				}): Promise<void> => {
+                    "result": boolean;
+                }): Promise<void> => {
 
                     return analyze.result ? Promise.resolve() : Promise.reject(new Error("\"" + plugin.name + "\" plugin has obsoletes modules"));
 
@@ -603,7 +596,7 @@ export default class PluginsManager extends EventEmitter {
         }
 
         // uninstall a plugin, using "data" in arguments for "release" and "uninstall" plugin's methods
-        public uninstall(plugin: Orchestrator, ...data: unknown[]): Promise<string> {
+        public uninstall (plugin: Orchestrator, ...data: unknown[]): Promise<string> {
 
             let directory: string = "";
             let key: number = -1;
@@ -674,4 +667,4 @@ export default class PluginsManager extends EventEmitter {
 
         }
 
-};
+}
