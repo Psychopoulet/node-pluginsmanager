@@ -23,7 +23,7 @@
 		const INVALID_NAME_PLUGIN = join(TESTS_PLUGINS_DIRECTORY, "TestInvalidNamePlugin");
 		const GOOD_PLUGIN = join(TESTS_PLUGINS_DIRECTORY, "test-good-plugin");
 
-	const TESTS_EXTERNAL_RESSOURCES_DIRECTORY = join(homedir(), "node-pluginsmanager-plugins-ressources");
+	const TESTS_EXTERNAL_RESOURCES_DIRECTORY = join(homedir(), "node-pluginsmanager-plugins-resources");
 
 // tests
 
@@ -41,7 +41,7 @@ describe("createPluginByDirectory", () => {
 
 		}).then(() => {
 
-			return mkdir(TESTS_EXTERNAL_RESSOURCES_DIRECTORY, {
+			return mkdir(TESTS_EXTERNAL_RESOURCES_DIRECTORY, {
 				"recursive": true
 			});
 
@@ -61,7 +61,7 @@ describe("createPluginByDirectory", () => {
 
 		}).then(() => {
 
-			return rm(TESTS_EXTERNAL_RESSOURCES_DIRECTORY, {
+			return rm(TESTS_EXTERNAL_RESOURCES_DIRECTORY, {
 				"recursive": true
 			});
 
@@ -251,7 +251,7 @@ describe("createPluginByDirectory", () => {
 				);
 
 			}).then(() => {
-				return createPluginByDirectory.default(NOT_PLUGIN, TESTS_EXTERNAL_RESSOURCES_DIRECTORY);
+				return createPluginByDirectory.default(NOT_PLUGIN, TESTS_EXTERNAL_RESOURCES_DIRECTORY);
 			}).then(() => {
 				done(new Error("There is no generated error"));
 			}).catch((err) => {
@@ -272,7 +272,7 @@ describe("createPluginByDirectory", () => {
 			copyPlugin(TESTS_PLUGINS_DIRECTORY, GOOD_PLUGIN, pluginName, {
 				"name": "test"
 			}).then(() => {
-				return createPluginByDirectory.default(INVALID_NAME_PLUGIN, TESTS_EXTERNAL_RESSOURCES_DIRECTORY);
+				return createPluginByDirectory.default(INVALID_NAME_PLUGIN, TESTS_EXTERNAL_RESOURCES_DIRECTORY);
 			}).then(() => {
 				done(new Error("There is no generated error"));
 			}).catch((err) => {
@@ -288,7 +288,7 @@ describe("createPluginByDirectory", () => {
 
 		it("should test plugin directory", () => {
 
-			return createPluginByDirectory.default(GOOD_PLUGIN, TESTS_EXTERNAL_RESSOURCES_DIRECTORY).then((plugin) => {
+			return createPluginByDirectory.default(GOOD_PLUGIN, TESTS_EXTERNAL_RESOURCES_DIRECTORY).then((plugin) => {
 
 				strictEqual(typeof plugin, "object", "Generated plugin is not an object");
 				strictEqual(plugin instanceof Orchestrator, true, "Generated plugin is not an Orchestrator");
