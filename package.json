@@ -70,7 +70,7 @@
   "husky": {
     "hooks": {
       "pre-commit": "npm run lint",
-      "pre-push": "npm run tests"
+      "pre-push": "npm run unit-tests"
     }
   },
 
@@ -80,7 +80,6 @@
     "gestion"
   ],
   "author": "Sébastien VIDAL",
-  "contributors": [],
   "license": "ISC",
 
   "homepage": "https://github.com/Psychopoulet/node-pluginsmanager#readme",
