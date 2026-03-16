@@ -51,7 +51,7 @@
   },
   "devDependencies": {
     "@types/express": "5.0.6",
-    "@types/node": "25.3.3",
+    "@types/node": "25.5.0",
     "@types/socket.io": "3.0.2",
     "@types/ws": "8.18.1",
     "eslint-plugin-personnallinter": "git+ssh://git@github.com/Psychopoulet/eslint-plugin-personnallinter",
