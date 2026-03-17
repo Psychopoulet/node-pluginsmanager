@@ -63,7 +63,13 @@ describe("checkers / checkOrchestrator", () => {
 
 	it("should test with Orchestrator", () => {
 
-		return checkOrchestrator.default("orchestrator", new Orchestrator());
+		return checkOrchestrator.default("orchestrator", new Orchestrator({
+			"externalResourcesDirectory": "",
+			"packageFile": "",
+			"descriptorFile": "",
+			"mediatorFile": "",
+			"serverFile": ""
+		}));
 
 	});
 
