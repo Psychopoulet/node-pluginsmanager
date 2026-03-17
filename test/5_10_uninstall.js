@@ -63,7 +63,13 @@ describe("pluginsmanager / uninstall", () => {
 
         it("should test update with not loaded plugin", (done) => {
 
-            const orchestrator = new Orchestrator();
+            const orchestrator = new Orchestrator({
+                "externalResourcesDirectory": "",
+                "packageFile": "",
+                "descriptorFile": "",
+                "mediatorFile": "",
+                "serverFile": ""
+            });
 
                 orchestrator.name = basename(TEST_PLUGIN_DIRECTORY);
                 orchestrator.github = "whatever";

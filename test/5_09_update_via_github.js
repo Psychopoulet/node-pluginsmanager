@@ -66,9 +66,13 @@ describe("pluginsmanager / update via github", () => {
 
         it("should test update with missing repo", (done) => {
 
-            const orchestrator = new Orchestrator();
-
-                orchestrator.name = basename(TEST_PLUGIN_DIRECTORY);
+            const orchestrator = new Orchestrator({
+                "externalResourcesDirectory": "",
+                "packageFile": "",
+                "descriptorFile": "",
+                "mediatorFile": "",
+                "serverFile": ""
+            });
 
             pluginsManager.updateViaGithub(orchestrator).then(() => {
                 done(new Error("tests does not generate error"));
@@ -85,7 +89,13 @@ describe("pluginsmanager / update via github", () => {
 
         it("should test update with not loaded plugin", (done) => {
 
-            const orchestrator = new Orchestrator();
+            const orchestrator = new Orchestrator({
+                "externalResourcesDirectory": "",
+                "packageFile": "",
+                "descriptorFile": "",
+                "mediatorFile": "",
+                "serverFile": ""
+            });
 
                 orchestrator.name = basename(TEST_PLUGIN_DIRECTORY);
                 orchestrator.github = "whatever";
