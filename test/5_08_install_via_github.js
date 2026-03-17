@@ -4,8 +4,11 @@
     const { ok, strictEqual } = require("node:assert");
     const { join } = require("node:path");
 
+    // externals
+    const proxyquire = require("proxyquire").noCallThru();
+
     // locals
-    const PluginsManager = require(join(__dirname, "..", "lib", "cjs", "main.cjs"));
+    const copyPlugin = require(join(__dirname, "utils", "copyPlugin.js"));
     const rmdirp = require(join(__dirname, "..", "lib", "cjs", "utils", "rmdirp.js")).default;
 
 // const
@@ -19,6 +22,28 @@
     const GITHUB_WRONG_REPO = "node-containerpattern";
 
     const EVENTS_DATA = "test";
+
+// mock (avoids real GitHub / git clone)
+
+    function mockGitInstall (directory, user, repo) {
+
+        if (repo === GITHUB_WRONG_REPO) {
+            return Promise.reject(new Error("Mock git clone failure"));
+        }
+        if (repo === GITHUB_REPO) {
+            return copyPlugin(PLUGINS_DIRECTORY, "test-good-plugin", GITHUB_REPO, { "name": GITHUB_REPO });
+        }
+
+        return Promise.reject(new Error("Unexpected repo in mock: " + repo));
+
+    }
+
+    const PluginsManager = proxyquire(join(__dirname, "..", "lib", "cjs", "PluginsManager.js"), {
+        "./cmd/git/gitInstall": {
+            "__esModule": true,
+            "default": mockGitInstall
+        }
+    }).default;
 
 // tests
 
