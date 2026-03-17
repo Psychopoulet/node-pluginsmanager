@@ -1,3 +1,8 @@
+/*
+    eslint-disable @typescript-eslint/unbound-method
+*/
+// => @typescript-eslint/unbound-method is disabled to allow check on data (no need for js context)
+
 // deps
 
     // natives
