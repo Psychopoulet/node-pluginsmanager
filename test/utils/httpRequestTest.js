@@ -2,7 +2,7 @@
 
     // natives
     const { request } = require("node:http");
-    const { parse } = require("node:url");
+    const { URL } = require("node:url");
     const { strictEqual } = require("node:assert");
 
 // consts
@@ -13,18 +13,17 @@
 
 module.exports = function httpRequestTest (urlpath, method, params, returnCode, returnResponse, returnContent) {
 
-    const url = parse(MAIN_URL + urlpath);
+    const { protocol, hostname, port } = new URL(urlpath, MAIN_URL);
 
     return new Promise((resolve, reject) => {
 
         const bodyParams = "undefined" !== typeof params ? JSON.stringify(params) : "";
 
         const opts = {
-            "protocol": url.protocol,
-            "hostname": url.hostname,
-            "port": url.port,
-            "path": url.path,
-            "query": url.query,
+            "protocol": protocol,
+            "hostname": hostname,
+            "port": port,
+            "path": urlpath,
             "method": method.toUpperCase(),
             "headers": {
                 "Content-Type": "application/json; charset=utf-8",
