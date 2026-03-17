@@ -1,3 +1,8 @@
+/*
+    eslint-disable no-undef
+*/
+// => no-undef is disabled to allow "exports.default" use
+
 // deps
 
     // natives
