@@ -42,7 +42,7 @@ export default function createPluginByDirectory (directory: string, externalReso
                 resolve(require(directory) as tMultiExportPlugin | tDefaultExportPlugin | typeof Orchestrator);
             }
             catch (e) {
-                reject(e as Error);
+                reject(e instanceof Error ? e : new Error(String(e)));
             }
 
         }).then((Plugin:tMultiExportPlugin | tDefaultExportPlugin | typeof Orchestrator): Promise<typeof Orchestrator> => {
