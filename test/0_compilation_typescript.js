@@ -2,8 +2,8 @@
 
     // natives
     const { exec } = require("node:child_process");
-    const { join } = require("node:path");
     const { unlink } = require("node:fs/promises");
+    const { join } = require("node:path");
 
 // consts
 

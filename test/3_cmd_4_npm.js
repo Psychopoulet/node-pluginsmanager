@@ -1,9 +1,9 @@
 // deps
 
     // natives
+    const { mkdir, writeFile, rm } = require("node:fs/promises");
     const { homedir } = require("node:os");
     const { join } = require("node:path");
-    const { mkdir, writeFile, rm } = require("node:fs/promises");
 
     // locals
 

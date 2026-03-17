@@ -1,8 +1,8 @@
 // deps
 
     // natives
+    const { ok, strictEqual } = require("node:assert");
     const { join } = require("node:path");
-    const { strictEqual } = require("node:assert");
 
     // locals
     const PluginsManager = require(join(__dirname, "..", "lib", "cjs", "main.cjs"));
@@ -55,7 +55,7 @@ describe("pluginsmanager / install via github", () => {
                 }).catch((err) => {
 
                     strictEqual(typeof err, "object", "Generated error is not an object");
-                    strictEqual(err instanceof ReferenceError, true, "Generated error is not an instance of Error");
+                    ok(err instanceof ReferenceError, "Generated error is not an instance of Error");
 
                     done();
 
@@ -70,7 +70,7 @@ describe("pluginsmanager / install via github", () => {
                 }).catch((err) => {
 
                     strictEqual(typeof err, "object", "Generated error is not an object");
-                    strictEqual(err instanceof TypeError, true, "Generated error is not an instance of Error");
+                    ok(err instanceof TypeError, "Generated error is not an instance of Error");
 
                     done();
 
@@ -85,7 +85,7 @@ describe("pluginsmanager / install via github", () => {
                 }).catch((err) => {
 
                     strictEqual(typeof err, "object", "Generated error is not an object");
-                    strictEqual(err instanceof RangeError, true, "Generated error is not an instance of Error");
+                    ok(err instanceof RangeError, "Generated error is not an instance of Error");
 
                     done();
 
@@ -104,7 +104,7 @@ describe("pluginsmanager / install via github", () => {
                 }).catch((err) => {
 
                     strictEqual(typeof err, "object", "Generated error is not an object");
-                    strictEqual(err instanceof ReferenceError, true, "Generated error is not an instance of Error");
+                    ok(err instanceof ReferenceError, "Generated error is not an instance of Error");
 
                     done();
 
@@ -119,7 +119,7 @@ describe("pluginsmanager / install via github", () => {
                 }).catch((err) => {
 
                     strictEqual(typeof err, "object", "Generated error is not an object");
-                    strictEqual(err instanceof TypeError, true, "Generated error is not an instance of Error");
+                    ok(err instanceof TypeError, "Generated error is not an instance of Error");
 
                     done();
 
@@ -134,7 +134,7 @@ describe("pluginsmanager / install via github", () => {
                 }).catch((err) => {
 
                     strictEqual(typeof err, "object", "Generated error is not an object");
-                    strictEqual(err instanceof RangeError, true, "Generated error is not an instance of Error");
+                    ok(err instanceof RangeError, "Generated error is not an instance of Error");
 
                     done();
 
@@ -155,7 +155,7 @@ describe("pluginsmanager / install via github", () => {
             }).catch((err) => {
 
                 strictEqual(typeof err, "object", "Generated error is not as expected");
-                strictEqual(err instanceof Error, true, "Generated error is not as expected");
+                ok(err instanceof Error, "Generated error is not as expected");
 
                 done();
 
@@ -191,7 +191,7 @@ describe("pluginsmanager / install via github", () => {
             }).catch((err) => {
 
                 strictEqual(typeof err, "object", "Generated error is not as expected");
-                strictEqual(err instanceof Error, true, "Generated error is not as expected");
+                ok(err instanceof Error, "Generated error is not as expected");
 
                 done();
 

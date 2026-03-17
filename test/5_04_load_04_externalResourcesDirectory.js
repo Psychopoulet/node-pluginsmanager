@@ -1,13 +1,13 @@
 // deps
 
     // natives
-    const { join } = require("node:path");
-    const { strictEqual } = require("node:assert");
+    const { ok, strictEqual } = require("node:assert");
     const { mkdir } = require("node:fs/promises");
+    const { join } = require("node:path");
 
     // locals
-    const PluginsManager = require(join(__dirname, "..", "lib", "cjs", "main.cjs"));
     const checkAbsoluteDirectory = require(join(__dirname, "..", "lib", "cjs", "checkers", "checkAbsoluteDirectory.js"));
+    const PluginsManager = require(join(__dirname, "..", "lib", "cjs", "main.cjs"));
 
 // tests
 
@@ -59,7 +59,7 @@ describe("pluginsmanager / externalResourcesDirectory", () => {
                 }).catch((err) => {
 
                     strictEqual(typeof err, "object", "Generated error is not as expected");
-                    strictEqual(err instanceof Error, true, "Generated error is not as expected");
+                    ok(err instanceof Error, "Generated error is not as expected");
 
                     resolve();
 

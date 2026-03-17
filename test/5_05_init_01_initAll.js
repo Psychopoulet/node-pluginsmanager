@@ -1,8 +1,8 @@
 // deps
 
     // natives
+    const { ok, strictEqual } = require("node:assert");
     const { join } = require("node:path");
-    const { strictEqual } = require("node:assert");
 
     // locals
     const PluginsManager = require(join(__dirname, "..", "lib", "cjs", "main.cjs"));
@@ -31,7 +31,7 @@ describe("pluginsmanager / initAll", () => {
                 }).catch((err) => {
 
                     strictEqual(typeof err, "object", "Generated error is not as expected");
-                    strictEqual(err instanceof ReferenceError, true, "Generated error is not as expected");
+                    ok(err instanceof ReferenceError, "Generated error is not as expected");
 
                     done();
 
@@ -50,7 +50,7 @@ describe("pluginsmanager / initAll", () => {
                 }).catch((err) => {
 
                     strictEqual(typeof err, "object", "Generated error is not as expected");
-                    strictEqual(err instanceof TypeError, true, "Generated error is not as expected");
+                    ok(err instanceof TypeError, "Generated error is not as expected");
 
                     done();
 
@@ -69,7 +69,7 @@ describe("pluginsmanager / initAll", () => {
                 }).catch((err) => {
 
                     strictEqual(typeof err, "object", "Generated error is not as expected");
-                    strictEqual(err instanceof Error, true, "Generated error is not as expected");
+                    ok(err instanceof Error, "Generated error is not as expected");
 
                     done();
 
@@ -88,7 +88,7 @@ describe("pluginsmanager / initAll", () => {
                 }).catch((err) => {
 
                     strictEqual(typeof err, "object", "Generated error is not as expected");
-                    strictEqual(err instanceof Error, true, "Generated error is not as expected");
+                    ok(err instanceof Error, "Generated error is not as expected");
 
                     done();
 
@@ -107,7 +107,7 @@ describe("pluginsmanager / initAll", () => {
                 }).catch((err) => {
 
                     strictEqual(typeof err, "object", "Generated error is not as expected");
-                    strictEqual(err instanceof Error, true, "Generated error is not as expected");
+                    ok(err instanceof Error, "Generated error is not as expected");
 
                     done();
 
@@ -132,7 +132,7 @@ describe("pluginsmanager / initAll", () => {
                 }).catch((err) => {
 
                     strictEqual(typeof err, "object", "Generated error is not as expected");
-                    strictEqual(err instanceof ReferenceError, true, "Generated error is not as expected");
+                    ok(err instanceof ReferenceError, "Generated error is not as expected");
 
                     done();
 
@@ -152,7 +152,7 @@ describe("pluginsmanager / initAll", () => {
                 }).catch((err) => {
 
                     strictEqual(typeof err, "object", "Generated error is not as expected");
-                    strictEqual(err instanceof TypeError, true, "Generated error is not as expected");
+                    ok(err instanceof TypeError, "Generated error is not as expected");
 
                     done();
 
@@ -172,7 +172,7 @@ describe("pluginsmanager / initAll", () => {
                 }).catch((err) => {
 
                     strictEqual(typeof err, "object", "Generated error is not as expected");
-                    strictEqual(err instanceof Error, true, "Generated error is not as expected");
+                    ok(err instanceof Error, "Generated error is not as expected");
 
                     done();
 
@@ -192,7 +192,7 @@ describe("pluginsmanager / initAll", () => {
                 }).catch((err) => {
 
                     strictEqual(typeof err, "object", "Generated error is not as expected");
-                    strictEqual(err instanceof Error, true, "Generated error is not as expected");
+                    ok(err instanceof Error, "Generated error is not as expected");
 
                     done();
 
@@ -229,19 +229,19 @@ describe("pluginsmanager / initAll", () => {
         it("should init all", () => {
 
             pluginsManager.plugins.forEach((plugin, key) => {
-                strictEqual(plugin.enabled, true, "plugin \"" + key + "\" is not valid");
+                ok(plugin.enabled, "plugin \"" + key + "\" is not valid");
                 strictEqual(plugin.initialized, false, "plugin \"" + key + "\" is not valid");
             });
 
             return pluginsManager.initAll("test").then(() => {
 
                 strictEqual(typeof pluginsManager.plugins, "object", "plugins is not an object");
-                strictEqual(pluginsManager.plugins instanceof Array, true, "plugins is not an Array");
+                ok(pluginsManager.plugins instanceof Array, "plugins is not an Array");
                 strictEqual(pluginsManager.plugins.length, 3, "plugins length is not valid");
 
                 pluginsManager.plugins.forEach((plugin, key) => {
-                    strictEqual(plugin.enabled, true, "plugin \"" + key + "\" is not valid");
-                    strictEqual(plugin.initialized, true, "plugin \"" + key + "\" is not valid");
+                    ok(plugin.enabled, "plugin \"" + key + "\" is not valid");
+                    ok(plugin.initialized, "plugin \"" + key + "\" is not valid");
                 });
 
             });

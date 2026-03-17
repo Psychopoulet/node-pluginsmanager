@@ -1,10 +1,10 @@
 // deps
 
     // natives
-    const { basename, join } = require("node:path");
-    const { strictEqual } = require("node:assert");
+    const { ok, strictEqual } = require("node:assert");
+    const { mkdir, rm, writeFile } = require("node:fs/promises");
     const { homedir } = require("node:os");
-    const { mkdir, writeFile, rm } = require("node:fs/promises");
+    const { basename, join } = require("node:path");
 
     // externals
     const { Orchestrator } = require("node-pluginsmanager-plugin");
@@ -78,7 +78,7 @@ describe("createPluginByDirectory", () => {
                 }).catch((err) => {
 
                     strictEqual(typeof err, "object", "Generated error is not an object");
-                    strictEqual(err instanceof ReferenceError, true, "Generated error is not an Error");
+                    ok(err instanceof ReferenceError, "Generated error is not an Error");
 
                     done();
 
@@ -93,7 +93,7 @@ describe("createPluginByDirectory", () => {
                 }).catch((err) => {
 
                     strictEqual(typeof err, "object", "Generated error is not an object");
-                    strictEqual(err instanceof TypeError, true, "Generated error is not an Error");
+                    ok(err instanceof TypeError, "Generated error is not an Error");
 
                     done();
 
@@ -108,7 +108,7 @@ describe("createPluginByDirectory", () => {
                 }).catch((err) => {
 
                     strictEqual(typeof err, "object", "Generated error is not an object");
-                    strictEqual(err instanceof Error, true, "Generated error is not an Error");
+                    ok(err instanceof Error, "Generated error is not an Error");
 
                     done();
 
@@ -123,7 +123,7 @@ describe("createPluginByDirectory", () => {
                 }).catch((err) => {
 
                     strictEqual(typeof err, "object", "Generated error is not an object");
-                    strictEqual(err instanceof Error, true, "Generated error is not an Error");
+                    ok(err instanceof Error, "Generated error is not an Error");
 
                     done();
 
@@ -138,7 +138,7 @@ describe("createPluginByDirectory", () => {
                 }).catch((err) => {
 
                     strictEqual(typeof err, "object", "Generated error is not an object");
-                    strictEqual(err instanceof Error, true, "Generated error is not an Error");
+                    ok(err instanceof Error, "Generated error is not an Error");
 
                     done();
 
@@ -157,7 +157,7 @@ describe("createPluginByDirectory", () => {
                 }).catch((err) => {
 
                     strictEqual(typeof err, "object", "Generated error is not an object");
-                    strictEqual(err instanceof ReferenceError, true, "Generated error is not an Error");
+                    ok(err instanceof ReferenceError, "Generated error is not an Error");
 
                     done();
 
@@ -172,7 +172,7 @@ describe("createPluginByDirectory", () => {
                 }).catch((err) => {
 
                     strictEqual(typeof err, "object", "Generated error is not an object");
-                    strictEqual(err instanceof TypeError, true, "Generated error is not an Error");
+                    ok(err instanceof TypeError, "Generated error is not an Error");
 
                     done();
 
@@ -187,7 +187,7 @@ describe("createPluginByDirectory", () => {
                 }).catch((err) => {
 
                     strictEqual(typeof err, "object", "Generated error is not an object");
-                    strictEqual(err instanceof Error, true, "Generated error is not an Error");
+                    ok(err instanceof Error, "Generated error is not an Error");
 
                     done();
 
@@ -202,7 +202,7 @@ describe("createPluginByDirectory", () => {
                 }).catch((err) => {
 
                     strictEqual(typeof err, "object", "Generated error is not an object");
-                    strictEqual(err instanceof Error, true, "Generated error is not an Error");
+                    ok(err instanceof Error, "Generated error is not an Error");
 
                     done();
 
@@ -217,7 +217,7 @@ describe("createPluginByDirectory", () => {
                 }).catch((err) => {
 
                     strictEqual(typeof err, "object", "Generated error is not an object");
-                    strictEqual(err instanceof Error, true, "Generated error is not an Error");
+                    ok(err instanceof Error, "Generated error is not an Error");
 
                     done();
 
@@ -255,7 +255,7 @@ describe("createPluginByDirectory", () => {
             }).catch((err) => {
 
                 strictEqual(typeof err, "object", "Generated error is not an object");
-                strictEqual(err instanceof Error, true, "Generated error is not an Error");
+                ok(err instanceof Error, "Generated error is not an Error");
 
                 done();
 
@@ -276,7 +276,7 @@ describe("createPluginByDirectory", () => {
             }).catch((err) => {
 
                 strictEqual(typeof err, "object", "Generated error is not an object");
-                strictEqual(err instanceof Error, true, "Generated error is not an Error");
+                ok(err instanceof Error, "Generated error is not an Error");
 
                 done();
 
@@ -289,7 +289,7 @@ describe("createPluginByDirectory", () => {
             return createPluginByDirectory.default(GOOD_PLUGIN, TESTS_EXTERNAL_RESOURCES_DIRECTORY).then((plugin) => {
 
                 strictEqual(typeof plugin, "object", "Generated plugin is not an object");
-                strictEqual(plugin instanceof Orchestrator, true, "Generated plugin is not an Orchestrator");
+                ok(plugin instanceof Orchestrator, "Generated plugin is not an Orchestrator");
 
             });
 

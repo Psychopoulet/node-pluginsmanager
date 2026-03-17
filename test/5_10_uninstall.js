@@ -1,16 +1,16 @@
 // deps
 
     // natives
+    const { ok, strictEqual } = require("node:assert");
     const { basename, join } = require("node:path");
-    const { strictEqual } = require("node:assert");
 
     // externals
     const { Orchestrator } = require("node-pluginsmanager-plugin");
 
     // locals
-    const rmdirp = require(join(__dirname, "..", "lib", "cjs", "utils", "rmdirp.js")).default;
-    const PluginsManager = require(join(__dirname, "..", "lib", "cjs", "main.cjs"));
     const copyPlugin = require(join(__dirname, "utils", "copyPlugin.js"));
+    const PluginsManager = require(join(__dirname, "..", "lib", "cjs", "main.cjs"));
+    const rmdirp = require(join(__dirname, "..", "lib", "cjs", "utils", "rmdirp.js")).default;
 
 // const
 
@@ -38,7 +38,7 @@ describe("pluginsmanager / uninstall", () => {
             }).catch((err) => {
 
                 strictEqual(typeof err, "object", "Generated error is not an object");
-                strictEqual(err instanceof ReferenceError, true, "Generated error is not an instance of Error");
+                ok(err instanceof ReferenceError, "Generated error is not an instance of Error");
 
                 done();
 
@@ -53,7 +53,7 @@ describe("pluginsmanager / uninstall", () => {
             }).catch((err) => {
 
                 strictEqual(typeof err, "object", "Generated error is not an object");
-                strictEqual(err instanceof TypeError, true, "Generated error is not an instance of Error");
+                ok(err instanceof TypeError, "Generated error is not an instance of Error");
 
                 done();
 
@@ -79,7 +79,7 @@ describe("pluginsmanager / uninstall", () => {
             }).catch((err) => {
 
                 strictEqual(typeof err, "object", "Generated error is not an object");
-                strictEqual(err instanceof Error, true, "Generated error is not an instance of Error");
+                ok(err instanceof Error, "Generated error is not an instance of Error");
 
                 done();
 

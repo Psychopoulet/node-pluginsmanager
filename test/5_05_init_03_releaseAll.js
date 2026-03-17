@@ -1,8 +1,8 @@
 // deps
 
     // natives
+    const { ok, strictEqual } = require("node:assert");
     const { join } = require("node:path");
-    const { strictEqual } = require("node:assert");
 
     // locals
     const PluginsManager = require(join(__dirname, "..", "lib", "cjs", "main.cjs"));
@@ -30,23 +30,23 @@ describe("pluginsmanager / releaseAll", () => {
     it("should release all", () => {
 
         strictEqual(typeof pluginsManager.plugins, "object", "plugins is not an object");
-        strictEqual(pluginsManager.plugins instanceof Array, true, "plugins is not an Array");
+        ok(pluginsManager.plugins instanceof Array, "plugins is not an Array");
         strictEqual(pluginsManager.plugins.length, 3, "plugins length is not valid");
 
         pluginsManager.plugins.forEach((plugin, key) => {
-            strictEqual(plugin.enabled, true, "plugin \"" + key + "\" is not valid");
+            ok(plugin.enabled, "plugin \"" + key + "\" is not valid");
             strictEqual(plugin.initialized, false, "plugin \"" + key + "\" is not valid");
         });
 
         return pluginsManager.initAll().then(() => {
 
             strictEqual(typeof pluginsManager.plugins, "object", "plugins is not an object");
-            strictEqual(pluginsManager.plugins instanceof Array, true, "plugins is not an Array");
+            ok(pluginsManager.plugins instanceof Array, "plugins is not an Array");
             strictEqual(pluginsManager.plugins.length, 3, "plugins length is not valid");
 
             pluginsManager.plugins.forEach((plugin, key) => {
-                strictEqual(plugin.enabled, true, "plugin \"" + key + "\" is not valid");
-                strictEqual(plugin.initialized, true, "plugin \"" + key + "\" is not valid");
+                ok(plugin.enabled, "plugin \"" + key + "\" is not valid");
+                ok(plugin.initialized, "plugin \"" + key + "\" is not valid");
             });
 
             return pluginsManager.releaseAll();
@@ -54,11 +54,11 @@ describe("pluginsmanager / releaseAll", () => {
         }).then(() => {
 
             strictEqual(typeof pluginsManager.plugins, "object", "plugins is not an object");
-            strictEqual(pluginsManager.plugins instanceof Array, true, "plugins is not an Array");
+            ok(pluginsManager.plugins instanceof Array, "plugins is not an Array");
             strictEqual(pluginsManager.plugins.length, 3, "plugins length is not valid");
 
             pluginsManager.plugins.forEach((plugin, key) => {
-                strictEqual(plugin.enabled, true, "plugin \"" + key + "\" is not valid");
+                ok(plugin.enabled, "plugin \"" + key + "\" is not valid");
                 strictEqual(plugin.initialized, false, "plugin \"" + key + "\" is not valid");
             });
 

@@ -1,10 +1,10 @@
 // deps
 
     // natives
-    const { strictEqual } = require("node:assert");
+    const { ok, strictEqual } = require("node:assert");
+    const { mkdir, rm } = require("node:fs/promises");
     const { homedir } = require("node:os");
     const { join } = require("node:path");
-    const { mkdir, rm } = require("node:fs/promises");
 
     // locals
 
@@ -54,7 +54,7 @@ describe("cmd / git", () => {
                 }).catch((err) => {
 
                     strictEqual(typeof err, "object", "generated error is not as expected");
-                    strictEqual(err instanceof ReferenceError, true, "generated error is not as expected");
+                    ok(err instanceof ReferenceError, "generated error is not as expected");
 
                     done();
 
@@ -69,7 +69,7 @@ describe("cmd / git", () => {
                 }).catch((err) => {
 
                     strictEqual(typeof err, "object", "generated error is not as expected");
-                    strictEqual(err instanceof ReferenceError, true, "generated error is not as expected");
+                    ok(err instanceof ReferenceError, "generated error is not as expected");
 
                     done();
 
@@ -84,7 +84,7 @@ describe("cmd / git", () => {
                 }).catch((err) => {
 
                     strictEqual(typeof err, "object", "generated error is not as expected");
-                    strictEqual(err instanceof ReferenceError, true, "generated error is not as expected");
+                    ok(err instanceof ReferenceError, "generated error is not as expected");
 
                     done();
 
@@ -103,7 +103,7 @@ describe("cmd / git", () => {
                 }).catch((err) => {
 
                     strictEqual(typeof err, "object", "generated error is not as expected");
-                    strictEqual(err instanceof TypeError, true, "generated error is not as expected");
+                    ok(err instanceof TypeError, "generated error is not as expected");
 
                     done();
 
@@ -118,7 +118,7 @@ describe("cmd / git", () => {
                 }).catch((err) => {
 
                     strictEqual(typeof err, "object", "generated error is not as expected");
-                    strictEqual(err instanceof TypeError, true, "generated error is not as expected");
+                    ok(err instanceof TypeError, "generated error is not as expected");
 
                     done();
 
@@ -133,7 +133,7 @@ describe("cmd / git", () => {
                 }).catch((err) => {
 
                     strictEqual(typeof err, "object", "generated error is not as expected");
-                    strictEqual(err instanceof TypeError, true, "generated error is not as expected");
+                    ok(err instanceof TypeError, "generated error is not as expected");
 
                     done();
 
@@ -152,7 +152,7 @@ describe("cmd / git", () => {
                 }).catch((err) => {
 
                     strictEqual(typeof err, "object", "generated error is not as expected");
-                    strictEqual(err instanceof Error, true, "generated error is not as expected");
+                    ok(err instanceof Error, "generated error is not as expected");
 
                     done();
 
@@ -167,7 +167,7 @@ describe("cmd / git", () => {
                 }).catch((err) => {
 
                     strictEqual(typeof err, "object", "generated error is not as expected");
-                    strictEqual(err instanceof Error, true, "generated error is not as expected");
+                    ok(err instanceof Error, "generated error is not as expected");
 
                     done();
 
@@ -182,7 +182,7 @@ describe("cmd / git", () => {
                 }).catch((err) => {
 
                     strictEqual(typeof err, "object", "generated error is not as expected");
-                    strictEqual(err instanceof Error, true, "generated error is not as expected");
+                    ok(err instanceof Error, "generated error is not as expected");
 
                     done();
 
@@ -205,7 +205,7 @@ describe("cmd / git", () => {
                 }).catch((err) => {
 
                     strictEqual(typeof err, "object", "generated error is not as expected");
-                    strictEqual(err instanceof Error, true, "generated error is not as expected");
+                    ok(err instanceof Error, "generated error is not as expected");
 
                     done();
 
@@ -226,7 +226,7 @@ describe("cmd / git", () => {
             }).catch((err) => {
 
                 strictEqual(typeof err, "object", "generated error is not as expected");
-                strictEqual(err instanceof ReferenceError, true, "generated error is not as expected");
+                ok(err instanceof ReferenceError, "generated error is not as expected");
 
                 done();
 
@@ -241,7 +241,7 @@ describe("cmd / git", () => {
             }).catch((err) => {
 
                 strictEqual(typeof err, "object", "generated error is not as expected");
-                strictEqual(err instanceof TypeError, true, "generated error is not as expected");
+                ok(err instanceof TypeError, "generated error is not as expected");
 
                 done();
 
@@ -256,7 +256,7 @@ describe("cmd / git", () => {
             }).catch((err) => {
 
                 strictEqual(typeof err, "object", "generated error is not as expected");
-                strictEqual(err instanceof Error, true, "generated error is not as expected");
+                ok(err instanceof Error, "generated error is not as expected");
 
                 done();
 
@@ -271,7 +271,7 @@ describe("cmd / git", () => {
             }).catch((err) => {
 
                 strictEqual(typeof err, "object", "generated error is not as expected");
-                strictEqual(err instanceof Error, true, "generated error is not as expected");
+                ok(err instanceof Error, "generated error is not as expected");
 
                 done();
 

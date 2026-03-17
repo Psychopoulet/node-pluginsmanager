@@ -1,8 +1,8 @@
 // deps
 
     // natives
-    const { join } = require("node:path");
     const { rm } = require("node:fs/promises");
+    const { join } = require("node:path");
 
     // locals
     const PluginsManager = require(join(__dirname, "..", "lib", "cjs", "main.cjs"));

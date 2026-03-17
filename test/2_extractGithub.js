@@ -1,8 +1,8 @@
 // deps
 
     // natives
-    const { join } = require("node:path");
     const { strictEqual } = require("node:assert");
+    const { join } = require("node:path");
 
     // locals
     const extractGithub = require(join(__dirname, "..", "lib", "cjs", "extractGithub.js"));

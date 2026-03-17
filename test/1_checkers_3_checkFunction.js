@@ -1,8 +1,8 @@
 // deps
 
     // natives
+    const { ok, strictEqual } = require("node:assert");
     const { join } = require("node:path");
-    const { strictEqual } = require("node:assert");
 
     // locals
     const checkFunction = require(join(__dirname, "..", "lib", "cjs", "checkers", "checkFunction.js"));
@@ -18,7 +18,7 @@ describe("checkers / checkFunction", () => {
         }).catch((err) => {
 
             strictEqual(typeof err, "object", "Generated error is not as expected");
-            strictEqual(err instanceof ReferenceError, true, "Generated error is not as expected");
+            ok(err instanceof ReferenceError, "Generated error is not as expected");
 
             done();
 
@@ -33,7 +33,7 @@ describe("checkers / checkFunction", () => {
         }).catch((err) => {
 
             strictEqual(typeof err, "object", "Generated error is not as expected");
-            strictEqual(err instanceof TypeError, true, "Generated error is not as expected");
+            ok(err instanceof TypeError, "Generated error is not as expected");
 
             done();
 

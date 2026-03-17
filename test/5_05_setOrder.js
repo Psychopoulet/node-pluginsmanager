@@ -1,8 +1,8 @@
 // deps
 
     // natives
+    const { deepStrictEqual, ok, strictEqual } = require("node:assert");
     const { join } = require("node:path");
-    const { deepStrictEqual, strictEqual } = require("node:assert");
 
     // locals
     const PluginsManager = require(join(__dirname, "..", "lib", "cjs", "main.cjs"));
@@ -29,7 +29,7 @@ describe("pluginsmanager / setOrder", () => {
             }).catch((err) => {
 
                 strictEqual(typeof err, "object", "Generated error is not an instance of Error");
-                strictEqual(err instanceof ReferenceError, true, "Generated error is not an instance of Error");
+                ok(err instanceof ReferenceError, "Generated error is not an instance of Error");
 
                 done();
 
@@ -44,7 +44,7 @@ describe("pluginsmanager / setOrder", () => {
             }).catch((err) => {
 
                 strictEqual(typeof err, "object", "Generated error is not an instance of Error");
-                strictEqual(err instanceof TypeError, true, "Generated error is not an instance of Error");
+                ok(err instanceof TypeError, "Generated error is not an instance of Error");
 
                 done();
 
@@ -59,7 +59,7 @@ describe("pluginsmanager / setOrder", () => {
             }).catch((err) => {
 
                 strictEqual(typeof err, "object", "Generated error is not an instance of Error");
-                strictEqual(err instanceof Error, true, "Generated error is not an instance of Error");
+                ok(err instanceof Error, "Generated error is not an instance of Error");
 
                 done();
 
@@ -74,7 +74,7 @@ describe("pluginsmanager / setOrder", () => {
             }).catch((err) => {
 
                 strictEqual(typeof err, "object", "Generated error is not an instance of Error");
-                strictEqual(err instanceof Error, true, "Generated error is not an instance of Error");
+                ok(err instanceof Error, "Generated error is not an instance of Error");
 
                 done();
 
@@ -93,7 +93,7 @@ describe("pluginsmanager / setOrder", () => {
             }).catch((err) => {
 
                 strictEqual(typeof err, "object", "Generated error is not an object");
-                strictEqual(err instanceof Error, true, "Generated error is not an Error");
+                ok(err instanceof Error, "Generated error is not an Error");
 
                 done();
 
@@ -205,12 +205,12 @@ describe("pluginsmanager / setOrder", () => {
 
             }).then(() => {
 
-                strictEqual(pluginsManager.plugins instanceof Array, true, "loaded plugins are incorrects");
+                ok(pluginsManager.plugins instanceof Array, "loaded plugins are incorrects");
                 strictEqual(pluginsManager.plugins.length, 3, "loaded plugins are incorrects");
 
                 // test-good-plugin
 
-                strictEqual("object" === typeof pluginsManager.plugins[0], true, "loaded plugins are incorrects");
+                ok("object" === typeof pluginsManager.plugins[0], "loaded plugins are incorrects");
 
                     strictEqual(
                         pluginsManager.plugins[0].name, "test-good-plugin",
@@ -231,7 +231,7 @@ describe("pluginsmanager / setOrder", () => {
 
                 // test-good-plugin-without-dependencies
 
-                strictEqual("object" === typeof pluginsManager.plugins[1], true, "loaded plugins are incorrects");
+                ok("object" === typeof pluginsManager.plugins[1], "loaded plugins are incorrects");
 
                     strictEqual(
                         pluginsManager.plugins[1].name, "test-good-plugin-with-default-export",

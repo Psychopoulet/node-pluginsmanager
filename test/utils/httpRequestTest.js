@@ -1,9 +1,9 @@
 // deps
 
     // natives
+    const { strictEqual } = require("node:assert");
     const { request } = require("node:http");
     const { URL } = require("node:url");
-    const { strictEqual } = require("node:assert");
 
 // consts
 

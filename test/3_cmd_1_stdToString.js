@@ -1,8 +1,8 @@
 // deps
 
     // natives
-    const { join } = require("node:path");
     const { strictEqual } = require("node:assert");
+    const { join } = require("node:path");
 
     // locals
     const stdToString = require(join(__dirname, "..", "lib", "cjs", "cmd", "stdToString.js"));

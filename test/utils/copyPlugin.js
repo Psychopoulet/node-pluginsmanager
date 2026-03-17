@@ -1,8 +1,8 @@
 // deps
 
     // natives
+    const { cp, mkdir, readdir, readFile, writeFile } = require("node:fs/promises");
     const { join } = require("node:path");
-    const { mkdir, readdir, readFile, writeFile, cp } = require("node:fs/promises");
 
 // module
 
