@@ -1,3 +1,8 @@
+/*
+    eslint-disable @typescript-eslint/no-base-to-string
+*/
+// => @typescript-eslint/no-base-to-string is disabled to force stringifying a potential object
+
 // module
 
 export default function stdToString (msg: unknown): string {
@@ -8,8 +13,11 @@ export default function stdToString (msg: unknown): string {
     else if (msg instanceof Buffer) {
         return msg.toString("utf8");
     }
+    else if ((msg as Record<string, string>).message) {
+        return (msg as Record<string, string>).message;
+    }
     else {
-        return (msg as Record<string, string>).message ? (msg as Record<string, string>).message : String(msg);
+        return String(msg);
     }
 
 }

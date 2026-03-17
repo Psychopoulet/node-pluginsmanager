@@ -17,7 +17,7 @@ export default class PluginsManager extends EventEmitter {
     directory: string;
     externalResourcesDirectory: string;
     plugins: Orchestrator[];
-    constructor(options: iPluginManagerOptions);
+    constructor(options?: iPluginManagerOptions);
     getPluginsNames(): string[];
     setOrder(pluginsNames: string[]): Promise<void>;
     getOrder(): string[];

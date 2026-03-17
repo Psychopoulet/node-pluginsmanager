@@ -91,7 +91,7 @@ export default function loadSortedPlugins (
                 return p === pluginName;
             });
 
-            if (plugin) {
+            if ("string" === typeof plugin) {
                 sortedPluginsNames.push(pluginName);
             }
 

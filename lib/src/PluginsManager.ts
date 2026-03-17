@@ -37,7 +37,7 @@
     import type { IncomingMessage, ServerResponse } from "node:http";
 
     // externals
-    import type { Orchestrator, tLogger, iServerResponse } from "node-pluginsmanager-plugin";
+    import type { Orchestrator, tLogger } from "node-pluginsmanager-plugin";
     import type { Server as WebSocketServer } from "ws";
     import type { Server as SocketIOServer } from "socket.io";
 
@@ -77,9 +77,15 @@ export default class PluginsManager extends EventEmitter {
 
     // constructor
 
-    public constructor (options: iPluginManagerOptions) {
+    public constructor (options: iPluginManagerOptions = {}) {
 
         super();
+
+        // mandatory props
+
+        if ("object" !== typeof options) {
+            throw new ReferenceError("\"options\" must be a non-null object");
+        }
 
         // protected
 
@@ -88,14 +94,14 @@ export default class PluginsManager extends EventEmitter {
 
             this._orderedPluginsNames = [];
 
-            this._logger = "function" === typeof options?.logger ? options.logger : null;
+            this._logger = "function" === typeof options.logger ? options.logger : null;
 
         // public
 
             this.plugins = [];
 
-            this.directory = options?.directory ?? DEFAULT_PLUGINS_DIRECTORY;
-            this.externalResourcesDirectory = options?.externalResourcesDirectory ?? DEFAULT_RESOURCES_DIRECTORY;
+            this.directory = options.directory ?? DEFAULT_PLUGINS_DIRECTORY;
+            this.externalResourcesDirectory = options.externalResourcesDirectory ?? DEFAULT_RESOURCES_DIRECTORY;
 
     }
 
@@ -193,12 +199,12 @@ export default class PluginsManager extends EventEmitter {
             }
             else {
 
-                const _recursiveNext: (i: number) => () => void = (i: number): (err?: unknown) => void => {
+                function _recursiveNext (i: number): () => void {
 
                     if (i < plugins.length) {
 
                         return (): void => {
-                            return plugins[i].appMiddleware(req, res as iServerResponse, _recursiveNext(i + 1));
+                            return plugins[i].appMiddleware(req, res, _recursiveNext(i + 1));
                         };
 
                     }
@@ -208,9 +214,9 @@ export default class PluginsManager extends EventEmitter {
                         return next;
                     }
 
-                };
+                }
 
-                return plugins[0].appMiddleware(req, res as iServerResponse, _recursiveNext(1)); // must start at index "1", cause the "0" is executed here
+                return plugins[0].appMiddleware(req, res, _recursiveNext(1)); // must start at index "1", cause the "0" is executed here
 
             }
 

@@ -1,3 +1,8 @@
+/*
+    eslint-disable @typescript-eslint/no-var-requires
+*/
+// => @typescript-eslint/no-var-requires is disabled to allow plugin load
+
 // deps
 
     // natives
@@ -42,10 +47,10 @@ export default function createPluginByDirectory (directory: string, externalReso
 
         }).then((Plugin:tMultiExportPlugin | tDefaultExportPlugin | typeof Orchestrator): Promise<typeof Orchestrator> => {
 
-            if ((Plugin as tMultiExportPlugin).Orchestrator) {
+            if ([ "function", "object" ].includes(typeof (Plugin as tMultiExportPlugin).Orchestrator)) {
                 return Promise.resolve((Plugin as tMultiExportPlugin).Orchestrator);
             }
-            else if ((Plugin as tDefaultExportPlugin).default) {
+            else if ([ "function", "object" ].includes(typeof (Plugin as tDefaultExportPlugin).default)) {
                 return Promise.resolve((Plugin as tDefaultExportPlugin).default);
             }
             else {
