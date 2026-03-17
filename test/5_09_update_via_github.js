@@ -5,12 +5,12 @@
     const { basename, join } = require("node:path");
 
     // externals
+    const proxyquire = require("proxyquire").noCallThru();
     const { Orchestrator } = require("node-pluginsmanager-plugin");
 
     // locals
     const checkDirectory = require(join(__dirname, "..", "lib", "cjs", "checkers", "checkDirectory.js"));
     const copyPlugin = require(join(__dirname, "utils", "copyPlugin.js"));
-    const PluginsManager = require(join(__dirname, "..", "lib", "cjs", "main.cjs"));
     const rmdirp = require(join(__dirname, "..", "lib", "cjs", "utils", "rmdirp.js")).default;
 
 // const
@@ -23,6 +23,19 @@
             const TEST_PLUGIN_MODULES_DIRECTORY = join(TEST_PLUGIN_DIRECTORY, "node_modules");
 
     const EVENTS_DATA = "test";
+
+// mock (avoids real GitHub / git pull)
+
+    function mockGitUpdate () {
+        return Promise.resolve();
+    }
+
+    const PluginsManager = proxyquire(join(__dirname, "..", "lib", "cjs", "PluginsManager.js"), {
+        "./cmd/git/gitUpdate": {
+            "__esModule": true,
+            "default": mockGitUpdate
+        }
+    }).default;
 
 // tests
 
