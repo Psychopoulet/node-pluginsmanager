@@ -1,206 +1,204 @@
-"use strict";
-
 // deps
 
-	// natives
-	const { join } = require("node:path");
-	const { strictEqual } = require("node:assert");
+    // natives
+    const { join } = require("node:path");
+    const { strictEqual } = require("node:assert");
 
-	// locals
-	const PluginsManager = require(join(__dirname, "..", "lib", "cjs", "main.cjs"));
-	const rmdirp = require(join(__dirname, "..", "lib", "cjs", "utils", "rmdirp.js")).default;
+    // locals
+    const PluginsManager = require(join(__dirname, "..", "lib", "cjs", "main.cjs"));
+    const rmdirp = require(join(__dirname, "..", "lib", "cjs", "utils", "rmdirp.js")).default;
 
 // const
 
-	const MAX_TIMOUT = 30 * 1000;
+    const MAX_TIMOUT = 30 * 1000;
 
-	const PLUGINS_DIRECTORY = join(__dirname, "plugins");
+    const PLUGINS_DIRECTORY = join(__dirname, "plugins");
 
-	const GITHUB_USER = "Psychopoulet";
-	const GITHUB_REPO = "node-pluginsmanager-plugin-test";
-	const GITHUB_WRONG_REPO = "node-containerpattern";
+    const GITHUB_USER = "Psychopoulet";
+    const GITHUB_REPO = "node-pluginsmanager-plugin-test";
+    const GITHUB_WRONG_REPO = "node-containerpattern";
 
-	const EVENTS_DATA = "test";
+    const EVENTS_DATA = "test";
 
 // tests
 
 describe("pluginsmanager / install via github", () => {
 
-	const pluginsManager = new PluginsManager({
-		"directory": PLUGINS_DIRECTORY
-	});
+    const pluginsManager = new PluginsManager({
+        "directory": PLUGINS_DIRECTORY
+    });
 
-	before(() => {
-		return pluginsManager.loadAll();
-	});
+    before(() => {
+        return pluginsManager.loadAll();
+    });
 
-	after(() => {
+    after(() => {
 
-		return pluginsManager.releaseAll().then(() => {
-			return pluginsManager.destroyAll();
-		}).then(() => {
-			return rmdirp(join(PLUGINS_DIRECTORY, GITHUB_REPO));
-		}).then(() => {
-			return rmdirp(join(PLUGINS_DIRECTORY, GITHUB_WRONG_REPO));
-		});
+        return pluginsManager.releaseAll().then(() => {
+            return pluginsManager.destroyAll();
+        }).then(() => {
+            return rmdirp(join(PLUGINS_DIRECTORY, GITHUB_REPO));
+        }).then(() => {
+            return rmdirp(join(PLUGINS_DIRECTORY, GITHUB_WRONG_REPO));
+        });
 
-	});
+    });
 
-	describe("params", () => {
+    describe("params", () => {
 
-		describe("user", () => {
+        describe("user", () => {
 
-			it("should test update without user", (done) => {
+            it("should test update without user", (done) => {
 
-				pluginsManager.installViaGithub().then(() => {
-					done(new Error("tests does not generate error"));
-				}).catch((err) => {
+                pluginsManager.installViaGithub().then(() => {
+                    done(new Error("tests does not generate error"));
+                }).catch((err) => {
 
-					strictEqual(typeof err, "object", "Generated error is not an object");
-					strictEqual(err instanceof ReferenceError, true, "Generated error is not an instance of Error");
+                    strictEqual(typeof err, "object", "Generated error is not an object");
+                    strictEqual(err instanceof ReferenceError, true, "Generated error is not an instance of Error");
 
-					done();
+                    done();
 
-				});
+                });
 
-			});
+            });
 
-			it("should test update with wrong user", (done) => {
+            it("should test update with wrong user", (done) => {
 
-				pluginsManager.installViaGithub(false).then(() => {
-					done(new Error("tests does not generate error"));
-				}).catch((err) => {
+                pluginsManager.installViaGithub(false).then(() => {
+                    done(new Error("tests does not generate error"));
+                }).catch((err) => {
 
-					strictEqual(typeof err, "object", "Generated error is not an object");
-					strictEqual(err instanceof TypeError, true, "Generated error is not an instance of Error");
+                    strictEqual(typeof err, "object", "Generated error is not an object");
+                    strictEqual(err instanceof TypeError, true, "Generated error is not an instance of Error");
 
-					done();
+                    done();
 
-				});
+                });
 
-			});
+            });
 
-			it("should test update with empty user", (done) => {
+            it("should test update with empty user", (done) => {
 
-				pluginsManager.installViaGithub("").then(() => {
-					done(new Error("tests does not generate error"));
-				}).catch((err) => {
+                pluginsManager.installViaGithub("").then(() => {
+                    done(new Error("tests does not generate error"));
+                }).catch((err) => {
 
-					strictEqual(typeof err, "object", "Generated error is not an object");
-					strictEqual(err instanceof RangeError, true, "Generated error is not an instance of Error");
+                    strictEqual(typeof err, "object", "Generated error is not an object");
+                    strictEqual(err instanceof RangeError, true, "Generated error is not an instance of Error");
 
-					done();
+                    done();
 
-				});
+                });
 
-			});
+            });
 
-		});
+        });
 
-		describe("repo", () => {
+        describe("repo", () => {
 
-			it("should test update without repo", (done) => {
+            it("should test update without repo", (done) => {
 
-				pluginsManager.installViaGithub(GITHUB_USER).then(() => {
-					done(new Error("tests does not generate error"));
-				}).catch((err) => {
+                pluginsManager.installViaGithub(GITHUB_USER).then(() => {
+                    done(new Error("tests does not generate error"));
+                }).catch((err) => {
 
-					strictEqual(typeof err, "object", "Generated error is not an object");
-					strictEqual(err instanceof ReferenceError, true, "Generated error is not an instance of Error");
+                    strictEqual(typeof err, "object", "Generated error is not an object");
+                    strictEqual(err instanceof ReferenceError, true, "Generated error is not an instance of Error");
 
-					done();
+                    done();
 
-				});
+                });
 
-			});
+            });
 
-			it("should test update with wrong repo", (done) => {
+            it("should test update with wrong repo", (done) => {
 
-				pluginsManager.installViaGithub(GITHUB_USER, false).then(() => {
-					done(new Error("tests does not generate error"));
-				}).catch((err) => {
+                pluginsManager.installViaGithub(GITHUB_USER, false).then(() => {
+                    done(new Error("tests does not generate error"));
+                }).catch((err) => {
 
-					strictEqual(typeof err, "object", "Generated error is not an object");
-					strictEqual(err instanceof TypeError, true, "Generated error is not an instance of Error");
+                    strictEqual(typeof err, "object", "Generated error is not an object");
+                    strictEqual(err instanceof TypeError, true, "Generated error is not an instance of Error");
 
-					done();
+                    done();
 
-				});
+                });
 
-			});
+            });
 
-			it("should test update with empty repo", (done) => {
+            it("should test update with empty repo", (done) => {
 
-				pluginsManager.installViaGithub(GITHUB_USER, "").then(() => {
-					done(new Error("tests does not generate error"));
-				}).catch((err) => {
+                pluginsManager.installViaGithub(GITHUB_USER, "").then(() => {
+                    done(new Error("tests does not generate error"));
+                }).catch((err) => {
 
-					strictEqual(typeof err, "object", "Generated error is not an object");
-					strictEqual(err instanceof RangeError, true, "Generated error is not an instance of Error");
+                    strictEqual(typeof err, "object", "Generated error is not an object");
+                    strictEqual(err instanceof RangeError, true, "Generated error is not an instance of Error");
 
-					done();
+                    done();
 
-				});
+                });
 
-			});
+            });
 
-		});
+        });
 
-	});
+    });
 
-	describe("execute", () => {
+    describe("execute", () => {
 
-		it("should test download with wrong repo", (done) => {
+        it("should test download with wrong repo", (done) => {
 
-			pluginsManager.installViaGithub(GITHUB_USER, GITHUB_WRONG_REPO).then(() => {
-				done(new Error("tests does not generate error"));
-			}).catch((err) => {
+            pluginsManager.installViaGithub(GITHUB_USER, GITHUB_WRONG_REPO).then(() => {
+                done(new Error("tests does not generate error"));
+            }).catch((err) => {
 
-				strictEqual(typeof err, "object", "Generated error is not as expected");
-				strictEqual(err instanceof Error, true, "Generated error is not as expected");
+                strictEqual(typeof err, "object", "Generated error is not as expected");
+                strictEqual(err instanceof Error, true, "Generated error is not as expected");
 
-				done();
+                done();
 
-			});
+            });
 
-		}).timeout(MAX_TIMOUT);
+        }).timeout(MAX_TIMOUT);
 
-		it("should test download with valid repo", () => {
+        it("should test download with valid repo", () => {
 
-			pluginsManager.on("installed", (plugin, data) => {
+            pluginsManager.on("installed", (plugin, data) => {
 
-				strictEqual(typeof data, "string", "Events data is not a string");
-				strictEqual(data, EVENTS_DATA, "Events data is not as expected");
+                strictEqual(typeof data, "string", "Events data is not a string");
+                strictEqual(data, EVENTS_DATA, "Events data is not as expected");
 
-				(0, console).log("--- [PluginsManager/events/installed] " + plugin.name + " - " + data);
+                (0, console).log("--- [PluginsManager/events/installed] " + plugin.name + " - " + data);
 
-			});
+            });
 
-			return pluginsManager.installViaGithub(GITHUB_USER, GITHUB_REPO, EVENTS_DATA).then((plugin) => {
+            return pluginsManager.installViaGithub(GITHUB_USER, GITHUB_REPO, EVENTS_DATA).then((plugin) => {
 
-				strictEqual(typeof plugin, "object", "Plugin is not an object");
-				strictEqual(typeof plugin.name, "string", "Plugin name is not a string");
-				strictEqual(plugin.name, GITHUB_REPO, "Plugin name is not as expected");
+                strictEqual(typeof plugin, "object", "Plugin is not an object");
+                strictEqual(typeof plugin.name, "string", "Plugin name is not a string");
+                strictEqual(plugin.name, GITHUB_REPO, "Plugin name is not as expected");
 
-			});
+            });
 
-		}).timeout(MAX_TIMOUT);
+        }).timeout(MAX_TIMOUT);
 
-		it("should test download already existing repo", (done) => {
+        it("should test download already existing repo", (done) => {
 
-			pluginsManager.installViaGithub(GITHUB_USER, GITHUB_REPO).then(() => {
-				done(new Error("tests does not generate error"));
-			}).catch((err) => {
+            pluginsManager.installViaGithub(GITHUB_USER, GITHUB_REPO).then(() => {
+                done(new Error("tests does not generate error"));
+            }).catch((err) => {
 
-				strictEqual(typeof err, "object", "Generated error is not as expected");
-				strictEqual(err instanceof Error, true, "Generated error is not as expected");
+                strictEqual(typeof err, "object", "Generated error is not as expected");
+                strictEqual(err instanceof Error, true, "Generated error is not as expected");
 
-				done();
+                done();
 
-			});
+            });
 
-		});
+        });
 
-	});
+    });
 
 });

@@ -1,67 +1,65 @@
-"use strict";
-
 // deps
 
-	// natives
-	const { join } = require("node:path");
-	const { strictEqual } = require("node:assert");
+    // natives
+    const { join } = require("node:path");
+    const { strictEqual } = require("node:assert");
 
-	// locals
-	const checkNonEmptyString = require(join(__dirname, "..", "lib", "cjs", "checkers", "checkNonEmptyString.js"));
+    // locals
+    const checkNonEmptyString = require(join(__dirname, "..", "lib", "cjs", "checkers", "checkNonEmptyString.js"));
 
 // tests
 
 describe("checkers / checkNonEmptyString", () => {
 
-	it("should test with empty data", (done) => {
+    it("should test with empty data", (done) => {
 
-		checkNonEmptyString.default("string").then(() => {
-			done(new Error("There is no generated error"));
-		}).catch((err) => {
+        checkNonEmptyString.default("string").then(() => {
+            done(new Error("There is no generated error"));
+        }).catch((err) => {
 
-			strictEqual(typeof err, "object", "Generated error is not as expected");
-			strictEqual(err instanceof ReferenceError, true, "Generated error is not as expected");
+            strictEqual(typeof err, "object", "Generated error is not as expected");
+            strictEqual(err instanceof ReferenceError, true, "Generated error is not as expected");
 
-			done();
+            done();
 
-		});
+        });
 
-	});
+    });
 
-	it("should test with wrong data", (done) => {
+    it("should test with wrong data", (done) => {
 
-		checkNonEmptyString.default("string", 1234).then(() => {
-			done(new Error("There is no generated error"));
-		}).catch((err) => {
+        checkNonEmptyString.default("string", 1234).then(() => {
+            done(new Error("There is no generated error"));
+        }).catch((err) => {
 
-			strictEqual(typeof err, "object", "Generated error is not as expected");
-			strictEqual(err instanceof TypeError, true, "Generated error is not as expected");
+            strictEqual(typeof err, "object", "Generated error is not as expected");
+            strictEqual(err instanceof TypeError, true, "Generated error is not as expected");
 
-			done();
+            done();
 
-		});
+        });
 
-	});
+    });
 
-	it("should test with empty data", (done) => {
+    it("should test with empty data", (done) => {
 
-		checkNonEmptyString.default("string", "").then(() => {
-			done(new Error("There is no generated error"));
-		}).catch((err) => {
+        checkNonEmptyString.default("string", "").then(() => {
+            done(new Error("There is no generated error"));
+        }).catch((err) => {
 
-			strictEqual(typeof err, "object", "Generated error is not as expected");
-			strictEqual(err instanceof RangeError, true, "Generated error is not as expected");
+            strictEqual(typeof err, "object", "Generated error is not as expected");
+            strictEqual(err instanceof RangeError, true, "Generated error is not as expected");
 
-			done();
+            done();
 
-		});
+        });
 
-	});
+    });
 
-	it("should test with absolute string", () => {
+    it("should test with absolute string", () => {
 
-		return checkNonEmptyString.default("string", "test");
+        return checkNonEmptyString.default("string", "test");
 
-	});
+    });
 
 });

@@ -1,290 +1,288 @@
-"use strict";
-
 // deps
 
-	// natives
-	const { strictEqual } = require("node:assert");
-	const { homedir } = require("node:os");
-	const { join } = require("node:path");
-	const { mkdir, rm } = require("node:fs/promises");
+    // natives
+    const { strictEqual } = require("node:assert");
+    const { homedir } = require("node:os");
+    const { join } = require("node:path");
+    const { mkdir, rm } = require("node:fs/promises");
 
-	// locals
+    // locals
 
-	const GIT_DIRECTORY = join(__dirname, "..", "lib", "cjs", "cmd", "git");
+    const GIT_DIRECTORY = join(__dirname, "..", "lib", "cjs", "cmd", "git");
 
-		const install = require(join(GIT_DIRECTORY, "gitInstall.js"));
-		const update = require(join(GIT_DIRECTORY, "gitUpdate.js"));
+        const install = require(join(GIT_DIRECTORY, "gitInstall.js"));
+        const update = require(join(GIT_DIRECTORY, "gitUpdate.js"));
 
 // const
 
-	const MAX_TIMOUT = 30 * 1000;
+    const MAX_TIMOUT = 30 * 1000;
 
-	const GITHUB_USER = "Psychopoulet";
-	const GITHUB_PACKAGE = "node-containerpattern";
+    const GITHUB_USER = "Psychopoulet";
+    const GITHUB_PACKAGE = "node-containerpattern";
 
-	const PLUGINS_DIRECTORY = join(homedir(), "node-pluginsmanager");
-		const DOWNLOADED_PLUGIN_DIRECTORY = join(PLUGINS_DIRECTORY, "node-containerpattern");
+    const PLUGINS_DIRECTORY = join(homedir(), "node-pluginsmanager");
+        const DOWNLOADED_PLUGIN_DIRECTORY = join(PLUGINS_DIRECTORY, "node-containerpattern");
 
 // tests
 
 describe("cmd / git", () => {
 
-	before(() => {
+    before(() => {
 
-		return mkdir(PLUGINS_DIRECTORY, {
-			"recursive": true
-		});
+        return mkdir(PLUGINS_DIRECTORY, {
+            "recursive": true
+        });
 
-	});
+    });
 
-	after(() => {
+    after(() => {
 
-		return rm(PLUGINS_DIRECTORY, {
-			"recursive": true
-		});
+        return rm(PLUGINS_DIRECTORY, {
+            "recursive": true
+        });
 
-	});
+    });
 
-	describe("install", () => {
+    describe("install", () => {
 
-		describe("missing data", () => {
+        describe("missing data", () => {
 
-			it("should test with missing directory", (done) => {
+            it("should test with missing directory", (done) => {
 
-				install.default().then(() => {
-					done(new Error("tests does not generate error"));
-				}).catch((err) => {
+                install.default().then(() => {
+                    done(new Error("tests does not generate error"));
+                }).catch((err) => {
 
-					strictEqual(typeof err, "object", "generated error is not as expected");
-					strictEqual(err instanceof ReferenceError, true, "generated error is not as expected");
+                    strictEqual(typeof err, "object", "generated error is not as expected");
+                    strictEqual(err instanceof ReferenceError, true, "generated error is not as expected");
 
-					done();
+                    done();
 
-				});
+                });
 
-			});
+            });
 
-			it("should test with missing user", (done) => {
+            it("should test with missing user", (done) => {
 
-				install.default(DOWNLOADED_PLUGIN_DIRECTORY).then(() => {
-					done(new Error("tests does not generate error"));
-				}).catch((err) => {
+                install.default(DOWNLOADED_PLUGIN_DIRECTORY).then(() => {
+                    done(new Error("tests does not generate error"));
+                }).catch((err) => {
 
-					strictEqual(typeof err, "object", "generated error is not as expected");
-					strictEqual(err instanceof ReferenceError, true, "generated error is not as expected");
+                    strictEqual(typeof err, "object", "generated error is not as expected");
+                    strictEqual(err instanceof ReferenceError, true, "generated error is not as expected");
 
-					done();
+                    done();
 
-				});
+                });
 
-			});
+            });
 
-			it("should test with missing repo", (done) => {
+            it("should test with missing repo", (done) => {
 
-				install.default(DOWNLOADED_PLUGIN_DIRECTORY, GITHUB_USER).then(() => {
-					done(new Error("tests does not generate error"));
-				}).catch((err) => {
+                install.default(DOWNLOADED_PLUGIN_DIRECTORY, GITHUB_USER).then(() => {
+                    done(new Error("tests does not generate error"));
+                }).catch((err) => {
 
-					strictEqual(typeof err, "object", "generated error is not as expected");
-					strictEqual(err instanceof ReferenceError, true, "generated error is not as expected");
+                    strictEqual(typeof err, "object", "generated error is not as expected");
+                    strictEqual(err instanceof ReferenceError, true, "generated error is not as expected");
 
-					done();
+                    done();
 
-				});
+                });
 
-			});
+            });
 
-		});
+        });
 
-		describe("wrong data", () => {
+        describe("wrong data", () => {
 
-			it("should test with wrong directory", (done) => {
+            it("should test with wrong directory", (done) => {
 
-				install.default(false).then(() => {
-					done(new Error("tests does not generate error"));
-				}).catch((err) => {
+                install.default(false).then(() => {
+                    done(new Error("tests does not generate error"));
+                }).catch((err) => {
 
-					strictEqual(typeof err, "object", "generated error is not as expected");
-					strictEqual(err instanceof TypeError, true, "generated error is not as expected");
+                    strictEqual(typeof err, "object", "generated error is not as expected");
+                    strictEqual(err instanceof TypeError, true, "generated error is not as expected");
 
-					done();
+                    done();
 
-				});
+                });
 
-			});
+            });
 
-			it("should test with wrong user", (done) => {
+            it("should test with wrong user", (done) => {
 
-				install.default(DOWNLOADED_PLUGIN_DIRECTORY, false).then(() => {
-					done(new Error("tests does not generate error"));
-				}).catch((err) => {
+                install.default(DOWNLOADED_PLUGIN_DIRECTORY, false).then(() => {
+                    done(new Error("tests does not generate error"));
+                }).catch((err) => {
 
-					strictEqual(typeof err, "object", "generated error is not as expected");
-					strictEqual(err instanceof TypeError, true, "generated error is not as expected");
+                    strictEqual(typeof err, "object", "generated error is not as expected");
+                    strictEqual(err instanceof TypeError, true, "generated error is not as expected");
 
-					done();
+                    done();
 
-				});
+                });
 
-			});
+            });
 
-			it("should test with wrong repo", (done) => {
+            it("should test with wrong repo", (done) => {
 
-				install.default(DOWNLOADED_PLUGIN_DIRECTORY, GITHUB_USER, false).then(() => {
-					done(new Error("tests does not generate error"));
-				}).catch((err) => {
+                install.default(DOWNLOADED_PLUGIN_DIRECTORY, GITHUB_USER, false).then(() => {
+                    done(new Error("tests does not generate error"));
+                }).catch((err) => {
 
-					strictEqual(typeof err, "object", "generated error is not as expected");
-					strictEqual(err instanceof TypeError, true, "generated error is not as expected");
+                    strictEqual(typeof err, "object", "generated error is not as expected");
+                    strictEqual(err instanceof TypeError, true, "generated error is not as expected");
 
-					done();
+                    done();
 
-				});
+                });
 
-			});
+            });
 
-		});
+        });
 
-		describe("empty data", () => {
+        describe("empty data", () => {
 
-			it("should test with empty data", (done) => {
+            it("should test with empty data", (done) => {
 
-				install.default("").then(() => {
-					done(new Error("tests does not generate error"));
-				}).catch((err) => {
+                install.default("").then(() => {
+                    done(new Error("tests does not generate error"));
+                }).catch((err) => {
 
-					strictEqual(typeof err, "object", "generated error is not as expected");
-					strictEqual(err instanceof Error, true, "generated error is not as expected");
+                    strictEqual(typeof err, "object", "generated error is not as expected");
+                    strictEqual(err instanceof Error, true, "generated error is not as expected");
 
-					done();
+                    done();
 
-				});
+                });
 
-			});
+            });
 
-			it("should test with empty user", (done) => {
+            it("should test with empty user", (done) => {
 
-				install.default(DOWNLOADED_PLUGIN_DIRECTORY, "").then(() => {
-					done(new Error("tests does not generate error"));
-				}).catch((err) => {
+                install.default(DOWNLOADED_PLUGIN_DIRECTORY, "").then(() => {
+                    done(new Error("tests does not generate error"));
+                }).catch((err) => {
 
-					strictEqual(typeof err, "object", "generated error is not as expected");
-					strictEqual(err instanceof Error, true, "generated error is not as expected");
+                    strictEqual(typeof err, "object", "generated error is not as expected");
+                    strictEqual(err instanceof Error, true, "generated error is not as expected");
 
-					done();
+                    done();
 
-				});
+                });
 
-			});
+            });
 
-			it("should test with empty repo", (done) => {
+            it("should test with empty repo", (done) => {
 
-				install.default(DOWNLOADED_PLUGIN_DIRECTORY, GITHUB_USER, "").then(() => {
-					done(new Error("tests does not generate error"));
-				}).catch((err) => {
+                install.default(DOWNLOADED_PLUGIN_DIRECTORY, GITHUB_USER, "").then(() => {
+                    done(new Error("tests does not generate error"));
+                }).catch((err) => {
 
-					strictEqual(typeof err, "object", "generated error is not as expected");
-					strictEqual(err instanceof Error, true, "generated error is not as expected");
+                    strictEqual(typeof err, "object", "generated error is not as expected");
+                    strictEqual(err instanceof Error, true, "generated error is not as expected");
 
-					done();
+                    done();
 
-				});
+                });
 
-			});
+            });
 
-		});
+        });
 
-		describe("valid", () => {
+        describe("valid", () => {
 
-			it("should test with valid data", () => {
-				return install.default(DOWNLOADED_PLUGIN_DIRECTORY, GITHUB_USER, GITHUB_PACKAGE);
-			}).timeout(MAX_TIMOUT);
+            it("should test with valid data", () => {
+                return install.default(DOWNLOADED_PLUGIN_DIRECTORY, GITHUB_USER, GITHUB_PACKAGE);
+            }).timeout(MAX_TIMOUT);
 
-			it("should test with already existing directory", (done) => {
+            it("should test with already existing directory", (done) => {
 
-				install.default(DOWNLOADED_PLUGIN_DIRECTORY, GITHUB_USER, GITHUB_PACKAGE).then(() => {
-					done(new Error("tests does not generate error"));
-				}).catch((err) => {
+                install.default(DOWNLOADED_PLUGIN_DIRECTORY, GITHUB_USER, GITHUB_PACKAGE).then(() => {
+                    done(new Error("tests does not generate error"));
+                }).catch((err) => {
 
-					strictEqual(typeof err, "object", "generated error is not as expected");
-					strictEqual(err instanceof Error, true, "generated error is not as expected");
+                    strictEqual(typeof err, "object", "generated error is not as expected");
+                    strictEqual(err instanceof Error, true, "generated error is not as expected");
 
-					done();
+                    done();
 
-				});
+                });
 
-			});
+            });
 
-		});
+        });
 
-	});
+    });
 
-	describe("update", () => {
+    describe("update", () => {
 
-		it("should test with missing data", (done) => {
+        it("should test with missing data", (done) => {
 
-			update.default().then(() => {
-				done(new Error("tests does not generate error"));
-			}).catch((err) => {
+            update.default().then(() => {
+                done(new Error("tests does not generate error"));
+            }).catch((err) => {
 
-				strictEqual(typeof err, "object", "generated error is not as expected");
-				strictEqual(err instanceof ReferenceError, true, "generated error is not as expected");
+                strictEqual(typeof err, "object", "generated error is not as expected");
+                strictEqual(err instanceof ReferenceError, true, "generated error is not as expected");
 
-				done();
+                done();
 
-			});
+            });
 
-		});
+        });
 
-		it("should test with wrong data", (done) => {
+        it("should test with wrong data", (done) => {
 
-			update.default(false).then(() => {
-				done(new Error("tests does not generate error"));
-			}).catch((err) => {
+            update.default(false).then(() => {
+                done(new Error("tests does not generate error"));
+            }).catch((err) => {
 
-				strictEqual(typeof err, "object", "generated error is not as expected");
-				strictEqual(err instanceof TypeError, true, "generated error is not as expected");
+                strictEqual(typeof err, "object", "generated error is not as expected");
+                strictEqual(err instanceof TypeError, true, "generated error is not as expected");
 
-				done();
+                done();
 
-			});
+            });
 
-		});
+        });
 
-		it("should test with empty data", (done) => {
+        it("should test with empty data", (done) => {
 
-			update.default("").then(() => {
-				done(new Error("tests does not generate error"));
-			}).catch((err) => {
+            update.default("").then(() => {
+                done(new Error("tests does not generate error"));
+            }).catch((err) => {
 
-				strictEqual(typeof err, "object", "generated error is not as expected");
-				strictEqual(err instanceof Error, true, "generated error is not as expected");
+                strictEqual(typeof err, "object", "generated error is not as expected");
+                strictEqual(err instanceof Error, true, "generated error is not as expected");
 
-				done();
+                done();
 
-			});
+            });
 
-		});
+        });
 
-		it("should test with not existing directory", (done) => {
+        it("should test with not existing directory", (done) => {
 
-			update.default(DOWNLOADED_PLUGIN_DIRECTORY + "test", GITHUB_USER, GITHUB_PACKAGE).then(() => {
-				done(new Error("tests does not generate error"));
-			}).catch((err) => {
+            update.default(DOWNLOADED_PLUGIN_DIRECTORY + "test", GITHUB_USER, GITHUB_PACKAGE).then(() => {
+                done(new Error("tests does not generate error"));
+            }).catch((err) => {
 
-				strictEqual(typeof err, "object", "generated error is not as expected");
-				strictEqual(err instanceof Error, true, "generated error is not as expected");
+                strictEqual(typeof err, "object", "generated error is not as expected");
+                strictEqual(err instanceof Error, true, "generated error is not as expected");
 
-				done();
+                done();
 
-			});
+            });
 
-		});
+        });
 
-		it("should test with valid data", () => {
-			return update.default(DOWNLOADED_PLUGIN_DIRECTORY);
-		}).timeout(MAX_TIMOUT);
+        it("should test with valid data", () => {
+            return update.default(DOWNLOADED_PLUGIN_DIRECTORY);
+        }).timeout(MAX_TIMOUT);
 
-	});
+    });
 
 });

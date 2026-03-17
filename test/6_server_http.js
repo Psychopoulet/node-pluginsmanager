@@ -1,127 +1,125 @@
-"use strict";
-
 // deps
 
-	// natives
-	const { join } = require("node:path");
-	const { createServer } = require("node:http");
+    // natives
+    const { join } = require("node:path");
+    const { createServer } = require("node:http");
 
-	// externals
-	const WebSocketServer = require("ws").Server;
+    // externals
+    const WebSocketServer = require("ws").Server;
 
-	// locals
-	const PluginsManager = require(join(__dirname, "..", "lib", "cjs", "main.cjs"));
-	const httpRequestTest = require(join(__dirname, "utils", "httpRequestTest.js"));
-	const socketRequestTest = require(join(__dirname, "utils", "socketRequestTest.js"));
+    // locals
+    const PluginsManager = require(join(__dirname, "..", "lib", "cjs", "main.cjs"));
+    const httpRequestTest = require(join(__dirname, "utils", "httpRequestTest.js"));
+    const socketRequestTest = require(join(__dirname, "utils", "socketRequestTest.js"));
 
 // consts
 
-	const PORT = "3000";
-	const PORT_SOCKETS = "3001";
+    const PORT = "3000";
+    const PORT_SOCKETS = "3001";
 
 // tests
 
 describe("Server test", () => {
 
-	const pluginsManager = new PluginsManager({
-		"directory": join(__dirname, "plugins")
-	});
+    const pluginsManager = new PluginsManager({
+        "directory": join(__dirname, "plugins")
+    });
 
-	let runningServer = null;
-	let runningSocketServer = null;
+    let runningServer = null;
+    let runningSocketServer = null;
 
-	before(() => {
+    before(() => {
 
-		return pluginsManager.setOrder([ "test-good-plugin-without-dependencies" ]).then(() => {
-			return pluginsManager.loadAll();
-		}).then(() => {
-			return pluginsManager.initAll();
-		}).then(() => {
+        return pluginsManager.setOrder([ "test-good-plugin-without-dependencies" ]).then(() => {
+            return pluginsManager.loadAll();
+        }).then(() => {
+            return pluginsManager.initAll();
+        }).then(() => {
 
-			return new Promise((resolve) => {
+            return new Promise((resolve) => {
 
-				runningServer = createServer((req, res) => {
+                runningServer = createServer((req, res) => {
 
-					pluginsManager.appMiddleware(req, res, () => {
+                    pluginsManager.appMiddleware(req, res, () => {
 
-						res.writeHead(404, {
-							"Content-Type": "application/json; charset=utf-8"
-						});
+                        res.writeHead(404, {
+                            "Content-Type": "application/json; charset=utf-8"
+                        });
 
-						res.end(JSON.stringify({
-							"code": "404",
-							"message": "Unknown page"
-						}));
+                        res.end(JSON.stringify({
+                            "code": "404",
+                            "message": "Unknown page"
+                        }));
 
-					});
+                    });
 
-				}).listen(PORT, resolve);
+                }).listen(PORT, resolve);
 
-			});
+            });
 
-		}).then(() => {
+        }).then(() => {
 
-			runningSocketServer = new WebSocketServer({
-				"port": PORT_SOCKETS
-			});
+            runningSocketServer = new WebSocketServer({
+                "port": PORT_SOCKETS
+            });
 
-			pluginsManager.socketMiddleware(runningSocketServer);
+            pluginsManager.socketMiddleware(runningSocketServer);
 
-		});
+        });
 
-	});
+    });
 
-	after(() => {
+    after(() => {
 
-		return Promise.resolve().then(() => {
+        return Promise.resolve().then(() => {
 
-			return runningServer ? new Promise((resolve) => {
-				runningServer.close(resolve);
-			}).then(() => {
-				runningServer = null;
-			}) : Promise.resolve();
+            return runningServer ? new Promise((resolve) => {
+                runningServer.close(resolve);
+            }).then(() => {
+                runningServer = null;
+            }) : Promise.resolve();
 
-		}).then(() => {
+        }).then(() => {
 
-			return runningSocketServer ? new Promise((resolve) => {
-				runningSocketServer.close(resolve);
-			}).then(() => {
-				runningSocketServer = null;
-			}) : Promise.resolve();
+            return runningSocketServer ? new Promise((resolve) => {
+                runningSocketServer.close(resolve);
+            }).then(() => {
+                runningSocketServer = null;
+            }) : Promise.resolve();
 
-		}).then(() => {
-			return pluginsManager.releaseAll();
-		}).then(() => {
-			return pluginsManager.destroyAll();
-		});
+        }).then(() => {
+            return pluginsManager.releaseAll();
+        }).then(() => {
+            return pluginsManager.destroyAll();
+        });
 
-	});
+    });
 
-	it("should test request with unknown root", () => {
+    it("should test request with unknown root", () => {
 
-		return httpRequestTest("/vkesvrhbselirv", "get", null, 404, "Not Found", {
-			"code": "404",
-			"message": "Unknown page"
-		});
+        return httpRequestTest("/vkesvrhbselirv", "get", null, 404, "Not Found", {
+            "code": "404",
+            "message": "Unknown page"
+        });
 
-	});
+    });
 
-	it("should test request with put root", () => {
+    it("should test request with put root", () => {
 
-		return httpRequestTest("/test-good-plugin/create", "put", null, 201, "Created");
+        return httpRequestTest("/test-good-plugin/create", "put", null, 201, "Created");
 
-	});
+    });
 
-	it("should test normal get root", () => {
+    it("should test normal get root", () => {
 
-		return httpRequestTest("/test-good-plugin-without-dependencies/get", "get", null, 200, "OK", [ "test" ]);
+        return httpRequestTest("/test-good-plugin-without-dependencies/get", "get", null, 200, "OK", [ "test" ]);
 
-	});
+    });
 
-	it("should test socket server", () => {
+    it("should test socket server", () => {
 
-		return socketRequestTest("ping", "pong");
+        return socketRequestTest("ping", "pong");
 
-	});
+    });
 
 });

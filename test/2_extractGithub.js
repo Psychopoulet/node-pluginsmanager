@@ -1,60 +1,58 @@
-"use strict";
-
 // deps
 
-	// natives
-	const { join } = require("node:path");
-	const { strictEqual } = require("node:assert");
+    // natives
+    const { join } = require("node:path");
+    const { strictEqual } = require("node:assert");
 
-	// locals
-	const extractGithub = require(join(__dirname, "..", "lib", "cjs", "extractGithub.js"));
+    // locals
+    const extractGithub = require(join(__dirname, "..", "lib", "cjs", "extractGithub.js"));
 
 // tests
 
 describe("extractGithub", () => {
 
-	it("should test without content", () => {
+    it("should test without content", () => {
 
-		const github = extractGithub.default();
+        const github = extractGithub.default();
 
-		strictEqual(typeof github, "object", "generated github type is not as expected");
-		strictEqual(github, null, "generated github is not as expected");
+        strictEqual(typeof github, "object", "generated github type is not as expected");
+        strictEqual(github, null, "generated github is not as expected");
 
-	});
+    });
 
-	it("should test with github", () => {
+    it("should test with github", () => {
 
-		const github = extractGithub.default({
-			"github": "test"
-		});
+        const github = extractGithub.default({
+            "github": "test"
+        });
 
-		strictEqual(typeof github, "string", "generated github type is not as expected");
-		strictEqual(github, "test", "generated github is not as expected");
+        strictEqual(typeof github, "string", "generated github type is not as expected");
+        strictEqual(github, "test", "generated github is not as expected");
 
-	});
+    });
 
-	it("should test with repository", () => {
+    it("should test with repository", () => {
 
-		const github = extractGithub.default({
-			"repository": "test"
-		});
+        const github = extractGithub.default({
+            "repository": "test"
+        });
 
-		strictEqual(typeof github, "string", "generated github type is not as expected");
-		strictEqual(github, "test", "generated github is not as expected");
+        strictEqual(typeof github, "string", "generated github type is not as expected");
+        strictEqual(github, "test", "generated github is not as expected");
 
-	});
+    });
 
-	it("should test with repository", () => {
+    it("should test with repository", () => {
 
-		const github = extractGithub.default({
-			"repository": {
-				"url": "test"
-			}
-		});
+        const github = extractGithub.default({
+            "repository": {
+                "url": "test"
+            }
+        });
 
-		strictEqual(typeof github, "string", "generated github type is not as expected");
-		strictEqual(github, "test", "generated github is not as expected");
+        strictEqual(typeof github, "string", "generated github type is not as expected");
+        strictEqual(github, "test", "generated github is not as expected");
 
-	});
+    });
 
 });

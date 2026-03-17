@@ -1,31 +1,28 @@
-
-"use strict";
-
 // deps
 
-	// externals
-	const { Mediator } = require("node-pluginsmanager-plugin");
+    // externals
+    const { Mediator } = require("node-pluginsmanager-plugin");
 
 // module
 
 module.exports = class MediatorGoodPlugin extends Mediator {
 
-	_initWorkSpace () {
+    _initWorkSpace () {
 
-		return Promise.resolve();
+        return Promise.resolve();
 
-	}
+    }
 
-	_releaseWorkSpace () {
+    _releaseWorkSpace () {
 
-		return Promise.resolve();
+        return Promise.resolve();
 
-	}
+    }
 
-	create () {
+    create () {
 
-		return Promise.resolve();
+        return Promise.resolve();
 
-	}
+    }
 
 };
