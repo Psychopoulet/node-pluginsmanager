@@ -37,22 +37,22 @@
     import type { IncomingMessage, ServerResponse } from "node:http";
 
     // externals
-    import type { Orchestrator, tLogger, iServerResponse } from "node-pluginsmanager-plugin";
+    import type { Orchestrator, tLogger } from "node-pluginsmanager-plugin";
     import type { Server as WebSocketServer } from "ws";
     import type { Server as SocketIOServer } from "socket.io";
 
     interface iPluginManagerOptions {
         "directory"?: string;
-        "externalRessourcesDirectory"?: string;
+        "externalResourcesDirectory"?: string;
         "logger"?: tLogger | null;
     }
 
-    type tBeforeAllMethodCallback = (...data: any) => Promise<void> | void;
+    type tBeforeAllMethodCallback = (...data: unknown[]) => Promise<void> | void;
 
 // consts
 
     const DEFAULT_PLUGINS_DIRECTORY: string = join(homedir(), "node-pluginsmanager-plugins");
-    const DEFAULT_RESSOURCES_DIRECTORY: string = join(homedir(), "node-pluginsmanager-resources");
+    const DEFAULT_RESOURCES_DIRECTORY: string = join(homedir(), "node-pluginsmanager-resources");
 
 // module
 
@@ -72,14 +72,20 @@ export default class PluginsManager extends EventEmitter {
     // public
 
         public directory: string; // plugins location (must be writable). default : join(homedir(), "node-pluginsmanager-plugins")
-        public externalRessourcesDirectory: string; // external resources locations (sqlite, files, cache, etc...) (must be writable). default : join(homedir(), "node-pluginsmanager-resources")
+        public externalResourcesDirectory: string; // external resources locations (sqlite, files, cache, etc...) (must be writable). default : join(homedir(), "node-pluginsmanager-resources")
         public plugins: Orchestrator[]; // plugins' Orchestrators
 
     // constructor
 
-    public constructor (options: iPluginManagerOptions) {
+    public constructor (options: iPluginManagerOptions = {}) {
 
         super();
+
+        // mandatory props
+
+        if ("object" !== typeof options) {
+            throw new ReferenceError("\"options\" must be a non-null object");
+        }
 
         // protected
 
@@ -88,21 +94,14 @@ export default class PluginsManager extends EventEmitter {
 
             this._orderedPluginsNames = [];
 
-            this._logger = options && "function" === typeof options.logger
-                ? options.logger
-                : null;
+            this._logger = "function" === typeof options.logger ? options.logger : null;
 
         // public
 
             this.plugins = [];
 
-            this.directory = options && "undefined" !== typeof options.directory
-                ? options.directory
-                : DEFAULT_PLUGINS_DIRECTORY;
-
-            this.externalRessourcesDirectory = options && "undefined" !== typeof options.externalRessourcesDirectory
-                ? options.externalRessourcesDirectory
-                : DEFAULT_RESSOURCES_DIRECTORY;
+            this.directory = options.directory ?? DEFAULT_PLUGINS_DIRECTORY;
+            this.externalResourcesDirectory = options.externalResourcesDirectory ?? DEFAULT_RESOURCES_DIRECTORY;
 
     }
 
@@ -110,7 +109,7 @@ export default class PluginsManager extends EventEmitter {
 
         public getPluginsNames (): string[] {
 
-            return [ ...this.plugins ].map((plugin: Orchestrator): string => {
+            return this.plugins.map((plugin: Orchestrator): string => {
                 return plugin.name;
             });
 
@@ -140,11 +139,9 @@ export default class PluginsManager extends EventEmitter {
 
                 return !errors.length ? Promise.resolve() : Promise.reject(new Error(errors.join("\r\n")));
 
-            }).then((): Promise<void> => {
+            }).then((): void => {
 
                 this._orderedPluginsNames = pluginsNames;
-
-                return Promise.resolve();
 
             });
 
@@ -158,17 +155,11 @@ export default class PluginsManager extends EventEmitter {
 
         public checkAllModules (): Promise<void> {
 
-            const _checkPluginsModules: (i?: number) => Promise<void> = (i: number = 0): Promise<void> => {
-
-                return i < this.plugins.length ? this.checkModules(this.plugins[i]).then((): Promise<void> => {
-
-                    return _checkPluginsModules(i + 1);
-
-                }) : Promise.resolve();
-
-            };
-
-            return _checkPluginsModules();
+            return Promise.all(this.plugins.map((plugin: Orchestrator): Promise<void> => {
+                return this.checkModules(plugin);
+            })).then((): Promise<void> => {
+                return Promise.resolve();
+            });
 
         }
 
@@ -184,8 +175,8 @@ export default class PluginsManager extends EventEmitter {
                     "failAtPatch": false,
                     "dev": false
                 }).then((analyze: {
-					"result": boolean;
-				}): Promise<void> => {
+                    "result": boolean;
+                }): Promise<void> => {
 
                     return analyze.result ? Promise.resolve() : Promise.reject(new Error("\"" + plugin.name + "\" plugin has obsoletes modules"));
 
@@ -208,12 +199,12 @@ export default class PluginsManager extends EventEmitter {
             }
             else {
 
-                const _recursiveNext: (i: number) => () => void = (i: number): () => void => {
+                function _recursiveNext (i: number): () => void {
 
                     if (i < plugins.length) {
 
                         return (): void => {
-                            return plugins[i].appMiddleware(req, res as iServerResponse, _recursiveNext(i + 1));
+                            return plugins[i].appMiddleware(req, res, _recursiveNext(i + 1));
                         };
 
                     }
@@ -223,9 +214,9 @@ export default class PluginsManager extends EventEmitter {
                         return next;
                     }
 
-                };
+                }
 
-                return plugins[0].appMiddleware(req, res as iServerResponse, _recursiveNext(1)); // must start at index "1", cause the "0" is executed here
+                return plugins[0].appMiddleware(req, res, _recursiveNext(1)); // must start at index "1", cause the "0" is executed here
 
             }
 
@@ -245,18 +236,16 @@ export default class PluginsManager extends EventEmitter {
         // add a function executed before loading all plugins
         public beforeLoadAll (callback: tBeforeAllMethodCallback): Promise<void> {
 
-            return checkFunction("beforeLoadAll/callback", callback).then((): Promise<void> => {
+            return checkFunction("beforeLoadAll/callback", callback).then((): void => {
 
                 this._beforeLoadAll = callback;
-
-                return Promise.resolve();
 
             });
 
         }
 
         // load all plugins asynchronously, using "data" in arguments for "load" plugin's Orchestrator method
-        public loadAll (...data: any): Promise<void> {
+        public loadAll (...data: unknown[]): Promise<void> {
 
             // create dir if not exist
             return checkNonEmptyString("initAll/directory", this.directory).then((): Promise<void> => {
@@ -270,12 +259,12 @@ export default class PluginsManager extends EventEmitter {
             // create dir if not exist
             }).then((): Promise<void> => {
 
-                return checkNonEmptyString("initAll/externalRessourcesDirectory", this.externalRessourcesDirectory).then((): Promise<void> => {
+                return checkNonEmptyString("initAll/externalResourcesDirectory", this.externalResourcesDirectory).then((): Promise<void> => {
 
-                    return mkdir(this.externalRessourcesDirectory, {
+                    return mkdir(this.externalResourcesDirectory, {
                         "recursive": true
                     }).then((): Promise<void> => {
-                        return checkAbsoluteDirectory("initAll/externalRessourcesDirectory", this.externalRessourcesDirectory);
+                        return checkAbsoluteDirectory("initAll/externalResourcesDirectory", this.externalResourcesDirectory);
                     });
 
                 });
@@ -312,12 +301,12 @@ export default class PluginsManager extends EventEmitter {
             }).then((files: string[]): Promise<void> => {
 
                 return loadSortedPlugins(
-                    this.directory, this.externalRessourcesDirectory, files, this.plugins,
+                    this.directory, this.externalResourcesDirectory, files, this.plugins,
                     this._orderedPluginsNames, this.emit.bind(this), this._logger, ...data
                 );
 
             // sort plugins
-            }).then((): Promise<void> => {
+            }).then((): void => {
 
                 this.plugins.sort((a: Orchestrator, b: Orchestrator): -1 | 0 | 1 => {
 
@@ -333,63 +322,33 @@ export default class PluginsManager extends EventEmitter {
 
                 });
 
-                return Promise.resolve();
-
             // end
-            }).then((): Promise<void> => {
+            }).then((): void => {
 
                 this.emit("allloaded", ...data);
-
-                return Promise.resolve();
 
             });
 
         }
 
         // after releasing, destroy packages data & free "plugins" list, using "data" in arguments for "destroy" plugin's Orchestrator method
-        public destroyAll (...data: any): Promise<void> {
+        public destroyAll (...data: unknown[]): Promise<void> {
 
-            return Promise.resolve().then((): Promise<void> => {
+            return Promise.all(this.plugins.map((plugin: Orchestrator): Promise<void> => {
 
-                const _destroyPlugin: (i?: number) => Promise<void> = (i: number = this.plugins.length - 1): Promise<void> => {
+                return plugin.destroy().then((): void => {
+                    this.emit("destroyed", plugin.name, ...data);
+                });
 
-                    return -1 < i ? Promise.resolve().then((): Promise<void> => {
-
-                        const pluginName: string = this.plugins[i].name;
-
-                        // emit event
-                        return this.plugins[i].destroy().then((): Promise<void> => {
-
-                            this.emit("destroyed", pluginName, ...data);
-
-                            return Promise.resolve();
-
-                        // loop
-                        }).then((): Promise<void> => {
-
-                            return _destroyPlugin(i - 1);
-
-                        });
-
-                    }) : Promise.resolve();
-
-                };
-
-                return _destroyPlugin();
-
-            // end
-            }).then((): Promise<void> => {
+            })).then((): void => {
 
                 this.plugins = [];
-
                 this.emit("alldestroyed", ...data);
-
-                return Promise.resolve();
 
             // remove all external resources
             }).then((): Promise<void> => {
 
-                return rmdirp(this.externalRessourcesDirectory);
+                return rmdirp(this.externalResourcesDirectory);
 
             });
 
@@ -398,21 +357,19 @@ export default class PluginsManager extends EventEmitter {
         // add a function executed before initializing all plugins
         public beforeInitAll (callback: tBeforeAllMethodCallback): Promise<void> {
 
-            return checkFunction("beforeInitAll/callback", callback).then((): Promise<void> => {
+            return checkFunction("beforeInitAll/callback", callback).then((): void => {
 
                 this._beforeInitAll = callback;
-
-                return Promise.resolve();
 
             });
 
         }
 
         // initialize all plugins asynchronously, using "data" in arguments for "init" plugin's Orchestrator method
-        public initAll (...data: any): Promise<void> {
+        public initAll (...data: unknown[]): Promise<void> {
 
             return checkAbsoluteDirectory("initAll/directory", this.directory).then((): Promise<void> => {
-                return checkAbsoluteDirectory("initAll/externalRessourcesDirectory", this.externalRessourcesDirectory);
+                return checkAbsoluteDirectory("initAll/externalResourcesDirectory", this.externalResourcesDirectory);
             }).then((): Promise<void> => {
 
                 // execute _beforeInitAll
@@ -435,58 +392,33 @@ export default class PluginsManager extends EventEmitter {
                 return initSortedPlugins(this.plugins, this._orderedPluginsNames, this.emit.bind(this), ...data);
 
             // end
-            }).then((): Promise<void> => {
+            }).then((): void => {
 
                 this.emit("allinitialized", ...data);
-
-                return Promise.resolve();
 
             });
 
         }
 
         // release a plugin (keep package but destroy Mediator & Server), using "data" in arguments for "release" plugin's Orchestrator method
-        public releaseAll (...data: any): Promise<void> {
+        public releaseAll (...data: unknown[]): Promise<void> {
 
-            return Promise.resolve().then((): Promise<void> => {
+            return Promise.all(this.plugins.map((plugin: Orchestrator): Promise<void> => {
 
-                const _releasePlugin: (i?: number) => Promise<void> = (i: number = this.plugins.length - 1): Promise<void> => {
+                return plugin.release(...data).then((): void => {
+                    this.emit("released", plugin, ...data);
+                });
 
-                    return -1 < i ? Promise.resolve().then((): Promise<void> => {
-
-                        return this.plugins[i].release(data);
-
-                    // emit event
-                    }).then((): Promise<void> => {
-
-                        this.emit("released", this.plugins[i], ...data);
-
-                        return Promise.resolve();
-
-                    // loop
-                    }).then((): Promise<void> => {
-
-                        return _releasePlugin(i - 1);
-
-                    }) : Promise.resolve();
-
-                };
-
-                return _releasePlugin();
-
-            // end
-            }).then((): Promise<void> => {
+            })).then((): void => {
 
                 this.emit("allreleased", ...data);
-
-                return Promise.resolve();
 
             });
 
         }
 
         // install a plugin via github repo, using "data" in arguments for "install" and "init" plugin's Orchestrator methods
-        public installViaGithub (user: string, repo: string, ...data: any): Promise<Orchestrator> {
+        public installViaGithub (user: string, repo: string, ...data: unknown[]): Promise<Orchestrator> {
 
             return checkAbsoluteDirectory("installViaGithub/directory", this.directory).then((): Promise<void> => {
                 return checkNonEmptyString("installViaGithub/user", user);
@@ -508,14 +440,10 @@ export default class PluginsManager extends EventEmitter {
 
             }).then((directory: string): Promise<Orchestrator> => {
 
-                return Promise.resolve().then((): Promise<void> => {
-
-                    return gitInstall(directory, user, repo);
-
-                }).then((): Promise<Orchestrator> => {
+                return gitInstall(directory, user, repo).then((): Promise<Orchestrator> => {
 
                     // install dependencies & execute install script
-                    return createPluginByDirectory(directory, this.externalRessourcesDirectory, this._logger, ...data);
+                    return createPluginByDirectory(directory, this.externalResourcesDirectory, this._logger, ...data);
 
                 // check plugin modules versions
                 }).then((plugin: Orchestrator): Promise<Orchestrator> => {
@@ -558,18 +486,12 @@ export default class PluginsManager extends EventEmitter {
 
                 }).catch((err: Error) => {
 
-                    return new Promise((resolve: Function, reject: (err: Error) => void): void => {
-
-                        checkAbsoluteDirectory("installViaGithub/plugindirectory", directory).then((): Promise<void> => {
-
-                            return rmdirp(directory).then((): void => {
-                                return err ? reject(err) : resolve();
-                            });
-
-                        }).catch((): void => {
-                            return err ? reject(err) : resolve();
-                        });
-
+                    return checkAbsoluteDirectory("installViaGithub/plugindirectory", directory).then((): Promise<void> => {
+                        return rmdirp(directory);
+                    }).then(() => { // if delete succeed, still reject with the original error
+                        return Promise.reject(err);
+                    }).catch(() => { // whatever happened, reject with the original error
+                        return Promise.reject(err);
                     });
 
                 });
@@ -579,7 +501,7 @@ export default class PluginsManager extends EventEmitter {
         }
 
         // update a plugin via its github repo, using "data" in arguments for "release", "update" and "init" plugin's methods
-        public updateViaGithub (plugin: Orchestrator, ...data: any): Promise<Orchestrator> {
+        public updateViaGithub (plugin: Orchestrator, ...data: unknown[]): Promise<Orchestrator> {
 
             let directory: string = "";
             let key: number = -1;
@@ -629,13 +551,11 @@ export default class PluginsManager extends EventEmitter {
 
                     return plugin.destroy();
 
-                }).then((): Promise<void> => {
+                }).then((): void => {
 
                     this.emit("destroyed", pluginName, ...data);
 
                     this.plugins.splice(key, 1);
-
-                    return Promise.resolve();
 
                 });
 
@@ -644,7 +564,7 @@ export default class PluginsManager extends EventEmitter {
 
                 return gitUpdate(directory).then((): Promise<Orchestrator> => {
 
-                    return createPluginByDirectory(directory, this.externalRessourcesDirectory, this._logger, ...data);
+                    return createPluginByDirectory(directory, this.externalResourcesDirectory, this._logger, ...data);
 
                 });
 
@@ -687,7 +607,7 @@ export default class PluginsManager extends EventEmitter {
         }
 
         // uninstall a plugin, using "data" in arguments for "release" and "uninstall" plugin's methods
-        public uninstall(plugin: Orchestrator, ...data: any): Promise<string> {
+        public uninstall (plugin: Orchestrator, ...data: unknown[]): Promise<string> {
 
             let directory: string = "";
             let key: number = -1;
@@ -723,7 +643,7 @@ export default class PluginsManager extends EventEmitter {
 
                 return plugin.release(...data).then((): Promise<void> => {
 
-                    return rmdirp(join(this.externalRessourcesDirectory));
+                    return rmdirp(join(this.externalResourcesDirectory, pluginName));
 
                 }).then((): Promise<void> => {
 
@@ -731,24 +651,18 @@ export default class PluginsManager extends EventEmitter {
 
                     return plugin.destroy(...data);
 
-                }).then((): Promise<void> => {
+                }).then((): void => {
 
                     this.emit("destroyed", pluginName, ...data);
 
                     this.plugins.splice(key, 1);
-
-                    return Promise.resolve();
 
                 });
 
             // update dependencies & execute update script
             }).then((): Promise<void> => {
 
-                return Promise.resolve().then((): Promise<void> => {
-
-                    return plugin.uninstall(...data);
-
-                }).then((): Promise<void> => {
+                return plugin.uninstall(...data).then((): Promise<void> => {
 
                     this.emit("uninstalled", pluginName, ...data);
 
@@ -764,4 +678,4 @@ export default class PluginsManager extends EventEmitter {
 
         }
 
-};
+}

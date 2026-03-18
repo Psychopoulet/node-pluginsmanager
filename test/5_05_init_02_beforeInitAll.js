@@ -1,82 +1,80 @@
-"use strict";
-
 // deps
 
-	// natives
-	const { join } = require("node:path");
-	const { strictEqual } = require("node:assert");
+    // natives
+    const { ok, strictEqual } = require("node:assert");
+    const { join } = require("node:path");
 
-	// locals
-	const PluginsManager = require(join(__dirname, "..", "lib", "cjs", "main.cjs"));
+    // locals
+    const PluginsManager = require(join(__dirname, "..", "lib", "cjs", "main.cjs"));
 
 // tests
 
 describe("pluginsmanager / beforeInitAll", () => {
 
-	const pluginsManager = new PluginsManager({
-		"directory": join(__dirname, "plugins")
-	});
+    const pluginsManager = new PluginsManager({
+        "directory": join(__dirname, "plugins")
+    });
 
-	before(() => {
-		return pluginsManager.loadAll();
-	});
+    before(() => {
+        return pluginsManager.loadAll();
+    });
 
-	after(() => {
+    after(() => {
 
-		return pluginsManager.releaseAll().then(() => {
-			return pluginsManager.destroyAll();
-		});
+        return pluginsManager.releaseAll().then(() => {
+            return pluginsManager.destroyAll();
+        });
 
-	});
+    });
 
-	it("should test empty data", (done) => {
+    it("should test empty data", (done) => {
 
-		pluginsManager.beforeInitAll().then(() => {
-			done(new Error("There is no generated error"));
-		}).catch((err) => {
+        pluginsManager.beforeInitAll().then(() => {
+            done(new Error("There is no generated error"));
+        }).catch((err) => {
 
-			strictEqual(typeof err, "object", "Generated error is not as expected");
-			strictEqual(err instanceof ReferenceError, true, "Generated error is not as expected");
+            strictEqual(typeof err, "object", "Generated error is not as expected");
+            ok(err instanceof ReferenceError, "Generated error is not as expected");
 
-			done();
+            done();
 
-		});
+        });
 
-	});
+    });
 
-	it("should test wrong data", (done) => {
+    it("should test wrong data", (done) => {
 
-		pluginsManager.beforeInitAll(false).then(() => {
-			done(new Error("There is no generated error"));
-		}).catch((err) => {
+        pluginsManager.beforeInitAll(false).then(() => {
+            done(new Error("There is no generated error"));
+        }).catch((err) => {
 
-			strictEqual(typeof err, "object", "Generated error is not as expected");
-			strictEqual(err instanceof TypeError, true, "Generated error is not as expected");
+            strictEqual(typeof err, "object", "Generated error is not as expected");
+            ok(err instanceof TypeError, "Generated error is not as expected");
 
-			done();
+            done();
 
-		});
+        });
 
-	});
+    });
 
-	it("should success on beforeInitAll call", () => {
+    it("should success on beforeInitAll call", () => {
 
-		return pluginsManager.beforeInitAll(() => {
-			// nothing to do here
-		}).then(() => {
-			return pluginsManager.initAll();
-		});
+        return pluginsManager.beforeInitAll(() => {
+            // nothing to do here
+        }).then(() => {
+            return pluginsManager.initAll();
+        });
 
-	});
+    });
 
-	it("should success on beforeInitAll call", () => {
+    it("should success on beforeInitAll call", () => {
 
-		return pluginsManager.beforeInitAll(() => {
-			return Promise.resolve();
-		}).then(() => {
-			return pluginsManager.initAll();
-		});
+        return pluginsManager.beforeInitAll(() => {
+            return Promise.resolve();
+        }).then(() => {
+            return pluginsManager.initAll();
+        });
 
-	});
+    });
 
 });

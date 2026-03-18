@@ -1,1 +1,1 @@
-export default function isNonEmptyArray(dataName: string, data: any): Promise<void>;
+export default function isNonEmptyArray(dataName: string, data: unknown): Promise<void>;

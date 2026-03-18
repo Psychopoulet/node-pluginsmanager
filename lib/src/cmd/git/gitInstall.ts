@@ -17,7 +17,7 @@ export default function gitInstall (directory: string, user: string, repo: strin
         return new Promise((resolve: () => void, reject: (err: Error) => void) => {
 
             checkDirectory("cmd/git/install/directory", directory).then((): void => {
-                reject(new Error("\"" + directory + "\" aldready exists"));
+                reject(new Error("\"" + directory + "\" already exists"));
             }).catch((): void => {
                 resolve();
             });

@@ -1,1 +1,1 @@
-export default function stdToString(msg: any): string;
+export default function stdToString(msg: unknown): string;

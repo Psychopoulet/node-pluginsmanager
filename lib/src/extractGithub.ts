@@ -12,9 +12,9 @@
 
 // module
 
-export default function extractGithub (plugin: OrchestratorExtended): string {
+export default function extractGithub (plugin: OrchestratorExtended): string | null {
 
-    let github: string = "";
+    let github: string | null = null;
 
     if ("object" === typeof plugin) {
 
@@ -30,6 +30,6 @@ export default function extractGithub (plugin: OrchestratorExtended): string {
 
     }
 
-    return github;
+    return github ?? null;
 
 }

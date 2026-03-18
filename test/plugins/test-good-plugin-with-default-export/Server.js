@@ -1,10 +1,7 @@
-
-"use strict";
-
 // deps
 
-	// externals
-	const { Server } = require("node-pluginsmanager-plugin");
+    // externals
+    const { Server } = require("node-pluginsmanager-plugin");
 
 // module
 

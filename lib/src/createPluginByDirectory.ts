@@ -1,3 +1,8 @@
+/*
+    eslint-disable @typescript-eslint/no-var-requires
+*/
+// => @typescript-eslint/no-var-requires is disabled to allow plugin load
+
 // deps
 
     // natives
@@ -25,10 +30,10 @@
 
 // module
 
-export default function createPluginByDirectory (directory: string, externalRessourcesDirectory: string, logger: tLogger | null, ...data: any): Promise<Orchestrator> {
+export default function createPluginByDirectory (directory: string, externalResourcesDirectory: string, logger: tLogger | null, ...data: unknown[]): Promise<Orchestrator> {
 
     return checkAbsoluteDirectory("createPluginByDirectory/directory", directory).then((): Promise<void> => {
-        return checkAbsoluteDirectory("createPluginByDirectory/externalRessourcesDirectory", externalRessourcesDirectory);
+        return checkAbsoluteDirectory("createPluginByDirectory/externalResourcesDirectory", externalResourcesDirectory);
     }).then((): Promise<Orchestrator> => {
 
         return new Promise((resolve: (value: tMultiExportPlugin | tDefaultExportPlugin | typeof Orchestrator) => void, reject: (err: Error) => void): void => {
@@ -37,15 +42,15 @@ export default function createPluginByDirectory (directory: string, externalRess
                 resolve(require(directory) as tMultiExportPlugin | tDefaultExportPlugin | typeof Orchestrator);
             }
             catch (e) {
-                reject(e as Error);
+                reject(e instanceof Error ? e : new Error(String(e)));
             }
 
         }).then((Plugin:tMultiExportPlugin | tDefaultExportPlugin | typeof Orchestrator): Promise<typeof Orchestrator> => {
 
-            if ((Plugin as tMultiExportPlugin).Orchestrator) {
+            if ([ "function", "object" ].includes(typeof (Plugin as tMultiExportPlugin).Orchestrator)) {
                 return Promise.resolve((Plugin as tMultiExportPlugin).Orchestrator);
             }
-            else if ((Plugin as tDefaultExportPlugin).default) {
+            else if ([ "function", "object" ].includes(typeof (Plugin as tDefaultExportPlugin).default)) {
                 return Promise.resolve((Plugin as tDefaultExportPlugin).default);
             }
             else {
@@ -61,7 +66,7 @@ export default function createPluginByDirectory (directory: string, externalRess
                 const plugin: Orchestrator = new Plugin({
 
                     // usefull for inherited Orchestrators
-                    "externalRessourcesDirectory": join(externalRessourcesDirectory, pluginBaseNameDirectory),
+                    "externalResourcesDirectory": join(externalResourcesDirectory, pluginBaseNameDirectory),
                     "logger": logger as tLogger,
 
                     // useless, setted in inherited Orchestrators

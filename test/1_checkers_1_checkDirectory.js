@@ -1,73 +1,71 @@
-"use strict";
-
 // deps
 
-	// natives
-	const { join } = require("node:path");
-	const { strictEqual } = require("node:assert");
+    // natives
+    const { ok, strictEqual } = require("node:assert");
+    const { join } = require("node:path");
 
-	// locals
-	const checkDirectory = require(join(__dirname, "..", "lib", "cjs", "checkers", "checkDirectory.js"));
+    // locals
+    const checkDirectory = require(join(__dirname, "..", "lib", "cjs", "checkers", "checkDirectory.js"));
 
 // tests
 
 describe("checkers / checkDirectory", () => {
 
-	it("should test with empty data", (done) => {
+    it("should test with empty data", (done) => {
 
-		checkDirectory.default("directory").then(() => {
-			done(new Error("There is no generated error"));
-		}).catch((err) => {
+        checkDirectory.default("directory").then(() => {
+            done(new Error("There is no generated error"));
+        }).catch((err) => {
 
-			strictEqual(typeof err, "object", "Generated error is not as expected");
-			strictEqual(err instanceof ReferenceError, true, "Generated error is not as expected");
+            strictEqual(typeof err, "object", "Generated error is not as expected");
+            ok(err instanceof ReferenceError, "Generated error is not as expected");
 
-			done();
+            done();
 
-		});
+        });
 
-	});
+    });
 
-	it("should test with wrong data", (done) => {
+    it("should test with wrong data", (done) => {
 
-		checkDirectory.default("directory", 1234).then(() => {
-			done(new Error("There is no generated error"));
-		}).catch((err) => {
+        checkDirectory.default("directory", 1234).then(() => {
+            done(new Error("There is no generated error"));
+        }).catch((err) => {
 
-			strictEqual(typeof err, "object", "Generated error is not as expected");
-			strictEqual(err instanceof TypeError, true, "Generated error is not as expected");
+            strictEqual(typeof err, "object", "Generated error is not as expected");
+            ok(err instanceof TypeError, "Generated error is not as expected");
 
-			done();
+            done();
 
-		});
+        });
 
-	});
+    });
 
-	it("should test with empty data", (done) => {
+    it("should test with empty data", (done) => {
 
-		checkDirectory.default("directory", "").then(() => {
-			done(new Error("There is no generated error"));
-		}).catch((err) => {
+        checkDirectory.default("directory", "").then(() => {
+            done(new Error("There is no generated error"));
+        }).catch((err) => {
 
-			strictEqual(typeof err, "object", "Generated error is not as expected");
-			strictEqual(err instanceof Error, true, "Generated error is not as expected");
+            strictEqual(typeof err, "object", "Generated error is not as expected");
+            ok(err instanceof Error, "Generated error is not as expected");
 
-			done();
+            done();
 
-		});
+        });
 
-	});
+    });
 
-	it("should test with not relative directory", () => {
+    it("should test with not relative directory", () => {
 
-		return checkDirectory.default("directory", "./");
+        return checkDirectory.default("directory", "./");
 
-	});
+    });
 
-	it("should test with absolute directory", () => {
+    it("should test with absolute directory", () => {
 
-		return checkDirectory.default("directory", __dirname);
+        return checkDirectory.default("directory", __dirname);
 
-	});
+    });
 
 });

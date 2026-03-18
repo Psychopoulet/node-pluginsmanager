@@ -1,299 +1,297 @@
-"use strict";
-
 // deps
 
-	// natives
-	const { join } = require("node:path");
-	const { strictEqual } = require("node:assert");
+    // natives
+    const { ok, strictEqual } = require("node:assert");
+    const { join } = require("node:path");
 
-	// locals
-	const PluginsManager = require(join(__dirname, "..", "lib", "cjs", "main.cjs"));
+    // locals
+    const PluginsManager = require(join(__dirname, "..", "lib", "cjs", "main.cjs"));
 
 // const
 
-	const PLUGINS_DIRECTORY = join(__dirname, "plugins");
-	const EVENTS_DATA = "test";
+    const PLUGINS_DIRECTORY = join(__dirname, "plugins");
+    const EVENTS_DATA = "test";
 
 // tests
 
 describe("pluginsmanager / initAll", () => {
 
-	describe("directories", () => {
+    describe("directories", () => {
 
-		describe("directory", () => {
+        describe("directory", () => {
 
-			it("should test without directory", (done) => {
+            it("should test without directory", (done) => {
 
-				const pluginsManager = new PluginsManager();
+                const pluginsManager = new PluginsManager();
 
-					delete pluginsManager.directory;
+                    delete pluginsManager.directory;
 
-				pluginsManager.initAll().then(() => {
-					done(new Error("Does not generate Error"));
-				}).catch((err) => {
+                pluginsManager.initAll().then(() => {
+                    done(new Error("Does not generate Error"));
+                }).catch((err) => {
 
-					strictEqual(typeof err, "object", "Generated error is not as expected");
-					strictEqual(err instanceof ReferenceError, true, "Generated error is not as expected");
+                    strictEqual(typeof err, "object", "Generated error is not as expected");
+                    ok(err instanceof ReferenceError, "Generated error is not as expected");
 
-					done();
+                    done();
 
-				});
+                });
 
-			});
+            });
 
-			it("should test with wrong directory", (done) => {
+            it("should test with wrong directory", (done) => {
 
-				const pluginsManager = new PluginsManager({
-					"directory": false
-				});
+                const pluginsManager = new PluginsManager({
+                    "directory": false
+                });
 
-				pluginsManager.initAll().then(() => {
-					done(new Error("Does not generate Error"));
-				}).catch((err) => {
+                pluginsManager.initAll().then(() => {
+                    done(new Error("Does not generate Error"));
+                }).catch((err) => {
 
-					strictEqual(typeof err, "object", "Generated error is not as expected");
-					strictEqual(err instanceof TypeError, true, "Generated error is not as expected");
+                    strictEqual(typeof err, "object", "Generated error is not as expected");
+                    ok(err instanceof TypeError, "Generated error is not as expected");
 
-					done();
+                    done();
 
-				});
+                });
 
-			});
+            });
 
-			it("should test with empty directory", (done) => {
+            it("should test with empty directory", (done) => {
 
-				const pluginsManager = new PluginsManager({
-					"directory": ""
-				});
+                const pluginsManager = new PluginsManager({
+                    "directory": ""
+                });
 
-				pluginsManager.initAll().then(() => {
-					done(new Error("Does not generate Error"));
-				}).catch((err) => {
+                pluginsManager.initAll().then(() => {
+                    done(new Error("Does not generate Error"));
+                }).catch((err) => {
 
-					strictEqual(typeof err, "object", "Generated error is not as expected");
-					strictEqual(err instanceof Error, true, "Generated error is not as expected");
+                    strictEqual(typeof err, "object", "Generated error is not as expected");
+                    ok(err instanceof Error, "Generated error is not as expected");
 
-					done();
+                    done();
 
-				});
+                });
 
-			});
+            });
 
-			it("should test with inexistant directory", (done) => {
+            it("should test with inexistant directory", (done) => {
 
-				const pluginsManager = new PluginsManager({
-					"directory": "qsdfgvqzgfvqzergzqerg"
-				});
+                const pluginsManager = new PluginsManager({
+                    "directory": "qsdfgvqzgfvqzergzqerg"
+                });
 
-				pluginsManager.initAll().then(() => {
-					done(new Error("Does not generate Error"));
-				}).catch((err) => {
+                pluginsManager.initAll().then(() => {
+                    done(new Error("Does not generate Error"));
+                }).catch((err) => {
 
-					strictEqual(typeof err, "object", "Generated error is not as expected");
-					strictEqual(err instanceof Error, true, "Generated error is not as expected");
+                    strictEqual(typeof err, "object", "Generated error is not as expected");
+                    ok(err instanceof Error, "Generated error is not as expected");
 
-					done();
+                    done();
 
-				});
+                });
 
-			});
+            });
 
-			it("should test with relative directory", (done) => {
+            it("should test with relative directory", (done) => {
 
-				const pluginsManager = new PluginsManager({
-					"directory": "."
-				});
+                const pluginsManager = new PluginsManager({
+                    "directory": "."
+                });
 
-				pluginsManager.initAll().then(() => {
-					done(new Error("Does not generate Error"));
-				}).catch((err) => {
+                pluginsManager.initAll().then(() => {
+                    done(new Error("Does not generate Error"));
+                }).catch((err) => {
 
-					strictEqual(typeof err, "object", "Generated error is not as expected");
-					strictEqual(err instanceof Error, true, "Generated error is not as expected");
+                    strictEqual(typeof err, "object", "Generated error is not as expected");
+                    ok(err instanceof Error, "Generated error is not as expected");
 
-					done();
+                    done();
 
-				});
+                });
 
-			});
+            });
 
-		});
+        });
 
-		describe("externalRessourcesDirectory", () => {
+        describe("externalResourcesDirectory", () => {
 
-			it("should test without externalRessourcesDirectory", (done) => {
+            it("should test without externalResourcesDirectory", (done) => {
 
-				const pluginsManager = new PluginsManager({
-					"directory": PLUGINS_DIRECTORY
-				});
+                const pluginsManager = new PluginsManager({
+                    "directory": PLUGINS_DIRECTORY
+                });
 
-					delete pluginsManager.externalRessourcesDirectory;
+                    delete pluginsManager.externalResourcesDirectory;
 
-				pluginsManager.initAll().then(() => {
-					done(new Error("Does not generate Error"));
-				}).catch((err) => {
+                pluginsManager.initAll().then(() => {
+                    done(new Error("Does not generate Error"));
+                }).catch((err) => {
 
-					strictEqual(typeof err, "object", "Generated error is not as expected");
-					strictEqual(err instanceof ReferenceError, true, "Generated error is not as expected");
+                    strictEqual(typeof err, "object", "Generated error is not as expected");
+                    ok(err instanceof ReferenceError, "Generated error is not as expected");
 
-					done();
+                    done();
 
-				});
+                });
 
-			});
+            });
 
-			it("should test with wrong externalRessourcesDirectory", (done) => {
+            it("should test with wrong externalResourcesDirectory", (done) => {
 
-				const pluginsManager = new PluginsManager({
-					"directory": PLUGINS_DIRECTORY,
-					"externalRessourcesDirectory": false
-				});
+                const pluginsManager = new PluginsManager({
+                    "directory": PLUGINS_DIRECTORY,
+                    "externalResourcesDirectory": false
+                });
 
-				pluginsManager.initAll().then(() => {
-					done(new Error("Does not generate Error"));
-				}).catch((err) => {
+                pluginsManager.initAll().then(() => {
+                    done(new Error("Does not generate Error"));
+                }).catch((err) => {
 
-					strictEqual(typeof err, "object", "Generated error is not as expected");
-					strictEqual(err instanceof TypeError, true, "Generated error is not as expected");
+                    strictEqual(typeof err, "object", "Generated error is not as expected");
+                    ok(err instanceof TypeError, "Generated error is not as expected");
 
-					done();
+                    done();
 
-				});
+                });
 
-			});
+            });
 
-			it("should test with empty externalRessourcesDirectory", (done) => {
+            it("should test with empty externalResourcesDirectory", (done) => {
 
-				const pluginsManager = new PluginsManager({
-					"directory": PLUGINS_DIRECTORY,
-					"externalRessourcesDirectory": ""
-				});
+                const pluginsManager = new PluginsManager({
+                    "directory": PLUGINS_DIRECTORY,
+                    "externalResourcesDirectory": ""
+                });
 
-				pluginsManager.initAll().then(() => {
-					done(new Error("Does not generate Error"));
-				}).catch((err) => {
+                pluginsManager.initAll().then(() => {
+                    done(new Error("Does not generate Error"));
+                }).catch((err) => {
 
-					strictEqual(typeof err, "object", "Generated error is not as expected");
-					strictEqual(err instanceof Error, true, "Generated error is not as expected");
+                    strictEqual(typeof err, "object", "Generated error is not as expected");
+                    ok(err instanceof Error, "Generated error is not as expected");
 
-					done();
+                    done();
 
-				});
+                });
 
-			});
+            });
 
-			it("should test with relative externalRessourcesDirectory", (done) => {
+            it("should test with relative externalResourcesDirectory", (done) => {
 
-				const pluginsManager = new PluginsManager({
-					"directory": PLUGINS_DIRECTORY,
-					"externalRessourcesDirectory": "."
-				});
+                const pluginsManager = new PluginsManager({
+                    "directory": PLUGINS_DIRECTORY,
+                    "externalResourcesDirectory": "."
+                });
 
-				pluginsManager.initAll().then(() => {
-					done(new Error("Does not generate Error"));
-				}).catch((err) => {
+                pluginsManager.initAll().then(() => {
+                    done(new Error("Does not generate Error"));
+                }).catch((err) => {
 
-					strictEqual(typeof err, "object", "Generated error is not as expected");
-					strictEqual(err instanceof Error, true, "Generated error is not as expected");
+                    strictEqual(typeof err, "object", "Generated error is not as expected");
+                    ok(err instanceof Error, "Generated error is not as expected");
 
-					done();
+                    done();
 
-				});
+                });
 
-			});
+            });
 
-		});
+        });
 
-	});
+    });
 
-	describe("execute", () => {
+    describe("execute", () => {
 
-		const pluginsManager = new PluginsManager({
-			"directory": PLUGINS_DIRECTORY
-		});
+        const pluginsManager = new PluginsManager({
+            "directory": PLUGINS_DIRECTORY
+        });
 
-		before(() => {
-			return pluginsManager.loadAll();
-		});
+        before(() => {
+            return pluginsManager.loadAll();
+        });
 
-		beforeEach(() => {
-			pluginsManager.directory = PLUGINS_DIRECTORY;
-		});
+        beforeEach(() => {
+            pluginsManager.directory = PLUGINS_DIRECTORY;
+        });
 
-		afterEach(() => {
-			return pluginsManager.releaseAll();
-		});
+        afterEach(() => {
+            return pluginsManager.releaseAll();
+        });
 
-		after(() => {
-			return pluginsManager.destroyAll();
-		});
+        after(() => {
+            return pluginsManager.destroyAll();
+        });
 
-		it("should init all", () => {
+        it("should init all", () => {
 
-			pluginsManager.plugins.forEach((plugin, key) => {
-				strictEqual(plugin.enabled, true, "plugin \"" + key + "\" is not valid");
-				strictEqual(plugin.initialized, false, "plugin \"" + key + "\" is not valid");
-			});
+            pluginsManager.plugins.forEach((plugin, key) => {
+                ok(plugin.enabled, "plugin \"" + key + "\" is not valid");
+                strictEqual(plugin.initialized, false, "plugin \"" + key + "\" is not valid");
+            });
 
-			return pluginsManager.initAll("test").then(() => {
+            return pluginsManager.initAll("test").then(() => {
 
-				strictEqual(typeof pluginsManager.plugins, "object", "plugins is not an object");
-				strictEqual(pluginsManager.plugins instanceof Array, true, "plugins is not an Array");
-				strictEqual(pluginsManager.plugins.length, 3, "plugins length is not valid");
+                strictEqual(typeof pluginsManager.plugins, "object", "plugins is not an object");
+                ok(pluginsManager.plugins instanceof Array, "plugins is not an Array");
+                strictEqual(pluginsManager.plugins.length, 3, "plugins length is not valid");
 
-				pluginsManager.plugins.forEach((plugin, key) => {
-					strictEqual(plugin.enabled, true, "plugin \"" + key + "\" is not valid");
-					strictEqual(plugin.initialized, true, "plugin \"" + key + "\" is not valid");
-				});
+                pluginsManager.plugins.forEach((plugin, key) => {
+                    ok(plugin.enabled, "plugin \"" + key + "\" is not valid");
+                    ok(plugin.initialized, "plugin \"" + key + "\" is not valid");
+                });
 
-			});
+            });
 
-		});
+        });
 
-		it("should test events", () => {
+        it("should test events", () => {
 
-			return new Promise((resolve, reject) => {
+            return new Promise((resolve, reject) => {
 
-				pluginsManager.on("initializing", (plugin, data) => {
+                pluginsManager.on("initializing", (plugin, data) => {
 
-					strictEqual(typeof plugin, "object", "Events plugin is not an object");
+                    strictEqual(typeof plugin, "object", "Events plugin is not an object");
 
-					strictEqual(typeof data, "string", "Events data is not a string");
-					strictEqual(data, EVENTS_DATA, "Events data is not as expected");
+                    strictEqual(typeof data, "string", "Events data is not a string");
+                    strictEqual(data, EVENTS_DATA, "Events data is not as expected");
 
-					(0, console).log("--- [PluginsManager/events/initializing] " + plugin.name + " - " + data);
+                    (0, console).log("--- [PluginsManager/events/initializing] " + plugin.name + " - " + data);
 
-				}).on("initialized", (plugin, data) => {
+                }).on("initialized", (plugin, data) => {
 
-					strictEqual(typeof plugin, "object", "Events plugin is not an object");
+                    strictEqual(typeof plugin, "object", "Events plugin is not an object");
 
-					strictEqual(typeof data, "string", "Events data is not a string");
-					strictEqual(data, EVENTS_DATA, "Events data is not as expected");
+                    strictEqual(typeof data, "string", "Events data is not a string");
+                    strictEqual(data, EVENTS_DATA, "Events data is not as expected");
 
-					(0, console).log("--- [PluginsManager/events/initialized] " + plugin.name + " - " + data);
+                    (0, console).log("--- [PluginsManager/events/initialized] " + plugin.name + " - " + data);
 
-				}).on("allinitialized", (data) => {
+                }).on("allinitialized", (data) => {
 
-					try {
+                    try {
 
-						strictEqual(typeof data, "string", "Events data is not a string");
-						strictEqual(data, EVENTS_DATA, "Events data is not as expected");
+                        strictEqual(typeof data, "string", "Events data is not a string");
+                        strictEqual(data, EVENTS_DATA, "Events data is not as expected");
 
-						resolve();
+                        resolve();
 
-					}
-					catch (e) {
-						reject(e);
-					}
+                    }
+                    catch (e) {
+                        reject(e);
+                    }
 
-				});
+                });
 
-				pluginsManager.initAll(EVENTS_DATA).catch(reject);
+                pluginsManager.initAll(EVENTS_DATA).catch(reject);
 
-			});
+            });
 
-		});
+        });
 
-	});
+    });
 
 });

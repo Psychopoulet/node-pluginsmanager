@@ -21,7 +21,7 @@
 
 	const manager: PluginManager = new PluginManager({
 		"directory": EXTERNAL_DIRECTORY_PLUGINS,
-		"externalRessourcesDirectory": EXTERNAL_DIRECTORY_RESSOURCES
+		"externalResourcesDirectory": EXTERNAL_DIRECTORY_RESSOURCES
 	});
 
 // module

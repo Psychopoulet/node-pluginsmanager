@@ -1,6 +1,6 @@
 // module
 
-export default function isFunction (dataName: string, data: any): Promise<void> {
+export default function isFunction (dataName: string, data: unknown): Promise<void> {
 
     if ("undefined" === typeof data) {
         return Promise.reject(new ReferenceError("\"" + dataName + "\" parameter is missing"));
