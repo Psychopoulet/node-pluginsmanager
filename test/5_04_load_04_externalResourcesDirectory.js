@@ -2,7 +2,7 @@
 
     // natives
     const { ok, strictEqual } = require("node:assert");
-    const { mkdir } = require("node:fs/promises");
+    const { mkdir, rmdir } = require("node:fs/promises");
     const { join } = require("node:path");
 
     // locals
@@ -49,6 +49,12 @@ describe("pluginsmanager / externalResourcesDirectory", () => {
         }).then(() => {
 
             return pluginsManager.destroyAll();
+
+        }).then(() => {
+
+            return rmdir(directoryTested, {
+                "recursive": true
+            });
 
         }).then(() => {
 

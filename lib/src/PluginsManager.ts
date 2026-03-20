@@ -345,11 +345,6 @@ export default class PluginsManager extends EventEmitter {
                 this.plugins = [];
                 this.emit("alldestroyed", ...data);
 
-            // remove all external resources
-            }).then((): Promise<void> => {
-
-                return rmdirp(this.externalResourcesDirectory);
-
             });
 
         }
