@@ -1,8 +1,7 @@
 // deps
 
     // natives
-    const { ok, strictEqual } = require("node:assert");
-    const { mkdir, rmdir } = require("node:fs/promises");
+    const { strictEqual } = require("node:assert");
     const { join } = require("node:path");
 
     // locals
@@ -19,8 +18,6 @@ describe("pluginsmanager / externalResourcesDirectory", () => {
 
     it("should load all", () => {
 
-        let directoryTested = "";
-
         return pluginsManager.loadAll().then(() => {
 
             return checkAbsoluteDirectory.default("externalResourcesDirectory", pluginsManager.externalResourcesDirectory);
@@ -36,40 +33,18 @@ describe("pluginsmanager / externalResourcesDirectory", () => {
 
             });
 
-            directoryTested = pluginsManager.plugins[0]._externalResourcesDirectory;
-
-        }).then(() => {
-
-            return mkdir(directoryTested);
-
-        }).then(() => {
-
-            return checkAbsoluteDirectory.default("directoryTested", directoryTested);
-
         }).then(() => {
 
             return pluginsManager.destroyAll();
 
         }).then(() => {
 
-            return rmdir(directoryTested, {
-                "recursive": true
-            });
+            pluginsManager.plugins.forEach((plugin) => {
 
-        }).then(() => {
-
-            return new Promise((resolve, reject) => {
-
-                checkAbsoluteDirectory.default("directoryTested", directoryTested).then(() => {
-                    reject(new Error("There is no generated error"));
-                }).catch((err) => {
-
-                    strictEqual(typeof err, "object", "Generated error is not as expected");
-                    ok(err instanceof Error, "Generated error is not as expected");
-
-                    resolve();
-
-                });
+                strictEqual(
+                    plugin._externalResourcesDirectory, "",
+                    "plugin's externalResourcesDirectory is not valid"
+                );
 
             });
 
