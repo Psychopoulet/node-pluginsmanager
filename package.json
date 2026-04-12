@@ -32,7 +32,7 @@
     "build": "npm run build-back",
 
     "check-requires": "npx used-deps-analyzer ./package.json ./lib/src --no-dev",
-    "check-updates": "npx check-version-modules",
+    "check-updates": "npx check-version-modules --no-fail-at-major --fail-at-minor --fail-at-patch",
     "unit-tests": "npx mocha",
     "unit-tests-local": "npx nyc --reporter=html --reporter=text mocha",
 
