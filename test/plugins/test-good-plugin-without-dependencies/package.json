@@ -7,6 +7,9 @@
     "Sébastien VIDAL",
     "test"
   ],
+  "engines": {
+    "node": ">=22.22.3"
+  },
   "dependencies": { },
   "license": "ISC"
 }

@@ -8,6 +8,7 @@
 
     // externals
     import versionModulesChecker from "check-version-modules";
+    import nodeEngineChecker from "check-node-engine";
 
     // locals
     import rmdirp from "./utils/rmdirp";
@@ -169,11 +170,21 @@ export default class PluginsManager extends EventEmitter {
                 return checkOrchestrator("checkModules/plugin", plugin);
             }).then((): Promise<void> => {
 
-                return versionModulesChecker(join(this.directory, plugin.name, "package.json"), {
-                    "failAtMajor": true,
-                    "failAtMinor": true,
-                    "failAtPatch": false,
-                    "dev": false
+                const packageFile: string = join(this.directory, plugin.name, "package.json");
+
+                // start with node engine checker to compare minimal node version used
+                return nodeEngineChecker(packageFile).then((): Promise<{
+                    "result": boolean;
+                }> => {
+
+                    // then check used packages versions
+                    return versionModulesChecker(packageFile, {
+                        "failAtMajor": false, // can break and be a huge source of dev
+                        "failAtMinor": true, // mandatory, most important updates
+                        "failAtPatch": false, // not critical
+                        "dev": false
+                    });
+
                 }).then((analyze: {
                     "result": boolean;
                 }): Promise<void> => {
