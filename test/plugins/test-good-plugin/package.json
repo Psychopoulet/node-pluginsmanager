@@ -5,8 +5,11 @@
   "main": "main.js",
   "author": "Sébastien VIDAL",
   "core": true,
+  "engines": {
+    "node": ">=22.22.3"
+  },
   "dependencies": {
-    "simpletts": "2.6.0"
+    "simpletts": "2.7.1"
   },
   "license": "ISC"
 }
