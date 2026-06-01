@@ -1,15 +1,8 @@
 // deps
 
-    // natives
-    import { lstat } from "node:fs";
-
     // locals
     import checkNonEmptyString from "./checkNonEmptyString";
-
-// types & interfaces
-
-    // natives
-    import type { Stats } from "node:fs";
+    import isDirectory from "../utils/isDirectory";
 
 // module
 
@@ -17,13 +10,7 @@ export default function checkDirectory (dataName: string, directory: string): Pr
 
     return checkNonEmptyString(dataName, directory).then((): Promise<boolean> => {
 
-        return new Promise((resolve: (exists: boolean) => void): void => {
-
-            lstat(directory, (err: Error | null, stats: Stats): void => {
-                return resolve(Boolean(!err && stats.isDirectory()));
-            });
-
-        });
+        return isDirectory(directory);
 
     }).then((exists: boolean): Promise<void> => {
 

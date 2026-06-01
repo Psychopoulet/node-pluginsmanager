@@ -10,7 +10,7 @@
 
 // module
 
-export default function isDirectory (directory: string): Promise<boolean> {
+export default function isFile (directory: string): Promise<boolean> {
 
     return new Promise((resolve, reject) => {
 
@@ -26,7 +26,7 @@ export default function isDirectory (directory: string): Promise<boolean> {
         else {
 
             lstat(directory, (err: Error | null, stats: Stats): void => {
-                return resolve(Boolean(!err && stats.isDirectory()));
+                return resolve(Boolean(!err && stats.isFile()));
             });
 
         }
