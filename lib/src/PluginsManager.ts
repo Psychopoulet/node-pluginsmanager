@@ -4,7 +4,7 @@
     import EventEmitter from "node:events";
     import { join } from "node:path";
     import { homedir } from "node:os";
-    import { mkdir, readdir } from "node:fs/promises";
+    import { mkdir, readdir, readFile } from "node:fs/promises";
 
     // externals
     import versionModulesChecker from "check-version-modules";
@@ -17,6 +17,8 @@
     import checkNonEmptyArray from "./checkers/checkNonEmptyArray";
     import checkNonEmptyString from "./checkers/checkNonEmptyString";
     import checkOrchestrator from "./checkers/checkOrchestrator";
+    import isDirectory from "./utils/isDirectory";
+    import isFile from "./utils/isFile";
     import createPluginByDirectory from "./createPluginByDirectory";
 
     import loadSortedPlugins from "./loadSortedPlugins";
@@ -446,9 +448,41 @@ export default class PluginsManager extends EventEmitter {
 
             }).then((directory: string): Promise<Orchestrator> => {
 
-                return gitInstall(directory, user, repo).then((): Promise<Orchestrator> => {
+                // download plugin
+                return Promise.resolve().then((): Promise<void> => {
 
-                    // install dependencies & execute install script
+                    return gitInstall(directory, user, repo);
+
+                // check if plugin directory is created
+                }).then((): Promise<void> => {
+
+                    return isDirectory(directory).then((isPluginADirectory: boolean): Promise<void> => {
+                        return !isPluginADirectory ? Promise.reject(new Error("\"" + repo + "\" plugin directory is not created")) : Promise.resolve();
+                    });
+
+                // check if plugin has a valid package.json
+                }).then((): Promise<void> => {
+
+                    return isFile(join(directory, "package.json")).then((isPluginAPackageFile: boolean): Promise<void> => {
+                        return !isPluginAPackageFile ? Promise.reject(new Error("\"" + repo + "\" plugin has no valid package.json")) : Promise.resolve();
+                    });
+
+                // install dependencies if needed
+                }).then((): Promise<void> => {
+
+                    return readFile(join(directory, "package.json"), "utf-8").then((content: string): Record<string, unknown> => {
+                        return JSON.parse(content) as Record<string, unknown>;
+                    }).then(({ dependencies }): Promise<void> => {
+
+                        return "object" !== typeof dependencies || null === dependencies || 0 >= Object.keys(dependencies).length
+                            ? Promise.resolve()
+                            : npmInstall(directory);
+
+                    });
+
+                // create plugin
+                }).then((): Promise<Orchestrator> => {
+
                     return createPluginByDirectory(directory, this.externalResourcesDirectory, this._logger, ...data);
 
                 // check plugin modules versions
@@ -460,25 +494,23 @@ export default class PluginsManager extends EventEmitter {
 
                 }).then((plugin: Orchestrator): Promise<Orchestrator> => {
 
+                    // execute plugin install script
                     return Promise.resolve().then((): Promise<void> => {
 
-                        return !plugin.dependencies ? Promise.resolve() : npmInstall(directory);
+                        return plugin.install(...data).then((): void => {
+                            this.emit("installed", plugin, ...data);
+                        });
 
+                    // execute init plugin script
                     }).then((): Promise<void> => {
 
-                        return plugin.install(...data);
+                        return plugin.init(...data).then((): void => {
+                            this.emit("initialized", plugin, ...data);
+                            this.plugins.push(plugin);
+                        });
 
-                    // execute init script
-                    }).then((): Promise<void> => {
-
-                        this.emit("installed", plugin, ...data);
-
-                        return plugin.init(...data);
-
+                    // return installed plugin
                     }).then((): Promise<Orchestrator> => {
-
-                        this.emit("initialized", plugin, ...data);
-                        this.plugins.push(plugin);
 
                         return Promise.resolve(plugin);
 

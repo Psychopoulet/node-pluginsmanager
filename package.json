@@ -1,7 +1,7 @@
 {
 
   "name": "node-pluginsmanager",
-  "version": "3.3.0",
+  "version": "3.4.0",
   "description": "A plugins manager.",
 
   "type": "commonjs",
@@ -47,7 +47,7 @@
   },
 
   "dependencies": {
-    "check-node-engine": "1.0.0",
+    "check-node-engine": "1.1.0",
     "check-version-modules": "2.5.0"
   },
   "devDependencies": {
@@ -59,13 +59,13 @@
     "express": "5.2.1",
     "husky": "9.1.7",
     "mocha": "11.7.6",
-    "node-pluginsmanager-plugin": "7.2.0",
+    "node-pluginsmanager-plugin": "7.3.0",
     "nyc": "18.0.0",
     "proxyquire": "2.1.3",
     "rimraf": "6.1.3",
     "socket.io": "4.8.3",
     "typescript": "5.9.3",
-    "used-deps-analyzer": "0.3.0",
+    "used-deps-analyzer": "0.4.0",
     "ws": "8.21.0"
   },
 
