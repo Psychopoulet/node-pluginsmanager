@@ -1,8 +1,9 @@
 // deps
 
     // natives
-    const { ok, strictEqual } = require("node:assert");
+    const { ok, strictEqual, rejects } = require("node:assert");
     const { join } = require("node:path");
+    const { cp } = require("node:fs/promises");
 
     // externals
     const proxyquire = require("proxyquire").noCallThru();
@@ -13,25 +14,34 @@
 
 // const
 
-    const MAX_TIMOUT = 30 * 1000;
-
     const PLUGINS_DIRECTORY = join(__dirname, "plugins");
+    const PLUGINS_DIRECTORY_MOCK = join(__dirname, "mock-plugins-repo");
 
     const GITHUB_USER = "Psychopoulet";
     const GITHUB_REPO = "node-pluginsmanager-plugin-test";
+    const GITHUB_REPO_NOT_BUILDED = "test-good-plugin-not-builded";
     const GITHUB_WRONG_REPO = "node-containerpattern";
 
     const EVENTS_DATA = "test";
 
 // mock (avoids real GitHub / git clone)
 
-    function mockGitInstall (directory, user, repo) {
+    function _mockGitInstall (directory, user, repo) {
 
         if (repo === GITHUB_WRONG_REPO) {
             return Promise.reject(new Error("Mock git clone failure"));
         }
-        if (repo === GITHUB_REPO) {
+        else if (repo === GITHUB_REPO) {
             return copyPlugin(PLUGINS_DIRECTORY, "test-good-plugin", GITHUB_REPO, { "name": GITHUB_REPO });
+        }
+        else if (repo === GITHUB_REPO_NOT_BUILDED) {
+
+            return cp(
+                join(PLUGINS_DIRECTORY_MOCK, GITHUB_REPO_NOT_BUILDED),
+                join(PLUGINS_DIRECTORY, GITHUB_REPO_NOT_BUILDED),
+                { "recursive": true }
+            );
+
         }
 
         return Promise.reject(new Error("Unexpected repo in mock: " + repo));
@@ -41,7 +51,7 @@
     const PluginsManager = proxyquire(join(__dirname, "..", "lib", "cjs", "PluginsManager.js"), {
         "./cmd/git/gitInstall": {
             "__esModule": true,
-            "default": mockGitInstall
+            "default": _mockGitInstall
         }
     }).default;
 
@@ -62,10 +72,13 @@ describe("pluginsmanager / install via github", () => {
         return pluginsManager.releaseAll().then(() => {
             return pluginsManager.destroyAll();
         }).then(() => {
-            return rmdirp(join(PLUGINS_DIRECTORY, GITHUB_REPO));
-        }).then(() => {
             return rmdirp(join(PLUGINS_DIRECTORY, GITHUB_WRONG_REPO));
+        }).then(() => {
+            return rmdirp(join(PLUGINS_DIRECTORY, GITHUB_REPO));
         });
+
+        // @TODO : when "build installed plugin" feature will be implemented, add this line back
+        // return rmdirp(join(PLUGINS_DIRECTORY, GITHUB_REPO_NOT_BUILDED));
 
     });
 
@@ -186,7 +199,7 @@ describe("pluginsmanager / install via github", () => {
 
             });
 
-        }).timeout(MAX_TIMOUT);
+        });
 
         it("should test download with valid repo", () => {
 
@@ -195,7 +208,7 @@ describe("pluginsmanager / install via github", () => {
                 strictEqual(typeof data, "string", "Events data is not a string");
                 strictEqual(data, EVENTS_DATA, "Events data is not as expected");
 
-                (0, console).log("--- [PluginsManager/events/installed] " + plugin.name + " - " + data);
+                (0, console).log("--- [PluginsManager/events/installed] '" + plugin.name + "' - " + data);
 
             });
 
@@ -207,7 +220,7 @@ describe("pluginsmanager / install via github", () => {
 
             });
 
-        }).timeout(MAX_TIMOUT);
+        });
 
         it("should test download already existing repo", (done) => {
 
@@ -219,6 +232,20 @@ describe("pluginsmanager / install via github", () => {
                 ok(err instanceof Error, "Generated error is not as expected");
 
                 done();
+
+            });
+
+        });
+
+        // @TODO : when "build installed plugin" feature will be implemented, modify this test
+        it("should test download with valid not builded repo", () => {
+
+            rejects(pluginsManager.installViaGithub(GITHUB_USER, GITHUB_REPO_NOT_BUILDED, EVENTS_DATA), (err) => {
+
+                strictEqual(typeof err, "object", "Generated error is not as expected");
+                ok(err instanceof Error, "Generated error is not as expected");
+
+                return true;
 
             });
 

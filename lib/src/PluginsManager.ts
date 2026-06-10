@@ -460,23 +460,57 @@ export default class PluginsManager extends EventEmitter {
                         return !isPluginADirectory ? Promise.reject(new Error("\"" + repo + "\" plugin directory is not created")) : Promise.resolve();
                     });
 
-                // check if plugin has a valid package.json
+                // work around package.json
                 }).then((): Promise<void> => {
 
-                    return isFile(join(directory, "package.json")).then((isPluginAPackageFile: boolean): Promise<void> => {
-                        return !isPluginAPackageFile ? Promise.reject(new Error("\"" + repo + "\" plugin has no valid package.json")) : Promise.resolve();
-                    });
+                    const packageFile: string = join(directory, "package.json");
 
-                // install dependencies if needed
-                }).then((): Promise<void> => {
+                    // check if plugin has a valid package.json
+                    return isFile(packageFile).then((isPluginAPackageFile: boolean): Promise<void> => {
 
-                    return readFile(join(directory, "package.json"), "utf-8").then((content: string): Record<string, unknown> => {
-                        return JSON.parse(content) as Record<string, unknown>;
-                    }).then(({ dependencies }): Promise<void> => {
+                        return !isPluginAPackageFile
+                            ? Promise.reject(new Error("\"" + repo + "\" plugin has no valid package.json"))
+                            : Promise.resolve();
 
-                        return "object" !== typeof dependencies || null === dependencies || 0 >= Object.keys(dependencies).length
-                            ? Promise.resolve()
-                            : npmInstall(directory);
+                    // read package.json and parse it
+                    }).then((): Promise<Record<string, unknown>> => {
+
+                        return readFile(packageFile, "utf-8").then((content: string): Record<string, unknown> => {
+                            return JSON.parse(content) as Record<string, unknown>;
+                        });
+
+                    }).then((packageData: Record<string, unknown>): Promise<void> => {
+
+                        const entryPoint: string = join(directory, packageData.main as string);
+
+                        // check if the plugin has a valid entry point
+                        return isFile(entryPoint).then((hasPluginEntryPoint: boolean): Promise<void> => {
+
+                            return !hasPluginEntryPoint
+                                ? Promise.reject(new Error("\"" + repo + "\" plugin has no valid entry point"))
+                                : Promise.resolve();
+
+                        // check if the plugin is builded
+                        // @TODO : "build installed plugin" feature to be implemented
+                        }).then(() => {
+
+                            return isFile(entryPoint).then((isEntryPointAFile: boolean): Promise<void> => {
+
+                                if (isEntryPointAFile) {
+                                    return Promise.resolve();
+                                }
+
+                                return Promise.reject(new Error("\"" + repo + "\" plugin entry point is not builded"));
+
+                            });
+
+                        }).then(() => {
+
+                            return "object" !== typeof packageData.dependencies || null === packageData.dependencies || 0 >= Object.keys(packageData.dependencies).length
+                                ? Promise.resolve()
+                                : npmInstall(directory);
+
+                        });
 
                     });
 

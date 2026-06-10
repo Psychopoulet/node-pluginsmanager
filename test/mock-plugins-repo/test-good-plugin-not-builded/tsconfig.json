@@ -1,0 +1,31 @@
+{
+    "compilerOptions": {
+
+        "target": "es2022",
+        "module": "commonjs",
+
+        "outDir": "./",
+
+        "declaration": true,
+        "declarationDir": "./",
+
+        "alwaysStrict": true,
+        "strict": true,
+        "strictFunctionTypes": true,
+        "strictNullChecks": true,
+        "noImplicitAny": true,
+        "noImplicitReturns": true,
+        "noImplicitThis": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": false,
+        "esModuleInterop": true,
+        "forceConsistentCasingInFileNames": true
+
+    },
+    "include": [
+        "./main.cts"
+    ],
+    "exclude": [
+        "node_modules"
+    ]
+}
