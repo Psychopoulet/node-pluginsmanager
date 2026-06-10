@@ -452,15 +452,11 @@ export default class PluginsManager extends EventEmitter {
                 // download plugin
                 return Promise.resolve().then((): Promise<void> => {
 
-                    if (this._logger) {
-                        this._logger("info", "Downloading plugin...", false, repo);
-                    }
+                    this._logger?.("info", "Downloading plugin...", false, repo);
 
                     return gitInstall(directory, user, repo).then((): void => {
 
-                        if (this._logger) {
-                            this._logger("success", "Download success", false, repo);
-                        }
+                        this._logger?.("success", "Download success", false, repo);
 
                     });
 
@@ -530,32 +526,24 @@ export default class PluginsManager extends EventEmitter {
                                 throw new Error("\"" + repo + "\" plugin has no build script registered");
                             }
 
-                            if (this._logger) {
-                                this._logger("info", "Installing dev dependencies...", false, pluginName);
-                            }
+                            this._logger?.("info", "Installing dev dependencies...", false, pluginName);
 
                             // install plugin with dependencies
                             return npmInstall(directory, true).then((): Promise<void> => {
 
-                                if (this._logger) {
-                                    this._logger("success", "Plugin installed successfully", false, pluginName);
-                                    this._logger("info", "Building plugin...", false, pluginName);
-                                }
+                                this._logger?.("success", "Plugin installed successfully", false, pluginName);
+                                this._logger?.("info", "Building plugin...", false, pluginName);
 
                                 return npmBuild(directory);
 
                             // remove dev dependencies
                             }).then((): Promise<void> => {
 
-                                if (this._logger) {
-                                    this._logger("debug", "Removing dev dependencies...", false, pluginName);
-                                }
+                                this._logger?.("debug", "Removing dev dependencies...", false, pluginName);
 
                                 return rmdirp(join(directory, "node_modules")).then((): void => {
 
-                                    if (this._logger) {
-                                        this._logger("success", "Dev dependencies removed successfully", false, pluginName);
-                                    }
+                                    this._logger?.("success", "Dev dependencies removed successfully", false, pluginName);
 
                                 });
 
@@ -567,15 +555,11 @@ export default class PluginsManager extends EventEmitter {
                                 return Promise.resolve();
                             }
 
-                            if (this._logger) {
-                                this._logger("debug", "Installing dependencies...", false, pluginName);
-                            }
+                            this._logger?.("debug", "Installing dependencies...", false, pluginName);
 
                             return npmInstall(directory).then((): void => {
 
-                                if (this._logger) {
-                                    this._logger("success", "Dependencies installed successfully", false, pluginName);
-                                }
+                                this._logger?.("success", "Dependencies installed successfully", false, pluginName);
 
                             });
 
