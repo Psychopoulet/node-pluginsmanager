@@ -456,13 +456,11 @@ export default class PluginsManager extends EventEmitter {
                 // check if plugin directory is created
                 }).then((): Promise<void> => {
 
-                    return isDirectory(directory).then((isPluginADirectory: boolean): Promise<void> => {
+                    return isDirectory(directory).then((isPluginADirectory: boolean): void => {
 
-                        if (isPluginADirectory) {
-                            return Promise.resolve();
+                        if (!isPluginADirectory) {
+                            throw new Error("\"" + repo + "\" plugin directory is not created");
                         }
-
-                        return Promise.reject(new Error("\"" + repo + "\" plugin directory is not created"));
 
                     });
 
@@ -472,13 +470,11 @@ export default class PluginsManager extends EventEmitter {
                     const packageFile: string = join(directory, "package.json");
 
                     // check if plugin has a valid package.json
-                    return isFile(packageFile).then((isPluginAPackageFile: boolean): Promise<void> => {
+                    return isFile(packageFile).then((isPluginAPackageFile: boolean): void => {
 
-                        if (isPluginAPackageFile) {
-                            return Promise.resolve();
+                        if (!isPluginAPackageFile) {
+                            throw new Error("\"" + repo + "\" plugin has no valid package.json");
                         }
-
-                        return Promise.reject(new Error("\"" + repo + "\" plugin has no valid package.json"));
 
                     // read package.json and parse it
                     }).then((): Promise<Record<string, unknown>> => {
@@ -492,25 +488,21 @@ export default class PluginsManager extends EventEmitter {
                         const entryPoint: string = join(directory, packageData.main as string);
 
                         // check if the plugin has a valid entry point
-                        return isFile(entryPoint).then((hasPluginEntryPoint: boolean): Promise<void> => {
+                        return isFile(entryPoint).then((hasPluginEntryPoint: boolean): void => {
 
-                            if (hasPluginEntryPoint) {
-                                return Promise.resolve();
+                            if (!hasPluginEntryPoint) {
+                                throw new Error("\"" + repo + "\" plugin has no valid entry point");
                             }
-
-                            return Promise.reject(new Error("\"" + repo + "\" plugin has no valid entry point"));
 
                         // check if the plugin is builded
                         // @TODO : "build installed plugin" feature to be implemented
                         }).then((): Promise<void> => {
 
-                            return isFile(entryPoint).then((isEntryPointAFile: boolean): Promise<void> => {
+                            return isFile(entryPoint).then((isEntryPointAFile: boolean): void => {
 
-                                if (isEntryPointAFile) {
-                                    return Promise.resolve();
+                                if (!isEntryPointAFile) {
+                                    throw new Error("\"" + repo + "\" plugin entry point is not builded");
                                 }
-
-                                return Promise.reject(new Error("\"" + repo + "\" plugin entry point is not builded"));
 
                             });
 
