@@ -1,7 +1,7 @@
 // deps
 
     // natives
-    const { ok, strictEqual, rejects } = require("node:assert");
+    const { ok, strictEqual } = require("node:assert");
     const { join } = require("node:path");
     const { cp } = require("node:fs/promises");
 
@@ -23,6 +23,8 @@
     const GITHUB_WRONG_REPO = "node-containerpattern";
 
     const EVENTS_DATA = "test";
+
+    const MAX_TIMOUT = 30 * 1000;
 
 // mock (avoids real GitHub / git clone)
 
@@ -75,10 +77,9 @@ describe("pluginsmanager / install via github", () => {
             return rmdirp(join(PLUGINS_DIRECTORY, GITHUB_WRONG_REPO));
         }).then(() => {
             return rmdirp(join(PLUGINS_DIRECTORY, GITHUB_REPO));
+        }).then(() => {
+            return rmdirp(join(PLUGINS_DIRECTORY, GITHUB_REPO_NOT_BUILDED));
         });
-
-        // @TODO : when "build installed plugin" feature will be implemented, add this line back
-        // return rmdirp(join(PLUGINS_DIRECTORY, GITHUB_REPO_NOT_BUILDED));
 
     });
 
@@ -237,19 +238,26 @@ describe("pluginsmanager / install via github", () => {
 
         });
 
-        // @TODO : when "build installed plugin" feature will be implemented, modify this test
         it("should test download with valid not builded repo", () => {
 
-            rejects(pluginsManager.installViaGithub(GITHUB_USER, GITHUB_REPO_NOT_BUILDED, EVENTS_DATA), (err) => {
+            pluginsManager.on("installed", (plugin, data) => {
 
-                strictEqual(typeof err, "object", "Generated error is not as expected");
-                ok(err instanceof Error, "Generated error is not as expected");
+                strictEqual(typeof data, "string", "Events data is not a string");
+                strictEqual(data, EVENTS_DATA, "Events data is not as expected");
 
-                return true;
+                (0, console).log("--- [PluginsManager/events/installed] '" + plugin.name + "' - " + data);
 
             });
 
-        });
+            return pluginsManager.installViaGithub(GITHUB_USER, GITHUB_REPO_NOT_BUILDED, EVENTS_DATA).then((plugin) => {
+
+                strictEqual(typeof plugin, "object", "Plugin is not an object");
+                strictEqual(typeof plugin.name, "string", "Plugin name is not a string");
+                strictEqual(plugin.name, GITHUB_REPO_NOT_BUILDED, "Plugin name is not as expected");
+
+            });
+
+        }).timeout(MAX_TIMOUT);
 
     });
 

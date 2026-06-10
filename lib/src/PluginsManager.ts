@@ -32,6 +32,7 @@
 
         // npm
         import npmInstall from "./cmd/npm/npmInstall";
+        import npmBuild from "./cmd/npm/npmBuild";
         import npmUpdate from "./cmd/npm/npmUpdate";
 
 // types & interfaces
@@ -485,24 +486,42 @@ export default class PluginsManager extends EventEmitter {
 
                     }).then((packageData: Record<string, unknown>): Promise<void> => {
 
-                        const entryPoint: string = join(directory, packageData.main as string);
-
                         // check if the plugin has a valid entry point
-                        return isFile(entryPoint).then((hasPluginEntryPoint: boolean): void => {
+                        if ("string" !== typeof packageData.main || "" === packageData.main.trim()) {
+                            throw new Error("\"" + repo + "\" plugin has no valid entry point");
+                        }
 
-                            if (!hasPluginEntryPoint) {
-                                throw new Error("\"" + repo + "\" plugin has no valid entry point");
+                        const entryPoint: string = join(directory, packageData.main);
+
+                        // check if the plugin is builded (build it if needed)
+                        return isFile(entryPoint).then((isEntryPointAFile: boolean): Promise<void> => {
+
+                            // already built, no need to build it
+                            if (isEntryPointAFile) {
+                                return Promise.resolve();
                             }
 
-                        // check if the plugin is builded
-                        // @TODO : "build installed plugin" feature to be implemented
-                        }).then((): Promise<void> => {
+                            // check if the plugin has a build script
 
-                            return isFile(entryPoint).then((isEntryPointAFile: boolean): void => {
+                            if ("object" !== typeof packageData.scripts || null === packageData.scripts || 0 >= Object.keys(packageData.scripts).length) {
+                                throw new Error("\"" + repo + "\" plugin has no scripts registered");
+                            }
 
-                                if (!isEntryPointAFile) {
-                                    throw new Error("\"" + repo + "\" plugin entry point is not builded");
-                                }
+                            const scripts: Record<string, string> = packageData.scripts as Record<string, string>;
+
+                            if ("string" !== typeof scripts.build || "" === scripts.build.trim()) {
+                                throw new Error("\"" + repo + "\" plugin has no build script registered");
+                            }
+
+                            // install plugin with dependencies
+                            return npmInstall(directory, true).then((): Promise<void> => {
+
+                                return npmBuild(directory);
+
+                            // remove dev dependencies
+                            }).then((): Promise<void> => {
+
+                                return rmdirp(join(directory, "node_modules"));
 
                             });
 
