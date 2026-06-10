@@ -1,0 +1,22 @@
+{
+  "name": "test-good-plugin-not-builded",
+  "version": "0.0.1",
+  "description": "A test for node-pluginsmanager",
+  "main": "main.cjs",
+  "author": "Sébastien VIDAL",
+  "core": true,
+
+  "scripts": {
+    "build": "npx tsc --project ./tsconfig.json"
+  },
+  "engines": {
+    "node": ">=22.22.3"
+  },
+  "dependencies": {
+    "simpletts": "2.8.0"
+  },
+  "devDependencies": {
+    "typescript": "5.9.3"
+  },
+  "license": "ISC"
+}
