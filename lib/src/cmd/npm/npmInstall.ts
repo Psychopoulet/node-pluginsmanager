@@ -5,12 +5,11 @@
 
 // module
 
-export default function npmInstall (directory: string): Promise<void> {
+export default function npmInstall (directory: string, isBuildMode: boolean = false): Promise<void> {
 
     return cmd(directory, "npm", [
         "install",
-        "--omit=dev",
-        "--no-optional"
+        ...(isBuildMode ? [ "--no-optional" ] : [ "--omit=dev", "--no-optional" ])
     ]);
 
 }
