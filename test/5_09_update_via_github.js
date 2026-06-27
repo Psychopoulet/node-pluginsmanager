@@ -30,10 +30,27 @@
         return Promise.resolve();
     }
 
+    function mockGetLatestGithubTag () {
+        return Promise.resolve({
+            "name": "1.0.0",
+            "commit": {
+                "sha": "abc",
+                "url": "test"
+            },
+            "tarball_url": "test",
+            "zipball_url": "test",
+            "node_id": "test"
+        });
+    }
+
     const PluginsManager = proxyquire(join(__dirname, "..", "lib", "cjs", "PluginsManager.js"), {
         "./cmd/git/gitUpdate": {
             "__esModule": true,
             "default": mockGitUpdate
+        },
+        "./utils/getLatestGithubTag": {
+            "__esModule": true,
+            "default": mockGetLatestGithubTag
         }
     }).default;
 
@@ -229,6 +246,97 @@ describe("pluginsmanager / update via github", () => {
             }).then(() => {
 
                 return checkDirectory.default("update/execute", TEST_PLUGIN_MODULES_DIRECTORY);
+
+            });
+
+        }).timeout(MAX_TIMOUT);
+
+        it("should test update with invalid github link", () => {
+
+            const pluginName = basename(TEST_PLUGIN_DIRECTORY);
+
+            return copyPlugin(PLUGINS_DIRECTORY, "test-good-plugin", pluginName, {
+                "name": pluginName,
+                "github": "whatever",
+                "version": "0.0.1"
+            }).then(() => {
+
+                return pluginsManager.loadAll();
+
+            }).then(() => {
+
+                return pluginsManager.updateViaGithub(pluginsManager.plugins.filter((plugin) => {
+                    return pluginName === plugin.name;
+                })[0] || null, EVENTS_DATA);
+
+            }).then(() => {
+                throw new Error("tests does not generate error");
+            }).catch((err) => {
+
+                strictEqual(typeof err, "object", "Generated error is not an object");
+                ok(err instanceof Error, "Generated error is not an instance of Error");
+                ok(-1 < err.message.indexOf("invalid github project link"), "Generated error message is not as expected");
+
+            });
+
+        }).timeout(MAX_TIMOUT);
+
+        it("should test update with already up to date plugin", () => {
+
+            const PluginsManagerOutdated = proxyquire(join(__dirname, "..", "lib", "cjs", "PluginsManager.js"), {
+                "./cmd/git/gitUpdate": {
+                    "__esModule": true,
+                    "default": mockGitUpdate
+                },
+                "./utils/getLatestGithubTag": {
+                    "__esModule": true,
+                    "default": () => {
+                        return Promise.resolve({
+                            "name": "0.0.4",
+                            "commit": {
+                                "sha": "abc",
+                                "url": "test"
+                            },
+                            "tarball_url": "test",
+                            "zipball_url": "test",
+                            "node_id": "test"
+                        });
+                    }
+                }
+            }).default;
+
+            const pluginsManagerOutdated = new PluginsManagerOutdated({
+                "directory": PLUGINS_DIRECTORY
+            });
+
+            const pluginName = basename(TEST_PLUGIN_DIRECTORY);
+
+            return copyPlugin(PLUGINS_DIRECTORY, "test-good-plugin", pluginName, {
+                "name": pluginName,
+                "github": "git://github.com/Psychopoulet/node-pluginsmanager-plugin-test"
+            }).then(() => {
+
+                return pluginsManagerOutdated.loadAll();
+
+            }).then(() => {
+
+                return pluginsManagerOutdated.updateViaGithub(pluginsManagerOutdated.plugins.filter((plugin) => {
+                    return pluginName === plugin.name;
+                })[0] || null, EVENTS_DATA);
+
+            }).then(() => {
+                throw new Error("tests does not generate error");
+            }).catch((err) => {
+
+                strictEqual(typeof err, "object", "Generated error is not an object");
+                ok(err instanceof Error, "Generated error is not an instance of Error");
+                ok(-1 < err.message.indexOf("already up to date"), "Generated error message is not as expected");
+
+            }).finally(() => {
+
+                return pluginsManagerOutdated.releaseAll().then(() => {
+                    return pluginsManagerOutdated.destroyAll();
+                });
 
             });
 
