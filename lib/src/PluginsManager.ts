@@ -24,7 +24,7 @@
     import loadSortedPlugins from "./loadSortedPlugins";
     import initSortedPlugins from "./initSortedPlugins";
 
-    import extractGithub from "./extractGithub";
+    import extractGithub from "./utils/extractGithub";
 
         // git
         import gitInstall from "./cmd/git/gitInstall";

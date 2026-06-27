@@ -5,7 +5,7 @@
     const { join } = require("node:path");
 
     // locals
-    const extractGithub = require(join(__dirname, "..", "lib", "cjs", "extractGithub.js"));
+    const extractGithub = require(join(__dirname, "..", "lib", "cjs", "utils", "extractGithub.js"));
 
 // tests
 
