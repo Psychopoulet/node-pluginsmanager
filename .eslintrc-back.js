@@ -13,5 +13,10 @@ module.exports = defineConfig({
     "extends": [ personnallinter.configs["ts-back"] ],
     "rules": {
         "@typescript-eslint/no-require-imports": "warn"
+    },
+    "languageOptions": {
+    "globals": {
+            "fetch": "readonly"
+        }
     }
 });

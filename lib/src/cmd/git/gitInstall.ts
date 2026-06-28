@@ -5,8 +5,14 @@
 
     // locals
     import checkDirectory from "../../checkers/checkDirectory";
+    import getLatestGithubTag from "../../utils/getLatestGithubTag";
     import checkNonEmptyString from "../../checkers/checkNonEmptyString";
     import cmd from "../cmd";
+
+// types & interfaces
+
+    // locals
+    import type { GithubTag } from "../../utils/getLatestGithubTag";
 
 // module
 
@@ -30,17 +36,23 @@ export default function gitInstall (directory: string, user: string, repo: strin
         return checkNonEmptyString("cmd/git/install/repo", repo);
     }).then((): Promise<void> => {
 
-        // git clone
-        return cmd(dirname(directory), "git", [
-            "-c",
-            "core.quotepath=false",
-            "clone",
-            "--recursive",
-            "--depth",
-            "1",
-            "https://github.com/" + user + "/" + repo + "/",
-            directory
-        ]);
+        return getLatestGithubTag(user, repo).then((tag: GithubTag): Promise<void> => {
+
+            // git clone
+            return cmd(dirname(directory), "git", [
+                "-c",
+                "core.quotepath=false",
+                "clone",
+                "--recursive",
+                "--depth",
+                "1",
+                "--branch",
+                tag.name,
+                "https://github.com/" + user + "/" + repo + "/",
+                directory
+            ]);
+
+        });
 
     });
 

@@ -9,6 +9,7 @@
     // externals
     import versionModulesChecker from "check-version-modules";
     import nodeEngineChecker from "check-node-engine";
+    import semver from "semver";
 
     // locals
     import rmdirp from "./utils/rmdirp";
@@ -24,7 +25,9 @@
     import loadSortedPlugins from "./loadSortedPlugins";
     import initSortedPlugins from "./initSortedPlugins";
 
-    import extractGithub from "./extractGithub";
+    import extractGithub from "./utils/extractGithub";
+    import getLatestGithubTag from "./utils/getLatestGithubTag";
+    import parseGithubUserRepo from "./utils/parseGithubUserRepo";
 
         // git
         import gitInstall from "./cmd/git/gitInstall";
@@ -44,6 +47,9 @@
     import type { Orchestrator, tLogger } from "node-pluginsmanager-plugin";
     import type { Server as WebSocketServer } from "ws";
     import type { Server as SocketIOServer } from "socket.io";
+
+    // locals
+    import type { GithubTag } from "./utils/getLatestGithubTag";
 
     interface iPluginManagerOptions {
         "directory"?: string;
@@ -426,6 +432,14 @@ export default class PluginsManager extends EventEmitter {
 
         }
 
+        public getLatestGithubTag (user: string, repo: string): Promise<string> {
+
+            return getLatestGithubTag(user, repo).then((tag: GithubTag): string => {
+                return tag.name;
+            });
+
+        }
+
         // install a plugin via github repo, using "data" in arguments for "install" and "init" plugin's Orchestrator methods
         public installViaGithub (user: string, repo: string, ...data: unknown[]): Promise<Orchestrator> {
 
@@ -630,29 +644,33 @@ export default class PluginsManager extends EventEmitter {
 
             let directory: string = "";
             let key: number = -1;
+            let githubUrl: string = "";
+            let latestTag: string = "";
 
             // check plugin
-            return Promise.resolve().then((): Promise<void> => {
+            return checkOrchestrator("updateViaGithub/plugin", plugin).then((): Promise<void> => {
 
-                return checkOrchestrator("updateViaGithub/plugin", plugin).then((): Promise<void> => {
+                const github: string | null = extractGithub(plugin);
 
-                    return checkNonEmptyString("updateViaGithub/github", extractGithub(plugin)).catch(() => {
+                return checkNonEmptyString("updateViaGithub/github", github).catch(() => {
 
-                        return Promise.reject(new ReferenceError(
-                            "Plugin \"" + plugin.name + "\" must be linked in the package to a github project to be updated"
-                        ));
+                    return Promise.reject(new ReferenceError(
+                        "Plugin \"" + plugin.name + "\" must be linked in the package to a github project to be updated"
+                    ));
 
-                    });
-
-                }).then((): Promise<void> => {
-
-                    key = this.getPluginsNames().findIndex((pluginName: string): boolean => {
-                        return pluginName === plugin.name;
-                    });
-
-                    return -1 < key ? Promise.resolve() : Promise.reject(new Error("Plugin \"" + plugin.name + "\" is not registered"));
-
+                }).then((): void => {
+                    githubUrl = github as string;
                 });
+
+            }).then((): void => {
+
+                key = this.getPluginsNames().findIndex((pluginName: string): boolean => {
+                    return pluginName === plugin.name;
+                });
+
+                if (-1 >= key) {
+                    throw new Error("Plugin \"" + plugin.name + "\" is not registered");
+                }
 
             // check plugin directory
             }).then((): Promise<void> => {
@@ -662,6 +680,59 @@ export default class PluginsManager extends EventEmitter {
                     directory = join(this.directory, plugin.name);
 
                     return checkAbsoluteDirectory("updateViaGithub/plugindirectory", directory);
+
+                });
+
+            // check remote version
+            }).then((): Promise<void> => {
+
+                const githubUserRepo = parseGithubUserRepo(githubUrl);
+
+                if (!githubUserRepo) {
+
+                    throw new Error(
+                        "Plugin \"" + plugin.name + "\" has an invalid github project link"
+                    );
+
+                }
+
+                const currentVersion = semver.coerce(plugin.version);
+
+                if (!currentVersion) {
+
+                    throw new Error(
+                        "Plugin \"" + plugin.name + "\" has no valid version (\"" + plugin.version + "\")"
+                    );
+
+                }
+
+                this._logger?.("debug", "Get github latest tag", false, plugin.name);
+
+                return getLatestGithubTag(githubUserRepo.user, githubUserRepo.repo).then((tag): void => {
+
+                    const latestVersion = semver.coerce(tag.name);
+
+                    if (!latestVersion) {
+
+                        throw new Error(
+                            "No valid version found for plugin \"" + plugin.name + "\" on github"
+                        );
+
+                    }
+
+                    this._logger?.("debug", "Compare local version with github lastest tag", false, plugin.name);
+
+                    if (!semver.gt(latestVersion, currentVersion)) {
+
+                        throw new Error(
+                            "Plugin \"" + plugin.name + "\" is already up to date (v" + plugin.version + ")"
+                        );
+
+                    }
+
+                    latestTag = tag.name;
+
+                    this._logger?.("success", "New version available", false, plugin.name);
 
                 });
 
@@ -684,10 +755,12 @@ export default class PluginsManager extends EventEmitter {
 
                 });
 
-            // download plugin
+            // update plugin
             }).then((): Promise<Orchestrator> => {
 
-                return gitUpdate(directory).then((): Promise<Orchestrator> => {
+                this._logger?.("debug", "Update with new plugin version", false, plugin.name);
+
+                return gitUpdate(directory, latestTag).then((): Promise<Orchestrator> => {
 
                     return createPluginByDirectory(directory, this.externalResourcesDirectory, this._logger, ...data);
 
@@ -696,8 +769,10 @@ export default class PluginsManager extends EventEmitter {
             // check plugin modules versions
             }).then((_plugin: Orchestrator): Promise<Orchestrator> => {
 
-                return this.checkModules(_plugin).then((): Promise<Orchestrator> => {
-                    return Promise.resolve(_plugin);
+                this._logger?.("debug", "Check modules", false, plugin.name);
+
+                return this.checkModules(_plugin).then((): Orchestrator => {
+                    return _plugin;
                 });
 
             }).then((_plugin: Orchestrator): Promise<Orchestrator> => {
@@ -718,12 +793,12 @@ export default class PluginsManager extends EventEmitter {
                     return _plugin.init(...data);
 
                 // execute init script
-                }).then((): Promise<Orchestrator> => {
+                }).then((): Orchestrator => {
 
                     this.emit("initialized", _plugin, ...data);
                     this.plugins[key] = _plugin;
 
-                    return Promise.resolve(_plugin);
+                    return _plugin;
 
                 });
 

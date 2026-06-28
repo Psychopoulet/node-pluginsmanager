@@ -46,9 +46,9 @@ describe("pluginsmanager / checkAllModules", () => {
 
         }).then(() => {
 
-            const plugin = pluginsManager.plugins.filter((p) => {
+            const plugin = pluginsManager.plugins.find((p) => {
                 return pluginName === p.name;
-            })[0] || null;
+            }) || null;
 
             return new Promise((resolve, reject) => {
 
