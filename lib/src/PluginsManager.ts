@@ -48,6 +48,9 @@
     import type { Server as WebSocketServer } from "ws";
     import type { Server as SocketIOServer } from "socket.io";
 
+    // locals
+    import type { iGithubTag } from "./utils/getLatestGithubTag";
+
     interface iPluginManagerOptions {
         "directory"?: string;
         "externalResourcesDirectory"?: string;
@@ -425,6 +428,14 @@ export default class PluginsManager extends EventEmitter {
 
                 this.emit("allreleased", ...data);
 
+            });
+
+        }
+
+        public getLatestGithubTag (user: string, repo: string): Promise<string> {
+
+            return getLatestGithubTag(user, repo).then((tag: iGithubTag): string => {
+                return tag.name;
             });
 
         }
