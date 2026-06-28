@@ -49,7 +49,7 @@
     import type { Server as SocketIOServer } from "socket.io";
 
     // locals
-    import type { iGithubTag } from "./utils/getLatestGithubTag";
+    import type { GithubTag } from "./utils/getLatestGithubTag";
 
     interface iPluginManagerOptions {
         "directory"?: string;
@@ -434,7 +434,7 @@ export default class PluginsManager extends EventEmitter {
 
         public getLatestGithubTag (user: string, repo: string): Promise<string> {
 
-            return getLatestGithubTag(user, repo).then((tag: iGithubTag): string => {
+            return getLatestGithubTag(user, repo).then((tag: GithubTag): string => {
                 return tag.name;
             });
 

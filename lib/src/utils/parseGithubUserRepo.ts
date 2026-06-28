@@ -2,14 +2,14 @@
 
     // locals
 
-    export interface iGithubUserRepo {
+    export interface GithubUserRepo {
         "user": string;
         "repo": string;
     }
 
 // module
 
-export default function parseGithubUserRepo (github: string): iGithubUserRepo | null {
+export default function parseGithubUserRepo (github: string): GithubUserRepo | null {
 
     if ("string" !== typeof github) {
         return null;

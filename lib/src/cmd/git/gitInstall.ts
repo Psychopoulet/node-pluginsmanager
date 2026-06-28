@@ -12,7 +12,7 @@
 // types & interfaces
 
     // locals
-    import type { iGithubTag } from "../../utils/getLatestGithubTag";
+    import type { GithubTag } from "../../utils/getLatestGithubTag";
 
 // module
 
@@ -36,7 +36,7 @@ export default function gitInstall (directory: string, user: string, repo: strin
         return checkNonEmptyString("cmd/git/install/repo", repo);
     }).then((): Promise<void> => {
 
-        return getLatestGithubTag(user, repo).then((tag: iGithubTag): Promise<void> => {
+        return getLatestGithubTag(user, repo).then((tag: GithubTag): Promise<void> => {
 
             // git clone
             return cmd(dirname(directory), "git", [

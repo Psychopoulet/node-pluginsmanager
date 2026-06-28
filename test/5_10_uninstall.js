@@ -124,9 +124,9 @@ describe("pluginsmanager / uninstall", () => {
 
                 strictEqual(pluginsManager.plugins.length, 4, "Distant plugin not installed");
 
-                return pluginsManager.uninstall(pluginsManager.plugins.filter((plugin) => {
+                return pluginsManager.uninstall(pluginsManager.plugins.find((plugin) => {
                     return pluginName === plugin.name;
-                })[0] || null, EVENTS_DATA);
+                }) || null, EVENTS_DATA);
 
             });
 

@@ -177,9 +177,9 @@ describe("pluginsmanager / update via github", () => {
 
                 strictEqual(pluginsManager.plugins.length, 4, "Distant plugin not installed");
 
-                return pluginsManager.updateViaGithub(pluginsManager.plugins.filter((plugin) => {
+                return pluginsManager.updateViaGithub(pluginsManager.plugins.find((plugin) => {
                     return pluginName === plugin.name;
-                })[0] || null, EVENTS_DATA);
+                }) || null, EVENTS_DATA);
 
             });
 
@@ -209,9 +209,9 @@ describe("pluginsmanager / update via github", () => {
 
                 strictEqual(pluginsManager.plugins.length, 4, "Distant plugin not installed");
 
-                return pluginsManager.updateViaGithub(pluginsManager.plugins.filter((plugin) => {
+                return pluginsManager.updateViaGithub(pluginsManager.plugins.find((plugin) => {
                     return pluginName === plugin.name;
-                })[0] || null, EVENTS_DATA);
+                }) || null, EVENTS_DATA);
 
             }).then(() => {
 
@@ -239,9 +239,9 @@ describe("pluginsmanager / update via github", () => {
 
                 strictEqual(pluginsManager.plugins.length, 4, "Distant plugin not installed");
 
-                return pluginsManager.updateViaGithub(pluginsManager.plugins.filter((plugin) => {
+                return pluginsManager.updateViaGithub(pluginsManager.plugins.find((plugin) => {
                     return pluginName === plugin.name;
-                })[0] || null, EVENTS_DATA);
+                }) || null, EVENTS_DATA);
 
             }).then(() => {
 
@@ -265,9 +265,9 @@ describe("pluginsmanager / update via github", () => {
 
             }).then(() => {
 
-                return pluginsManager.updateViaGithub(pluginsManager.plugins.filter((plugin) => {
+                return pluginsManager.updateViaGithub(pluginsManager.plugins.find((plugin) => {
                     return pluginName === plugin.name;
-                })[0] || null, EVENTS_DATA);
+                }) || null, EVENTS_DATA);
 
             }).then(() => {
                 throw new Error("tests does not generate error");
@@ -320,9 +320,9 @@ describe("pluginsmanager / update via github", () => {
 
             }).then(() => {
 
-                return pluginsManagerOutdated.updateViaGithub(pluginsManagerOutdated.plugins.filter((plugin) => {
+                return pluginsManagerOutdated.updateViaGithub(pluginsManagerOutdated.plugins.find((plugin) => {
                     return pluginName === plugin.name;
-                })[0] || null, EVENTS_DATA);
+                }) || null, EVENTS_DATA);
 
             }).then(() => {
                 throw new Error("tests does not generate error");

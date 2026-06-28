@@ -7,7 +7,7 @@
 
     // locals
 
-    export interface iGithubTag {
+    export interface GithubTag {
         "name": string;
         "commit": {
             "sha": string;
@@ -20,11 +20,11 @@
 
 // module
 
-export default function getLatestGithubTag (user: string, repo: string): Promise<iGithubTag> {
+export default function getLatestGithubTag (user: string, repo: string): Promise<GithubTag> {
 
     return checkNonEmptyString("utils/getLatestGithubTag/user", user).then((): Promise<void> => {
         return checkNonEmptyString("utils/getLatestGithubTag/repo", repo);
-    }).then((): Promise<iGithubTag> => {
+    }).then((): Promise<GithubTag> => {
 
         const url: string = "https://api.github.com/repos/" + user + "/" + repo + "/tags";
         const method: string = "GET";
@@ -34,7 +34,7 @@ export default function getLatestGithubTag (user: string, repo: string): Promise
             "headers": {
                 "Content-Type": "application/json"
             }
-        }).then((res: Response): Promise<iGithubTag[]> => {
+        }).then((res: Response): Promise<GithubTag[]> => {
 
             if (res.ok) {
                 return res.json();
@@ -43,7 +43,7 @@ export default function getLatestGithubTag (user: string, repo: string): Promise
                 throw new Error("Failed to fetch '" + url + "': " + res.statusText);
             }
 
-        }).then((data: iGithubTag[]): iGithubTag => {
+        }).then((data: GithubTag[]): GithubTag => {
 
             if (0 >= data.length) {
                 throw new Error("No tags found for '" + url + "'");
