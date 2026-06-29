@@ -94,29 +94,6 @@ describe("pluginsmanager / update via github", () => {
 
         });
 
-        it("should test update with missing repo", (done) => {
-
-            const orchestrator = new Orchestrator({
-                "externalResourcesDirectory": "",
-                "packageFile": "",
-                "descriptorFile": "",
-                "mediatorFile": "",
-                "serverFile": ""
-            });
-
-            pluginsManager.updateViaGithub(orchestrator).then(() => {
-                done(new Error("tests does not generate error"));
-            }).catch((err) => {
-
-                strictEqual(typeof err, "object", "Generated error is not an object");
-                ok(err instanceof ReferenceError, "Generated error is not an instance of Error");
-
-                done();
-
-            });
-
-        });
-
         it("should test update with not loaded plugin", (done) => {
 
             const orchestrator = new Orchestrator({
@@ -246,6 +223,35 @@ describe("pluginsmanager / update via github", () => {
             }).then(() => {
 
                 return checkDirectory.default("update/execute", TEST_PLUGIN_MODULES_DIRECTORY);
+
+            });
+
+        }).timeout(MAX_TIMOUT);
+
+        it("should test update with missing repo", () => {
+
+            const pluginName = basename(TEST_PLUGIN_DIRECTORY);
+
+            return copyPlugin(PLUGINS_DIRECTORY, "test-good-plugin", pluginName, {
+                "name": pluginName,
+                "version": "0.0.1"
+            }).then(() => {
+
+                return pluginsManager.loadAll();
+
+            }).then(() => {
+
+                return pluginsManager.updateViaGithub(pluginsManager.plugins.find((plugin) => {
+                    return pluginName === plugin.name;
+                }) || null, EVENTS_DATA);
+
+            }).then(() => {
+                throw new Error("tests does not generate error");
+            }).catch((err) => {
+
+                strictEqual(typeof err, "object", "Generated error is not an object");
+                ok(err instanceof Error, "Generated error is not an instance of Error");
+                ok(-1 < err.message.indexOf("invalid github project link"), "Generated error message is not as expected");
 
             });
 
