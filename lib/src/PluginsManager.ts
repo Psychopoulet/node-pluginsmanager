@@ -432,10 +432,24 @@ export default class PluginsManager extends EventEmitter {
 
         }
 
-        public getLatestGithubTag (user: string, repo: string): Promise<string> {
+        public getLatestGithubTag (plugin: Orchestrator): Promise<string> {
 
-            return getLatestGithubTag(user, repo).then((tag: GithubTag): string => {
-                return tag.name;
+            return checkOrchestrator("getLatestGithubTag/plugin", plugin).then((): Promise<string> => {
+
+                const githubUserRepo = parseGithubUserRepo(extractGithub(plugin) as string);
+
+                if (!githubUserRepo) {
+
+                    throw new Error(
+                        "Plugin \"" + plugin.name + "\" has an invalid github project link"
+                    );
+
+                }
+
+                return getLatestGithubTag(githubUserRepo.user, githubUserRepo.repo).then((tag: GithubTag): string => {
+                    return tag.name;
+                });
+
             });
 
         }
@@ -644,25 +658,9 @@ export default class PluginsManager extends EventEmitter {
 
             let directory: string = "";
             let key: number = -1;
-            let githubUrl: string = "";
-            let latestTag: string = "";
 
             // check plugin
-            return checkOrchestrator("updateViaGithub/plugin", plugin).then((): Promise<void> => {
-
-                const github: string | null = extractGithub(plugin);
-
-                return checkNonEmptyString("updateViaGithub/github", github).catch(() => {
-
-                    return Promise.reject(new ReferenceError(
-                        "Plugin \"" + plugin.name + "\" must be linked in the package to a github project to be updated"
-                    ));
-
-                }).then((): void => {
-                    githubUrl = github as string;
-                });
-
-            }).then((): void => {
+            return checkOrchestrator("updateViaGithub/plugin", plugin).then((): void => {
 
                 key = this.getPluginsNames().findIndex((pluginName: string): boolean => {
                     return pluginName === plugin.name;
@@ -684,17 +682,7 @@ export default class PluginsManager extends EventEmitter {
                 });
 
             // check remote version
-            }).then((): Promise<void> => {
-
-                const githubUserRepo = parseGithubUserRepo(githubUrl);
-
-                if (!githubUserRepo) {
-
-                    throw new Error(
-                        "Plugin \"" + plugin.name + "\" has an invalid github project link"
-                    );
-
-                }
+            }).then((): Promise<string> => {
 
                 const currentVersion = semver.coerce(plugin.version);
 
@@ -708,9 +696,9 @@ export default class PluginsManager extends EventEmitter {
 
                 this._logger?.("debug", "Get github latest tag", false, plugin.name);
 
-                return getLatestGithubTag(githubUserRepo.user, githubUserRepo.repo).then((tag): void => {
+                return this.getLatestGithubTag(plugin).then((tag: string): string => {
 
-                    const latestVersion = semver.coerce(tag.name);
+                    const latestVersion = semver.coerce(tag);
 
                     if (!latestVersion) {
 
@@ -730,14 +718,14 @@ export default class PluginsManager extends EventEmitter {
 
                     }
 
-                    latestTag = tag.name;
-
                     this._logger?.("success", "New version available", false, plugin.name);
+
+                    return tag;
 
                 });
 
             // release plugin
-            }).then((): Promise<void> => {
+            }).then((latestTag: string): Promise<string> => {
 
                 const pluginName: string = plugin.name;
 
@@ -747,16 +735,18 @@ export default class PluginsManager extends EventEmitter {
 
                     return plugin.destroy();
 
-                }).then((): void => {
+                }).then((): string => {
 
                     this.emit("destroyed", pluginName, ...data);
 
                     this.plugins.splice(key, 1);
 
+                    return latestTag;
+
                 });
 
             // update plugin
-            }).then((): Promise<Orchestrator> => {
+            }).then((latestTag: string): Promise<Orchestrator> => {
 
                 this._logger?.("debug", "Update with new plugin version", false, plugin.name);
 
