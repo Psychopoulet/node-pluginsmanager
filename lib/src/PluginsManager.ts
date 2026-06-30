@@ -356,7 +356,7 @@ export default class PluginsManager extends EventEmitter {
 
             return Promise.all(this.plugins.map((plugin: Orchestrator): Promise<void> => {
 
-                return plugin.destroy().then((): void => {
+                return plugin.destroy(...data).then((): void => {
                     this.emit("destroyed", plugin.name, ...data);
                 });
 
@@ -658,16 +658,19 @@ export default class PluginsManager extends EventEmitter {
 
             let directory: string = "";
             let key: number = -1;
+            let pluginName: string = "";
 
             // check plugin
             return checkOrchestrator("updateViaGithub/plugin", plugin).then((): void => {
 
-                key = this.getPluginsNames().findIndex((pluginName: string): boolean => {
-                    return pluginName === plugin.name;
+                pluginName = plugin.name;
+
+                key = this.getPluginsNames().findIndex((pn: string): boolean => {
+                    return pluginName === pn;
                 });
 
                 if (-1 >= key) {
-                    throw new Error("Plugin \"" + plugin.name + "\" is not registered");
+                    throw new Error("Plugin \"" + pluginName + "\" is not registered");
                 }
 
             // check plugin directory
@@ -675,7 +678,7 @@ export default class PluginsManager extends EventEmitter {
 
                 return checkAbsoluteDirectory("updateViaGithub/directory", this.directory).then((): Promise<void> => {
 
-                    directory = join(this.directory, plugin.name);
+                    directory = join(this.directory, pluginName);
 
                     return checkAbsoluteDirectory("updateViaGithub/plugindirectory", directory);
 
@@ -689,12 +692,12 @@ export default class PluginsManager extends EventEmitter {
                 if (!currentVersion) {
 
                     throw new Error(
-                        "Plugin \"" + plugin.name + "\" has no valid version (\"" + plugin.version + "\")"
+                        "Plugin \"" + pluginName + "\" has no valid version (\"" + plugin.version + "\")"
                     );
 
                 }
 
-                this._logger?.("debug", "Get github latest tag", false, plugin.name);
+                this._logger?.("debug", "Get github latest tag", false, pluginName);
 
                 return this.getLatestGithubTag(plugin).then((tag: string): string => {
 
@@ -703,22 +706,22 @@ export default class PluginsManager extends EventEmitter {
                     if (!latestVersion) {
 
                         throw new Error(
-                            "No valid version found for plugin \"" + plugin.name + "\" on github"
+                            "No valid version found for plugin \"" + pluginName + "\" on github"
                         );
 
                     }
 
-                    this._logger?.("debug", "Compare local version with github lastest tag", false, plugin.name);
+                    this._logger?.("debug", "Compare local version with github latest tag", false, pluginName);
 
                     if (!semver.gt(latestVersion, currentVersion)) {
 
                         throw new Error(
-                            "Plugin \"" + plugin.name + "\" is already up to date (v" + plugin.version + ")"
+                            "Plugin \"" + pluginName + "\" is already up to date (v" + plugin.version + ")"
                         );
 
                     }
 
-                    this._logger?.("success", "New version available", false, plugin.name);
+                    this._logger?.("success", "New version available", false, pluginName);
 
                     return tag;
 
@@ -727,13 +730,11 @@ export default class PluginsManager extends EventEmitter {
             // release plugin
             }).then((latestTag: string): Promise<string> => {
 
-                const pluginName: string = plugin.name;
-
                 return plugin.release(...data).then((): Promise<void> => {
 
                     this.emit("released", plugin, ...data);
 
-                    return plugin.destroy();
+                    return plugin.destroy(...data);
 
                 }).then((): string => {
 
@@ -748,7 +749,7 @@ export default class PluginsManager extends EventEmitter {
             // update plugin
             }).then((latestTag: string): Promise<Orchestrator> => {
 
-                this._logger?.("debug", "Update with new plugin version", false, plugin.name);
+                this._logger?.("debug", "Update with new plugin version", false, pluginName);
 
                 return gitUpdate(directory, latestTag).then((): Promise<Orchestrator> => {
 
@@ -759,7 +760,7 @@ export default class PluginsManager extends EventEmitter {
             // check plugin modules versions
             }).then((_plugin: Orchestrator): Promise<Orchestrator> => {
 
-                this._logger?.("debug", "Check modules", false, plugin.name);
+                this._logger?.("debug", "Check modules", false, pluginName);
 
                 return this.checkModules(_plugin).then((): Orchestrator => {
                     return _plugin;
@@ -800,19 +801,18 @@ export default class PluginsManager extends EventEmitter {
         public uninstall (plugin: Orchestrator, ...data: unknown[]): Promise<string> {
 
             let directory: string = "";
-            let key: number = -1;
             let pluginName: string = "";
 
             // check plugin
             return Promise.resolve().then((): Promise<void> => {
 
-                return checkOrchestrator("uninstall/plugin", plugin).then((): Promise<void> => {
+                return checkOrchestrator("uninstall/plugin", plugin).then((): void => {
 
-                    key = this.getPluginsNames().findIndex((name: string): boolean => {
-                        return name === plugin.name;
-                    });
+                    pluginName = plugin.name;
 
-                    return -1 < key ? Promise.resolve() : Promise.reject(new Error("Plugin \"" + plugin.name + "\" is not registered"));
+                    if (!this.getPluginsNames().includes(pluginName)) {
+                        throw new Error("Plugin \"" + pluginName + "\" is not registered");
+                    }
 
                 });
 
@@ -821,7 +821,6 @@ export default class PluginsManager extends EventEmitter {
 
                 return checkAbsoluteDirectory("uninstall/directory", this.directory).then((): Promise<void> => {
 
-                    pluginName = plugin.name;
                     directory = join(this.directory, pluginName);
 
                     return checkAbsoluteDirectory("uninstall/plugindirectory", directory);
@@ -830,6 +829,10 @@ export default class PluginsManager extends EventEmitter {
 
             // release plugin
             }).then((): Promise<void> => {
+
+                const key: number = this.getPluginsNames().findIndex((name: string): boolean => {
+                    return name === pluginName;
+                });
 
                 return plugin.release(...data).then((): Promise<void> => {
 
