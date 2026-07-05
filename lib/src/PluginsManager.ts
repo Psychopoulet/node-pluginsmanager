@@ -28,6 +28,8 @@
     import getLatestGithubTag from "./utils/getLatestGithubTag";
     import parseGithubUserRepo from "./utils/parseGithubUserRepo";
 
+        import isGitUsed from "./cmd/isGitUsed";
+
         // git
         import gitInstall from "./cmd/git/gitInstall";
         import gitUpdate from "./cmd/git/gitUpdate";
@@ -749,9 +751,19 @@ export default class PluginsManager extends EventEmitter {
 
                 this._logger?.("debug", "Update with new plugin version", false, pluginName);
 
-                return gitUpdate(directory, latestTag).then((): Promise<Orchestrator> => {
+                return isGitUsed(directory).then((check: boolean): void => {
 
-                    return createPluginByDirectory(directory, this.externalResourcesDirectory, this._logger, ...data);
+                    if (!check) {
+                        throw new Error("Git is not enabled in the plugin directory");
+                    }
+
+                }).then((): Promise<Orchestrator> => {
+
+                    return gitUpdate(directory, latestTag).then((): Promise<Orchestrator> => {
+
+                        return createPluginByDirectory(directory, this.externalResourcesDirectory, this._logger, ...data);
+
+                    });
 
                 });
 
