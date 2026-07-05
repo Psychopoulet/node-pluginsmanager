@@ -656,7 +656,6 @@ export default class PluginsManager extends EventEmitter {
         public updateViaGithub (plugin: Orchestrator, ...data: unknown[]): Promise<Orchestrator> {
 
             let directory: string = "";
-            let key: number = -1;
             let pluginName: string = "";
 
             // check plugin
@@ -664,11 +663,7 @@ export default class PluginsManager extends EventEmitter {
 
                 pluginName = plugin.name;
 
-                key = this.getPluginsNames().findIndex((pn: string): boolean => {
-                    return pluginName === pn;
-                });
-
-                if (-1 >= key) {
+                if (!this.getPluginsNames().includes(pluginName)) {
                     throw new Error("Plugin \"" + pluginName + "\" is not registered");
                 }
 
@@ -739,7 +734,13 @@ export default class PluginsManager extends EventEmitter {
 
                     this.emit("destroyed", pluginName, ...data);
 
-                    this.plugins.splice(key, 1);
+                    const key: number = this.getPluginsNames().findIndex((pn: string): boolean => {
+                        return pluginName === pn;
+                    });
+
+                    if (-1 < key) {
+                        this.plugins.splice(key, 1);
+                    }
 
                     return latestTag;
 
@@ -786,7 +787,7 @@ export default class PluginsManager extends EventEmitter {
                 }).then((): Orchestrator => {
 
                     this.emit("initialized", _plugin, ...data);
-                    this.plugins[key] = _plugin;
+                    this.plugins.push(_plugin);
 
                     return _plugin;
 
@@ -829,10 +830,6 @@ export default class PluginsManager extends EventEmitter {
             // release plugin
             }).then((): Promise<void> => {
 
-                const key: number = this.getPluginsNames().findIndex((name: string): boolean => {
-                    return name === pluginName;
-                });
-
                 return plugin.release(...data).then((): Promise<void> => {
 
                     return rmdirp(join(this.externalResourcesDirectory, pluginName));
@@ -847,7 +844,13 @@ export default class PluginsManager extends EventEmitter {
 
                     this.emit("destroyed", pluginName, ...data);
 
-                    this.plugins.splice(key, 1);
+                    const key: number = this.getPluginsNames().findIndex((name: string): boolean => {
+                        return name === pluginName;
+                    });
+
+                    if (-1 < key) {
+                        this.plugins.splice(key, 1);
+                    }
 
                 });
 
