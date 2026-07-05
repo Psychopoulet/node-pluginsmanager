@@ -724,6 +724,8 @@ export default class PluginsManager extends EventEmitter {
             // release plugin
             }).then((latestTag: string): Promise<string> => {
 
+                const key: number = this.plugins.indexOf(plugin);
+
                 return plugin.release(...data).then((): Promise<void> => {
 
                     this.emit("released", plugin, ...data);
@@ -733,10 +735,6 @@ export default class PluginsManager extends EventEmitter {
                 }).then((): string => {
 
                     this.emit("destroyed", pluginName, ...data);
-
-                    const key: number = this.getPluginsNames().findIndex((pn: string): boolean => {
-                        return pluginName === pn;
-                    });
 
                     if (-1 < key) {
                         this.plugins.splice(key, 1);
@@ -830,6 +828,8 @@ export default class PluginsManager extends EventEmitter {
             // release plugin
             }).then((): Promise<void> => {
 
+                const key: number = this.plugins.indexOf(plugin);
+
                 return plugin.release(...data).then((): Promise<void> => {
 
                     return rmdirp(join(this.externalResourcesDirectory, pluginName));
@@ -843,10 +843,6 @@ export default class PluginsManager extends EventEmitter {
                 }).then((): void => {
 
                     this.emit("destroyed", pluginName, ...data);
-
-                    const key: number = this.getPluginsNames().findIndex((name: string): boolean => {
-                        return name === pluginName;
-                    });
 
                     if (-1 < key) {
                         this.plugins.splice(key, 1);
