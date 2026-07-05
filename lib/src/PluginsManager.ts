@@ -25,7 +25,6 @@
     import loadSortedPlugins from "./loadSortedPlugins";
     import initSortedPlugins from "./initSortedPlugins";
 
-    import extractGithub from "./utils/extractGithub";
     import getLatestGithubTag from "./utils/getLatestGithubTag";
     import parseGithubUserRepo from "./utils/parseGithubUserRepo";
 
@@ -436,7 +435,7 @@ export default class PluginsManager extends EventEmitter {
 
             return checkOrchestrator("getLatestGithubTag/plugin", plugin).then((): Promise<string> => {
 
-                const githubUserRepo = parseGithubUserRepo(extractGithub(plugin) as string);
+                const githubUserRepo = parseGithubUserRepo(plugin.repository);
 
                 if (!githubUserRepo) {
 

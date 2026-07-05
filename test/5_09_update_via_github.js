@@ -138,30 +138,6 @@ describe("pluginsmanager / update via github", () => {
 
         });
 
-        it("should test update plugins and dependancies with \"github\" parameter", () => {
-
-            const pluginName = basename(TEST_PLUGIN_DIRECTORY);
-
-            return copyPlugin(PLUGINS_DIRECTORY, "test-good-plugin", pluginName, {
-                "name": pluginName,
-                "github": "git://github.com/Psychopoulet/node-pluginsmanager-plugin-test",
-                "dependencies": {}
-            }).then(() => {
-
-                return pluginsManager.loadAll();
-
-            }).then(() => {
-
-                strictEqual(pluginsManager.plugins.length, 4, "Distant plugin not installed");
-
-                return pluginsManager.updateViaGithub(pluginsManager.plugins.find((plugin) => {
-                    return pluginName === plugin.name;
-                }) || null, EVENTS_DATA);
-
-            });
-
-        }).timeout(MAX_TIMOUT);
-
         it("should test update plugins and dependancies with \"repository\" parameter", () => {
 
             pluginsManager.on("updated", (plugin, data) => {
@@ -319,7 +295,7 @@ describe("pluginsmanager / update via github", () => {
 
             return copyPlugin(PLUGINS_DIRECTORY, "test-good-plugin", pluginName, {
                 "name": pluginName,
-                "github": "git://github.com/Psychopoulet/node-pluginsmanager-plugin-test"
+                "repository": "git://github.com/Psychopoulet/node-pluginsmanager-plugin-test"
             }).then(() => {
 
                 return pluginsManagerOutdated.loadAll();
