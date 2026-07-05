@@ -213,11 +213,21 @@ describe("pluginsmanager / install via github", () => {
 
             });
 
+            const pluginsCountBeforeInstall = pluginsManager.plugins.length;
+
             return pluginsManager.installViaGithub(GITHUB_USER, GITHUB_REPO, EVENTS_DATA).then((plugin) => {
 
                 strictEqual(typeof plugin, "object", "Plugin is not an object");
                 strictEqual(typeof plugin.name, "string", "Plugin name is not a string");
                 strictEqual(plugin.name, GITHUB_REPO, "Plugin name is not as expected");
+
+                strictEqual(pluginsManager.plugins.length, pluginsCountBeforeInstall + 1, "Installed plugin is not registered");
+                ok(pluginsManager.getPluginsNames().includes(GITHUB_REPO), "Installed plugin name is not registered");
+                strictEqual(
+                    pluginsManager.plugins.find((p) => {
+                        return GITHUB_REPO === p.name;
+                    }), plugin, "Installed plugin is not in plugins list"
+                );
 
             });
 
@@ -249,11 +259,28 @@ describe("pluginsmanager / install via github", () => {
 
             });
 
+            const pluginsCountBeforeInstall = pluginsManager.plugins.length;
+
             return pluginsManager.installViaGithub(GITHUB_USER, GITHUB_REPO_NOT_BUILDED, EVENTS_DATA).then((plugin) => {
 
                 strictEqual(typeof plugin, "object", "Plugin is not an object");
                 strictEqual(typeof plugin.name, "string", "Plugin name is not a string");
                 strictEqual(plugin.name, GITHUB_REPO_NOT_BUILDED, "Plugin name is not as expected");
+
+                strictEqual(
+                    pluginsManager.plugins.length, pluginsCountBeforeInstall + 1, "Installed plugin is not registered"
+                );
+                ok(
+                    pluginsManager.getPluginsNames().includes(GITHUB_REPO_NOT_BUILDED),
+                    "Installed plugin name is not registered"
+                );
+                strictEqual(
+                    pluginsManager.plugins.find((p) => {
+                        return GITHUB_REPO_NOT_BUILDED === p.name;
+                    }),
+                    plugin,
+                    "Installed plugin is not in plugins list"
+                );
 
             });
 

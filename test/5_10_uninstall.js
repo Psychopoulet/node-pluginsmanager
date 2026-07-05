@@ -115,6 +115,7 @@ describe("pluginsmanager / uninstall", () => {
             });
 
             const pluginName = basename(TEST_PLUGIN_DIRECTORY);
+            let pluginsCountBeforeUninstall = 0;
 
             return copyPlugin(PLUGINS_DIRECTORY, "test-good-plugin", pluginName, {
                 "name": pluginName
@@ -122,11 +123,19 @@ describe("pluginsmanager / uninstall", () => {
                 return pluginsManager.loadAll();
             }).then(() => {
 
-                strictEqual(pluginsManager.plugins.length, 4, "Distant plugin not installed");
+                pluginsCountBeforeUninstall = pluginsManager.plugins.length;
+                ok(pluginsManager.getPluginsNames().includes(pluginName), "Distant plugin not installed");
 
                 return pluginsManager.uninstall(pluginsManager.plugins.find((plugin) => {
                     return pluginName === plugin.name;
                 }) || null, EVENTS_DATA);
+
+            }).then(() => {
+
+                strictEqual(
+                    pluginsManager.plugins.length, pluginsCountBeforeUninstall - 1, "Uninstalled plugin is still registered"
+                );
+                ok(!pluginsManager.getPluginsNames().includes(pluginName), "Uninstalled plugin name is still registered");
 
             });
 
