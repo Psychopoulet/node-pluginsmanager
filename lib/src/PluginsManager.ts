@@ -4,7 +4,7 @@
     import EventEmitter from "node:events";
     import { join } from "node:path";
     import { homedir } from "node:os";
-    import { mkdir, readdir, readFile } from "node:fs/promises";
+    import { mkdir, readdir, readFile, rm } from "node:fs/promises";
 
     // externals
     import versionModulesChecker from "check-version-modules";
@@ -51,6 +51,7 @@
 
     // locals
     import type { GithubTag } from "./utils/getLatestGithubTag";
+    import type { GithubUserRepo } from "./utils/parseGithubUserRepo";
 
     interface iPluginManagerOptions {
         "directory"?: string;
@@ -437,7 +438,7 @@ export default class PluginsManager extends EventEmitter {
 
             return checkOrchestrator("getLatestGithubTag/plugin", plugin).then((): Promise<string> => {
 
-                const githubUserRepo = parseGithubUserRepo(plugin.repository);
+                const githubUserRepo: GithubUserRepo | null = parseGithubUserRepo(plugin.repository);
 
                 if (!githubUserRepo) {
 
@@ -654,8 +655,29 @@ export default class PluginsManager extends EventEmitter {
 
         }
 
-        private _updateWithoutGit (directory: string, latestTag: string): Promise<void> {
-            throw new Error("Git is not enabled in the plugin directory '" + directory + "' to update the plugin with tag '" + latestTag + "'");
+        private _updateWithoutGit (directory: string, githubRepository: string): Promise<void> {
+
+            return rm(directory, {
+                "recursive": true,
+                "force": true
+            }).then((): Promise<void> => {
+
+                const githubUserRepo: GithubUserRepo | null = parseGithubUserRepo(githubRepository);
+
+                if (!githubUserRepo) {
+
+                    throw new Error(
+                        "Plugin has an invalid github project link"
+                    );
+
+                }
+
+                const { user, repo } = githubUserRepo;
+
+                return gitInstall(directory, user, repo);
+
+            });
+
         }
 
         // update a plugin via its github repo, using "data" in arguments for "release", "update" and "init" plugin's methods
@@ -663,11 +685,13 @@ export default class PluginsManager extends EventEmitter {
 
             let directory: string = "";
             let pluginName: string = "";
+            let githubRepository: string = "";
 
             // check plugin
             return checkOrchestrator("updateViaGithub/plugin", plugin).then((): void => {
 
                 pluginName = plugin.name;
+                githubRepository = plugin.repository;
 
                 if (!this.getPluginsNames().includes(pluginName)) {
                     throw new Error("Plugin \"" + pluginName + "\" is not registered");
@@ -759,7 +783,7 @@ export default class PluginsManager extends EventEmitter {
 
                     return gitUsed
                         ? gitUpdate(directory, latestTag)
-                        : this._updateWithoutGit(directory, latestTag);
+                        : this._updateWithoutGit(directory, githubRepository);
 
                 });
 
