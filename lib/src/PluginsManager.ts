@@ -654,6 +654,10 @@ export default class PluginsManager extends EventEmitter {
 
         }
 
+        private _updateWithoutGit (directory: string, latestTag: string): Promise<void> {
+            throw new Error("Git is not enabled in the plugin directory '" + directory + "' to update the plugin with tag '" + latestTag + "'");
+        }
+
         // update a plugin via its github repo, using "data" in arguments for "release", "update" and "init" plugin's methods
         public updateViaGithub (plugin: Orchestrator, ...data: unknown[]): Promise<Orchestrator> {
 
@@ -747,25 +751,22 @@ export default class PluginsManager extends EventEmitter {
                 });
 
             // update plugin
-            }).then((latestTag: string): Promise<Orchestrator> => {
+            }).then((latestTag: string): Promise<void> => {
 
                 this._logger?.("debug", "Update with new plugin version", false, pluginName);
 
-                return isGitUsed(directory).then((check: boolean): void => {
+                return isGitUsed(directory).then((gitUsed: boolean): Promise<void> => {
 
-                    if (!check) {
-                        throw new Error("Git is not enabled in the plugin directory");
-                    }
-
-                }).then((): Promise<Orchestrator> => {
-
-                    return gitUpdate(directory, latestTag).then((): Promise<Orchestrator> => {
-
-                        return createPluginByDirectory(directory, this.externalResourcesDirectory, this._logger, ...data);
-
-                    });
+                    return gitUsed
+                        ? gitUpdate(directory, latestTag)
+                        : this._updateWithoutGit(directory, latestTag);
 
                 });
+
+            // after update, create plugin
+            }).then((): Promise<Orchestrator> => {
+
+                return createPluginByDirectory(directory, this.externalResourcesDirectory, this._logger, ...data);
 
             // check plugin modules versions
             }).then((_plugin: Orchestrator): Promise<Orchestrator> => {
