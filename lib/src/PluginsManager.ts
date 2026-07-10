@@ -84,8 +84,10 @@ export default class PluginsManager extends EventEmitter<{
     "destroyed": [ string, ...unknown[] ]; // plugin name, ...data
     "alldestroyed": [ ...unknown[] ];
 
+    "installing": [ string, number, number, string, ...unknown[] ]; // plugin name, current step, total steps, step description, ...data
     "installed": [ Orchestrator, ...unknown[] ]; // plugin, ...data
 
+    "updating": [ string, number, number, string, ...unknown[] ]; // plugin name, current step, total steps, step description, ...data
     "updated": [ Orchestrator, ...unknown[] ]; // plugin, ...data
 
     "uninstalled": [ string, ...unknown[] ]; // plugin name, ...data

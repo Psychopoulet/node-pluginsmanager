@@ -62,8 +62,12 @@ $ npm install node-pluginsmanager
   * ``` on("destroyed", (pluginName: string, ...unknown[]) => void) : this ``` fires if a plugin is destroyed
   * ``` on("alldestroyed", (...unknown[]) => void) : this ``` fires if all the plugins are destroyed
 
+  * ``` on("installing", (pluginName: string, currentStep: number, maxSteps: number, stepDescription: string, ...unknown[]) => void) : this ``` fires with plugin installation progress
   * ``` on("installed", (plugin: Orchestrator, ...unknown[]) => void) : this ``` fires if a plugin is installed
+
+  * ``` on("updating", (pluginName: string, currentStep: number, maxSteps: number, stepDescription: string, ...unknown[]) => void) : this ``` fires with plugin update progress
   * ``` on("updated", (plugin: Orchestrator, ...unknown[]) => void) : this ``` fires if a plugin is updated
+
   * ``` on("uninstalled", (pluginName: string, ...unknown[]) => void) : this ``` fires if a plugin is uninstalled
 
 ## Examples
