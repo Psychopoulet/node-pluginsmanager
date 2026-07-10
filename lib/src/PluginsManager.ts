@@ -68,7 +68,29 @@
 
 // module
 
-export default class PluginsManager extends EventEmitter {
+export default class PluginsManager extends EventEmitter<{
+
+    "loading": [ string, ...unknown[] ]; // plugin name, ...data
+    "loaded": [ Orchestrator, ...unknown[] ]; // plugin, ...data
+    "allloaded": [ ...unknown[] ];
+
+    "initializing": [ Orchestrator, ...unknown[] ]; // plugin, ...data
+    "initialized": [ Orchestrator, ...unknown[] ]; // plugin, ...data
+    "allinitialized": [ ...unknown[] ];
+
+    "released": [ Orchestrator, ...unknown[] ]; // plugin, ...data
+    "allreleased": [ ...unknown[] ];
+
+    "destroyed": [ string, ...unknown[] ]; // plugin name, ...data
+    "alldestroyed": [ ...unknown[] ];
+
+    "installed": [ Orchestrator, ...unknown[] ]; // plugin, ...data
+
+    "updated": [ Orchestrator, ...unknown[] ]; // plugin, ...data
+
+    "uninstalled": [ string, ...unknown[] ]; // plugin name, ...data
+
+}> {
 
     // attributes
 
@@ -358,8 +380,10 @@ export default class PluginsManager extends EventEmitter {
 
             return Promise.all(this.plugins.map((plugin: Orchestrator): Promise<void> => {
 
+                const pluginName: string = plugin.name;
+
                 return plugin.destroy(...data).then((): void => {
-                    this.emit("destroyed", plugin.name, ...data);
+                    this.emit("destroyed", pluginName, ...data);
                 });
 
             })).then((): void => {
