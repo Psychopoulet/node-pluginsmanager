@@ -756,123 +756,129 @@ export default class PluginsManager extends EventEmitter<{
 
                 });
 
-            // check remote version
-            }).then((): Promise<string> => {
+            }).then((): Promise<boolean> => {
 
-                const currentVersion = semver.coerce(plugin.version);
+                return isGitUsed(directory);
 
-                if (!currentVersion) {
+            }).then((gitUsed: boolean): Promise<Orchestrator> => {
 
-                    throw new Error(
-                        "Plugin \"" + pluginName + "\" has no valid version (\"" + plugin.version + "\")"
-                    );
 
-                }
+                // check remote version
 
-                this._logger?.("debug", "Get github latest tag", false, pluginName);
+                return Promise.resolve().then((): Promise<string> => {
 
-                return this.getLatestGithubTag(plugin).then((tag: string): string => {
+                    const currentVersion = semver.coerce(plugin.version);
 
-                    const latestVersion = semver.coerce(tag);
-
-                    if (!latestVersion) {
+                    if (!currentVersion) {
 
                         throw new Error(
-                            "No valid version found for plugin \"" + pluginName + "\" on github"
+                            "Plugin \"" + pluginName + "\" has no valid version (\"" + plugin.version + "\")"
                         );
 
                     }
 
-                    this._logger?.("debug", "Compare local version with github latest tag", false, pluginName);
+                    this._logger?.("debug", "Get github latest tag", false, pluginName);
 
-                    if (!semver.gt(latestVersion, currentVersion)) {
+                    return this.getLatestGithubTag(plugin).then((tag: string): string => {
 
-                        throw new Error(
-                            "Plugin \"" + pluginName + "\" is already up to date (v" + plugin.version + ")"
-                        );
+                        const latestVersion = semver.coerce(tag);
 
-                    }
+                        if (!latestVersion) {
 
-                    this._logger?.("success", "New version available", false, pluginName);
+                            throw new Error(
+                                "No valid version found for plugin \"" + pluginName + "\" on github"
+                            );
 
-                    return tag;
+                        }
 
-                });
+                        this._logger?.("debug", "Compare local version with github latest tag", false, pluginName);
 
-            // release plugin
-            }).then((latestTag: string): Promise<string> => {
+                        if (!semver.gt(latestVersion, currentVersion)) {
 
-                const key: number = this.plugins.indexOf(plugin);
+                            throw new Error(
+                                "Plugin \"" + pluginName + "\" is already up to date (v" + plugin.version + ")"
+                            );
 
-                return plugin.release(...data).then((): Promise<void> => {
+                        }
 
-                    this.emit("released", plugin, ...data);
+                        this._logger?.("success", "New version available", false, pluginName);
 
-                    return plugin.destroy(...data);
+                        return tag;
 
-                }).then((): string => {
+                    });
 
-                    this.emit("destroyed", pluginName, ...data);
+                // release plugin
+                }).then((latestTag: string): Promise<string> => {
 
-                    if (-1 < key) {
-                        this.plugins.splice(key, 1);
-                    }
+                    const key: number = this.plugins.indexOf(plugin);
 
-                    return latestTag;
+                    return plugin.release(...data).then((): Promise<void> => {
 
-                });
+                        this.emit("released", plugin, ...data);
 
-            // update plugin
-            }).then((latestTag: string): Promise<void> => {
+                        return plugin.destroy(...data);
 
-                this._logger?.("debug", "Update with new plugin version", false, pluginName);
+                    }).then((): string => {
 
-                return isGitUsed(directory).then((gitUsed: boolean): Promise<void> => {
+                        this.emit("destroyed", pluginName, ...data);
+
+                        if (-1 < key) {
+                            this.plugins.splice(key, 1);
+                        }
+
+                        return latestTag;
+
+                    });
+
+                // update plugin
+                }).then((latestTag: string): Promise<void> => {
+
+                    this._logger?.("debug", "Update with new plugin version", false, pluginName);
 
                     return gitUsed
                         ? gitUpdate(directory, latestTag)
                         : this._updateWithoutGit(directory, githubRepository);
 
-                });
+                // after update, create plugin
+                }).then((): Promise<Orchestrator> => {
 
-            // after update, create plugin
-            }).then((): Promise<Orchestrator> => {
+                    return createPluginByDirectory(directory, this.externalResourcesDirectory, this._logger, ...data);
 
-                return createPluginByDirectory(directory, this.externalResourcesDirectory, this._logger, ...data);
+                // check plugin modules versions
+                }).then((_plugin: Orchestrator): Promise<Orchestrator> => {
 
-            // check plugin modules versions
-            }).then((_plugin: Orchestrator): Promise<Orchestrator> => {
+                    this._logger?.("debug", "Check modules", false, pluginName);
 
-                this._logger?.("debug", "Check modules", false, pluginName);
+                    return this.checkModules(_plugin).then((): Orchestrator => {
+                        return _plugin;
+                    });
 
-                return this.checkModules(_plugin).then((): Orchestrator => {
-                    return _plugin;
-                });
+                }).then((_plugin: Orchestrator): Promise<Orchestrator> => {
 
-            }).then((_plugin: Orchestrator): Promise<Orchestrator> => {
+                    // update dependencies & execute update script
+                    return Promise.resolve().then((): Promise<void> => {
 
-                // update dependencies & execute update script
-                return Promise.resolve().then((): Promise<void> => {
+                        return !_plugin.dependencies ? Promise.resolve() : npmUpdate(directory);
 
-                    return !_plugin.dependencies ? Promise.resolve() : npmUpdate(directory);
+                    }).then((): Promise<void> => {
 
-                }).then((): Promise<void> => {
+                        return _plugin.update(...data);
 
-                    return _plugin.update(...data);
+                    }).then((): Promise<void> => {
 
-                }).then((): Promise<void> => {
+                        this.emit("updated", _plugin, ...data);
 
-                    this.emit("updated", _plugin, ...data);
+                        return _plugin.init(...data);
 
-                    return _plugin.init(...data);
+                    // execute init script
+                    }).then((): Orchestrator => {
 
-                // execute init script
-                }).then((): Orchestrator => {
+                        this.emit("initialized", _plugin, ...data);
+                        this.plugins.push(_plugin);
 
-                    this.emit("initialized", _plugin, ...data);
-                    this.plugins.push(_plugin);
+                        return _plugin;
 
-                    return _plugin;
+                    });
 
                 });
 
