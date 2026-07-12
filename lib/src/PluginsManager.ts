@@ -486,19 +486,20 @@ export default class PluginsManager extends EventEmitter<{
         public installViaGithub (user: string, repo: string, ...data: unknown[]): Promise<Orchestrator> {
 
             const MAX_INSTALL_STEPS = 10;
+            let pluginName: string = repo;
 
             return checkAbsoluteDirectory("installViaGithub/directory", this.directory).then((): Promise<void> => {
                 return checkNonEmptyString("installViaGithub/user", user);
             }).then((): Promise<void> => {
-                return checkNonEmptyString("installViaGithub/repo", repo);
+                return checkNonEmptyString("installViaGithub/repo", pluginName);
             }).then((): Promise<string> => {
 
-                const directory: string = join(this.directory, repo);
+                const directory: string = join(this.directory, pluginName);
 
                 return new Promise((resolve: (dir: string) => void, reject: (err: Error) => void): void => {
 
                     checkAbsoluteDirectory("installViaGithub/plugindirectory", directory).then((): void => {
-                        return reject(new Error("\"" + repo + "\" plugin already exists"));
+                        return reject(new Error("\"" + pluginName + "\" plugin already exists"));
                     }).catch((): void => {
                         return resolve(directory);
                     });
@@ -510,13 +511,12 @@ export default class PluginsManager extends EventEmitter<{
                 // download plugin
                 return Promise.resolve().then((): Promise<void> => {
 
-                    this._logger?.("info", "Downloading plugin...", false, repo);
+                    this._logger?.("info", "Downloading plugin...", false, pluginName);
+                    this.emit("installing", pluginName, 1, MAX_INSTALL_STEPS, "Downloading plugin...");
 
-                    this.emit("installing", repo, 1, MAX_INSTALL_STEPS, "Downloading plugin...");
+                    return gitInstall(directory, user, pluginName).then((): void => {
 
-                    return gitInstall(directory, user, repo).then((): void => {
-
-                        this._logger?.("success", "Download success", false, repo);
+                        this._logger?.("success", "Download success", false, pluginName);
 
                     });
 
@@ -526,7 +526,7 @@ export default class PluginsManager extends EventEmitter<{
                     return isDirectory(directory).then((isPluginADirectory: boolean): void => {
 
                         if (!isPluginADirectory) {
-                            throw new Error("\"" + repo + "\" plugin directory is not created");
+                            throw new Error("\"" + pluginName + "\" plugin directory is not created");
                         }
 
                     });
@@ -540,13 +540,14 @@ export default class PluginsManager extends EventEmitter<{
                     return isFile(packageFile).then((isPluginAPackageFile: boolean): void => {
 
                         if (!isPluginAPackageFile) {
-                            throw new Error("\"" + repo + "\" plugin has no valid package.json");
+                            throw new Error("\"" + pluginName + "\" plugin has no valid package.json");
                         }
 
                     // read package.json and parse it
                     }).then((): Promise<Record<string, unknown>> => {
 
-                        this.emit("installing", repo, 2, MAX_INSTALL_STEPS, "Reading package.json...");
+                        this._logger?.("debug", "Reading package.json...", false, pluginName);
+                        this.emit("installing", pluginName, 2, MAX_INSTALL_STEPS, "Reading package.json...");
 
                         return readFile(packageFile, "utf-8").then((content: string): Record<string, unknown> => {
                             return JSON.parse(content) as Record<string, unknown>;
@@ -556,14 +557,14 @@ export default class PluginsManager extends EventEmitter<{
 
                         // check if the plugin has a valid name
                         if ("string" !== typeof packageData.name || "" === packageData.name.trim()) {
-                            throw new Error("\"" + repo + "\" plugin has no valid name");
+                            throw new Error("\"" + pluginName + "\" plugin has no valid name");
                         }
 
-                        const pluginName: string = packageData.name;
+                        pluginName = packageData.name;
 
                         // check if the plugin has a valid entry point
                         if ("string" !== typeof packageData.main || "" === packageData.main.trim()) {
-                            throw new Error("\"" + repo + "\" plugin has no valid entry point");
+                            throw new Error("\"" + pluginName + "\" plugin has no valid entry point");
                         }
 
                         const entryPoint: string = join(directory, packageData.main);
@@ -579,18 +580,17 @@ export default class PluginsManager extends EventEmitter<{
                             // check if the plugin has a build script
 
                             if ("object" !== typeof packageData.scripts || null === packageData.scripts || 0 >= Object.keys(packageData.scripts).length) {
-                                throw new Error("\"" + repo + "\" plugin has no scripts registered");
+                                throw new Error("\"" + pluginName + "\" plugin has no scripts registered");
                             }
 
                             const scripts: Record<string, string> = packageData.scripts as Record<string, string>;
 
                             if ("string" !== typeof scripts.build || "" === scripts.build.trim()) {
-                                throw new Error("\"" + repo + "\" plugin has no build script registered");
+                                throw new Error("\"" + pluginName + "\" plugin has no build script registered");
                             }
 
                             this._logger?.("info", "Installing dev dependencies...", false, pluginName);
-
-                            this.emit("installing", repo, 3, MAX_INSTALL_STEPS, "Installing dev dependencies...");
+                            this.emit("installing", pluginName, 3, MAX_INSTALL_STEPS, "Installing dev dependencies...");
 
                             // install plugin with dependencies
                             return npmInstall(directory, true).then((): Promise<void> => {
@@ -598,7 +598,7 @@ export default class PluginsManager extends EventEmitter<{
                                 this._logger?.("success", "Plugin installed successfully", false, pluginName);
                                 this._logger?.("info", "Building plugin...", false, pluginName);
 
-                                this.emit("installing", repo, 4, MAX_INSTALL_STEPS, "Building plugin...");
+                                this.emit("installing", pluginName, 4, MAX_INSTALL_STEPS, "Building plugin...");
 
                                 return npmBuild(directory);
 
@@ -606,8 +606,7 @@ export default class PluginsManager extends EventEmitter<{
                             }).then((): Promise<void> => {
 
                                 this._logger?.("debug", "Removing dev dependencies...", false, pluginName);
-
-                                this.emit("installing", repo, 5, MAX_INSTALL_STEPS, "Removing dev dependencies...");
+                                this.emit("installing", pluginName, 5, MAX_INSTALL_STEPS, "Removing dev dependencies...");
 
                                 return rmdirp(join(directory, "node_modules")).then((): void => {
 
@@ -624,8 +623,7 @@ export default class PluginsManager extends EventEmitter<{
                             }
 
                             this._logger?.("debug", "Installing plugin dependencies...", false, pluginName);
-
-                            this.emit("installing", repo, 6, MAX_INSTALL_STEPS, "Installing plugin dependencies...");
+                            this.emit("installing", pluginName, 6, MAX_INSTALL_STEPS, "Installing plugin dependencies...");
 
                             return npmInstall(directory).then((): void => {
 
@@ -640,14 +638,16 @@ export default class PluginsManager extends EventEmitter<{
                 // create plugin
                 }).then((): Promise<Orchestrator> => {
 
-                    this.emit("installing", repo, 7, MAX_INSTALL_STEPS, "Creating plugin...");
+                    this._logger?.("debug", "Creating plugin...", false, pluginName);
+                    this.emit("installing", pluginName, 7, MAX_INSTALL_STEPS, "Creating plugin...");
 
                     return createPluginByDirectory(directory, this.externalResourcesDirectory, this._logger, ...data);
 
                 // check plugin modules versions
                 }).then((plugin: Orchestrator): Promise<Orchestrator> => {
 
-                    this.emit("installing", repo, 8, MAX_INSTALL_STEPS, "Checking plugin modules versions...");
+                    this._logger?.("debug", "Checking plugin modules versions...", false, pluginName);
+                    this.emit("installing", pluginName, 8, MAX_INSTALL_STEPS, "Checking plugin modules versions...");
 
                     return this.checkModules(plugin).then((): Promise<Orchestrator> => {
                         return Promise.resolve(plugin);
@@ -658,7 +658,8 @@ export default class PluginsManager extends EventEmitter<{
                     // execute plugin install script
                     return Promise.resolve().then((): Promise<void> => {
 
-                        this.emit("installing", repo, 9, MAX_INSTALL_STEPS, "Executing plugin install script...");
+                        this._logger?.("debug", "Executing plugin install script...", false, pluginName);
+                        this.emit("installing", pluginName, 9, MAX_INSTALL_STEPS, "Executing plugin install script...");
 
                         return plugin.install(...data).then((): void => {
                             this.emit("installed", plugin, ...data);
@@ -667,7 +668,8 @@ export default class PluginsManager extends EventEmitter<{
                     // execute init plugin script
                     }).then((): Promise<void> => {
 
-                        this.emit("installing", repo, 10, MAX_INSTALL_STEPS, "Executing plugin init script...");
+                        this._logger?.("debug", "Executing plugin init script...", false, pluginName);
+                        this.emit("installing", pluginName, 10, MAX_INSTALL_STEPS, "Executing plugin init script...");
 
                         return plugin.init(...data).then((): void => {
                             this.emit("initialized", plugin, ...data);
