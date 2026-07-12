@@ -19,7 +19,12 @@ export default function isGitUsed (directory: string): Promise<boolean> {
 
         return new Promise((resolve: (value: boolean) => void): void => {
 
-            cmd(directory, "git", [ "fetch" ]).then(() => {
+            cmd(directory, "git", [
+                "rev-parse",
+                "-q",
+                "--verify",
+                "HEAD"
+            ]).then(() => {
                 resolve(true);
             }).catch(() => {
                 resolve(false);
