@@ -764,9 +764,9 @@ export default class PluginsManager extends EventEmitter<{
 
             }).then((gitUsed: boolean): Promise<Orchestrator> => {
 
+                const MAX_UPDATE_STEPS = 7;
 
                 // check remote version
-
                 return Promise.resolve().then((): Promise<string> => {
 
                     const currentVersion = semver.coerce(plugin.version);
@@ -780,6 +780,7 @@ export default class PluginsManager extends EventEmitter<{
                     }
 
                     this._logger?.("debug", "Get github latest tag", false, pluginName);
+                    this.emit("updating", pluginName, 1, MAX_UPDATE_STEPS, "Getting github latest tag...");
 
                     return this.getLatestGithubTag(plugin).then((tag: string): string => {
 
@@ -812,6 +813,9 @@ export default class PluginsManager extends EventEmitter<{
                 // release plugin
                 }).then((latestTag: string): Promise<string> => {
 
+                    this._logger?.("debug", "Releasing plugin...", false, pluginName);
+                    this.emit("updating", pluginName, 2, MAX_UPDATE_STEPS, "Releasing plugin...");
+
                     const key: number = this.plugins.indexOf(plugin);
 
                     return plugin.release(...data).then((): Promise<void> => {
@@ -836,6 +840,7 @@ export default class PluginsManager extends EventEmitter<{
                 }).then((latestTag: string): Promise<void> => {
 
                     this._logger?.("debug", "Update with new plugin version", false, pluginName);
+                    this.emit("updating", pluginName, 3, MAX_UPDATE_STEPS, "Updating plugin with new version...");
 
                     return gitUsed
                         ? gitUpdate(directory, latestTag)
@@ -843,6 +848,9 @@ export default class PluginsManager extends EventEmitter<{
 
                 // after update, create plugin
                 }).then((): Promise<Orchestrator> => {
+
+                    this._logger?.("debug", "Creating plugin...", false, pluginName);
+                    this.emit("updating", pluginName, 4, MAX_UPDATE_STEPS, "Creating plugin...");
 
                     return createPluginByDirectory(directory, this.externalResourcesDirectory, this._logger, ...data);
 
@@ -860,13 +868,22 @@ export default class PluginsManager extends EventEmitter<{
                     // update dependencies & execute update script
                     return Promise.resolve().then((): Promise<void> => {
 
+                        this._logger?.("debug", "Updating dependencies...", false, pluginName);
+                        this.emit("updating", pluginName, 5, MAX_UPDATE_STEPS, "Updating dependencies...");
+
                         return !_plugin.dependencies ? Promise.resolve() : npmUpdate(directory);
 
                     }).then((): Promise<void> => {
 
+                        this._logger?.("debug", "Executing plugin update script...", false, pluginName);
+                        this.emit("updating", pluginName, 6, MAX_UPDATE_STEPS, "Executing plugin update script...");
+
                         return _plugin.update(...data);
 
                     }).then((): Promise<void> => {
+
+                        this._logger?.("debug", "Executing plugin init script...", false, pluginName);
+                        this.emit("updating", pluginName, 7, MAX_UPDATE_STEPS, "Executing plugin init script...");
 
                         this.emit("updated", _plugin, ...data);
 
