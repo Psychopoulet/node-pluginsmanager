@@ -48,23 +48,27 @@ $ npm install node-pluginsmanager
 
   * ``` on("error", (err: Error) => void) : this ``` fires if an error occurs
 
-  * ``` on("loading", (plugin: Orchestrator, data?: any) => void) : this ``` fires if a plugin starts load
-  * ``` on("loaded", (plugin: Orchestrator, data?: any) => void) : this ``` fires if a plugin ends load
-  * ``` on("allloaded", (data?: any) => void) : this ``` fires if all the plugins are loaded
+  * ``` on("loading", (pluginName: string, ...unknown[]) => void) : this ``` fires if a plugin starts load
+  * ``` on("loaded", (plugin: Orchestrator, ...unknown[]) => void) : this ``` fires if a plugin ends load
+  * ``` on("allloaded", (...unknown[]) => void) : this ``` fires if all the plugins are loaded
 
-  * ``` on("initializing", (plugin: Orchestrator, data?: any) => void) : this ``` fires if a plugin starts init
-  * ``` on("initialized", (plugin: Orchestrator, data?: any) => void) : this ``` fires if a plugin ends init
-  * ``` on("allinitialized", (data?: any) => void) : this ``` fires if all the plugins are initialized
+  * ``` on("initializing", (plugin: Orchestrator, ...unknown[]) => void) : this ``` fires if a plugin starts init
+  * ``` on("initialized", (plugin: Orchestrator, ...unknown[]) => void) : this ``` fires if a plugin ends init
+  * ``` on("allinitialized", (...unknown[]) => void) : this ``` fires if all the plugins are initialized
 
-  * ``` on("released", (plugin: Orchestrator, data?: any) => void) : this ``` fires if a plugin is released
-  * ``` on("allreleased", (data?: any) => void) : this ``` fires if all the plugins are released
+  * ``` on("released", (plugin: Orchestrator, ...unknown[]) => void) : this ``` fires if a plugin is released
+  * ``` on("allreleased", (...unknown[]) => void) : this ``` fires if all the plugins are released
 
-  * ``` on("destroyed", (pluginName: string, data?: any) => void) : this ``` fires if a plugin is destroyed
-  * ``` on("alldestroyed", (data?: any) => void) : this ``` fires if all the plugins are destroyed
+  * ``` on("destroyed", (pluginName: string, ...unknown[]) => void) : this ``` fires if a plugin is destroyed
+  * ``` on("alldestroyed", (...unknown[]) => void) : this ``` fires if all the plugins are destroyed
 
-  * ``` on("installed", (pluginName: string, data?: any) => void) : this ``` fires if a plugin is installed
-  * ``` on("updated", (plugin: Orchestrator, data?: any) => void) : this ``` fires if a plugin is updated
-  * ``` on("uninstalled", (pluginName: string, data?: any) => void) : this ``` fires if a plugin is uninstalled
+  * ``` on("installing", (pluginName: string, currentStep: number, maxSteps: number, stepDescription: string, ...unknown[]) => void) : this ``` fires with plugin installation progress
+  * ``` on("installed", (plugin: Orchestrator, ...unknown[]) => void) : this ``` fires if a plugin is installed
+
+  * ``` on("updating", (pluginName: string, currentStep: number, maxSteps: number, stepDescription: string, ...unknown[]) => void) : this ``` fires with plugin update progress
+  * ``` on("updated", (plugin: Orchestrator, ...unknown[]) => void) : this ``` fires if a plugin is updated
+
+  * ``` on("uninstalled", (pluginName: string, ...unknown[]) => void) : this ``` fires if a plugin is uninstalled
 
 ## Examples
 

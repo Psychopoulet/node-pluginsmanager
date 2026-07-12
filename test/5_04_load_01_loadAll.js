@@ -1,7 +1,7 @@
 // deps
 
     // natives
-    const { ok, strictEqual } = require("node:assert");
+    const { deepStrictEqual, ok, strictEqual } = require("node:assert");
     const { join } = require("node:path");
 
     // locals
@@ -166,7 +166,18 @@ describe("pluginsmanager / loadAll", () => {
 
                 strictEqual(typeof pluginsManager.plugins, "object", "plugins is not an object");
                 ok(pluginsManager.plugins instanceof Array, "plugins is not an Array");
-                strictEqual(pluginsManager.plugins.length, 3, "plugins length is not valid");
+
+                const basePlugins = [
+                    "test-good-plugin",
+                    "test-good-plugin-with-default-export",
+                    "test-good-plugin-without-dependencies"
+                ];
+
+                const loadedBasePlugins = pluginsManager.getPluginsNames().filter((name) => {
+                    return basePlugins.includes(name);
+                });
+
+                deepStrictEqual(loadedBasePlugins, basePlugins, "base plugins are not loaded in sorted order");
 
             });
 

@@ -24,7 +24,11 @@
 
     const EVENTS_DATA = "test";
 
-// mock (avoids real GitHub / git pull)
+// mock (avoids real GitHub / git pull / git directory check)
+
+    function mockIsGitUsed () {
+        return Promise.resolve(true);
+    }
 
     function mockGitUpdate () {
         return Promise.resolve();
@@ -43,7 +47,11 @@
         });
     }
 
-    const PluginsManager = proxyquire(join(__dirname, "..", "lib", "cjs", "PluginsManager.js"), {
+    const MOCKS = {
+        "./cmd/isGitUsed": {
+            "__esModule": true,
+            "default": mockIsGitUsed
+        },
         "./cmd/git/gitUpdate": {
             "__esModule": true,
             "default": mockGitUpdate
@@ -52,7 +60,9 @@
             "__esModule": true,
             "default": mockGetLatestGithubTag
         }
-    }).default;
+    };
+
+    const PluginsManager = proxyquire(join(__dirname, "..", "lib", "cjs", "PluginsManager.js"), MOCKS).default;
 
 // tests
 
@@ -105,7 +115,7 @@ describe("pluginsmanager / update via github", () => {
             });
 
                 orchestrator.name = basename(TEST_PLUGIN_DIRECTORY);
-                orchestrator.github = "whatever";
+                orchestrator.repository = "whatever";
 
             pluginsManager.updateViaGithub(orchestrator).then(() => {
                 done(new Error("tests does not generate error"));
@@ -150,6 +160,8 @@ describe("pluginsmanager / update via github", () => {
             });
 
             const pluginName = basename(TEST_PLUGIN_DIRECTORY);
+            let oldPlugin = null;
+            let pluginsCountBeforeUpdate = 0;
 
             return copyPlugin(PLUGINS_DIRECTORY, "test-good-plugin", pluginName, {
                 "name": pluginName,
@@ -160,13 +172,29 @@ describe("pluginsmanager / update via github", () => {
 
             }).then(() => {
 
-                strictEqual(pluginsManager.plugins.length, 4, "Distant plugin not installed");
+                pluginsCountBeforeUpdate = pluginsManager.plugins.length;
+                ok(pluginsManager.getPluginsNames().includes(pluginName), "Distant plugin not installed");
 
-                return pluginsManager.updateViaGithub(pluginsManager.plugins.find((plugin) => {
+                oldPlugin = pluginsManager.plugins.find((plugin) => {
                     return pluginName === plugin.name;
-                }) || null, EVENTS_DATA);
+                }) || null;
 
-            }).then(() => {
+                return pluginsManager.updateViaGithub(oldPlugin, EVENTS_DATA);
+
+            }).then((updatedPlugin) => {
+
+                strictEqual(
+                    pluginsManager.plugins.length, pluginsCountBeforeUpdate, "plugins length is incorrect after update"
+                );
+                ok(pluginsManager.getPluginsNames().includes(pluginName), "Updated plugin is not registered");
+                ok(pluginsManager.getPluginsNames().includes("test-good-plugin"), "Other plugins were removed during update");
+
+                const registeredPlugin = pluginsManager.plugins.find((plugin) => {
+                    return pluginName === plugin.name;
+                }) || null;
+
+                ok(oldPlugin !== registeredPlugin, "Updated plugin was not pushed as new instance");
+                strictEqual(registeredPlugin, updatedPlugin, "Registered plugin is not the updated instance");
 
                 return checkDirectory.default("update/execute", TEST_PLUGIN_MODULES_DIRECTORY);
 
@@ -177,6 +205,8 @@ describe("pluginsmanager / update via github", () => {
         it("should test update plugins and dependancies with \"repository.url\" parameter", () => {
 
             const pluginName = basename(TEST_PLUGIN_DIRECTORY);
+            let oldPlugin = null;
+            let pluginsCountBeforeUpdate = 0;
 
             return copyPlugin(PLUGINS_DIRECTORY, "test-good-plugin", pluginName, {
                 "name": pluginName,
@@ -190,13 +220,28 @@ describe("pluginsmanager / update via github", () => {
 
             }).then(() => {
 
-                strictEqual(pluginsManager.plugins.length, 4, "Distant plugin not installed");
+                pluginsCountBeforeUpdate = pluginsManager.plugins.length;
+                ok(pluginsManager.getPluginsNames().includes(pluginName), "Distant plugin not installed");
 
-                return pluginsManager.updateViaGithub(pluginsManager.plugins.find((plugin) => {
+                oldPlugin = pluginsManager.plugins.find((plugin) => {
                     return pluginName === plugin.name;
-                }) || null, EVENTS_DATA);
+                }) || null;
 
-            }).then(() => {
+                return pluginsManager.updateViaGithub(oldPlugin, EVENTS_DATA);
+
+            }).then((updatedPlugin) => {
+
+                strictEqual(
+                    pluginsManager.plugins.length, pluginsCountBeforeUpdate, "plugins length is incorrect after update"
+                );
+                ok(pluginsManager.getPluginsNames().includes(pluginName), "Updated plugin is not registered");
+
+                const registeredPlugin = pluginsManager.plugins.find((plugin) => {
+                    return pluginName === plugin.name;
+                }) || null;
+
+                ok(oldPlugin !== registeredPlugin, "Updated plugin was not pushed as new instance");
+                strictEqual(registeredPlugin, updatedPlugin, "Registered plugin is not the updated instance");
 
                 return checkDirectory.default("update/execute", TEST_PLUGIN_MODULES_DIRECTORY);
 
@@ -239,7 +284,7 @@ describe("pluginsmanager / update via github", () => {
 
             return copyPlugin(PLUGINS_DIRECTORY, "test-good-plugin", pluginName, {
                 "name": pluginName,
-                "github": "whatever",
+                "repository": "whatever",
                 "version": "0.0.1"
             }).then(() => {
 
@@ -266,10 +311,7 @@ describe("pluginsmanager / update via github", () => {
         it("should test update with already up to date plugin", () => {
 
             const PluginsManagerOutdated = proxyquire(join(__dirname, "..", "lib", "cjs", "PluginsManager.js"), {
-                "./cmd/git/gitUpdate": {
-                    "__esModule": true,
-                    "default": mockGitUpdate
-                },
+                ...MOCKS,
                 "./utils/getLatestGithubTag": {
                     "__esModule": true,
                     "default": () => {

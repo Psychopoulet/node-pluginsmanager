@@ -4,7 +4,7 @@
     import EventEmitter from "node:events";
     import { join } from "node:path";
     import { homedir } from "node:os";
-    import { mkdir, readdir, readFile } from "node:fs/promises";
+    import { mkdir, readdir, readFile, rm } from "node:fs/promises";
 
     // externals
     import versionModulesChecker from "check-version-modules";
@@ -28,6 +28,8 @@
     import getLatestGithubTag from "./utils/getLatestGithubTag";
     import parseGithubUserRepo from "./utils/parseGithubUserRepo";
 
+        import isGitUsed from "./cmd/isGitUsed";
+
         // git
         import gitInstall from "./cmd/git/gitInstall";
         import gitUpdate from "./cmd/git/gitUpdate";
@@ -49,6 +51,7 @@
 
     // locals
     import type { GithubTag } from "./utils/getLatestGithubTag";
+    import type { GithubUserRepo } from "./utils/parseGithubUserRepo";
 
     interface iPluginManagerOptions {
         "directory"?: string;
@@ -65,7 +68,31 @@
 
 // module
 
-export default class PluginsManager extends EventEmitter {
+export default class PluginsManager extends EventEmitter<{
+
+    "loading": [ string, ...unknown[] ]; // plugin name, ...data
+    "loaded": [ Orchestrator, ...unknown[] ]; // plugin, ...data
+    "allloaded": [ ...unknown[] ];
+
+    "initializing": [ Orchestrator, ...unknown[] ]; // plugin, ...data
+    "initialized": [ Orchestrator, ...unknown[] ]; // plugin, ...data
+    "allinitialized": [ ...unknown[] ];
+
+    "released": [ Orchestrator, ...unknown[] ]; // plugin, ...data
+    "allreleased": [ ...unknown[] ];
+
+    "destroyed": [ string, ...unknown[] ]; // plugin name, ...data
+    "alldestroyed": [ ...unknown[] ];
+
+    "installing": [ string, number, number, string, ...unknown[] ]; // plugin name, current step, total steps, step description, ...data
+    "installed": [ Orchestrator, ...unknown[] ]; // plugin, ...data
+
+    "updating": [ string, number, number, string, ...unknown[] ]; // plugin name, current step, total steps, step description, ...data
+    "updated": [ Orchestrator, ...unknown[] ]; // plugin, ...data
+
+    "uninstalled": [ string, ...unknown[] ]; // plugin name, ...data
+
+}> {
 
     // attributes
 
@@ -355,8 +382,10 @@ export default class PluginsManager extends EventEmitter {
 
             return Promise.all(this.plugins.map((plugin: Orchestrator): Promise<void> => {
 
+                const pluginName: string = plugin.name;
+
                 return plugin.destroy(...data).then((): void => {
-                    this.emit("destroyed", plugin.name, ...data);
+                    this.emit("destroyed", pluginName, ...data);
                 });
 
             })).then((): void => {
@@ -435,7 +464,7 @@ export default class PluginsManager extends EventEmitter {
 
             return checkOrchestrator("getLatestGithubTag/plugin", plugin).then((): Promise<string> => {
 
-                const githubUserRepo = parseGithubUserRepo(plugin.repository);
+                const githubUserRepo: GithubUserRepo | null = parseGithubUserRepo(plugin.repository);
 
                 if (!githubUserRepo) {
 
@@ -456,18 +485,21 @@ export default class PluginsManager extends EventEmitter {
         // install a plugin via github repo, using "data" in arguments for "install" and "init" plugin's Orchestrator methods
         public installViaGithub (user: string, repo: string, ...data: unknown[]): Promise<Orchestrator> {
 
+            const MAX_INSTALL_STEPS = 10;
+            let pluginName: string = repo;
+
             return checkAbsoluteDirectory("installViaGithub/directory", this.directory).then((): Promise<void> => {
                 return checkNonEmptyString("installViaGithub/user", user);
             }).then((): Promise<void> => {
-                return checkNonEmptyString("installViaGithub/repo", repo);
+                return checkNonEmptyString("installViaGithub/repo", pluginName);
             }).then((): Promise<string> => {
 
-                const directory: string = join(this.directory, repo);
+                const directory: string = join(this.directory, pluginName);
 
                 return new Promise((resolve: (dir: string) => void, reject: (err: Error) => void): void => {
 
                     checkAbsoluteDirectory("installViaGithub/plugindirectory", directory).then((): void => {
-                        return reject(new Error("\"" + repo + "\" plugin already exists"));
+                        return reject(new Error("\"" + pluginName + "\" plugin already exists"));
                     }).catch((): void => {
                         return resolve(directory);
                     });
@@ -479,11 +511,12 @@ export default class PluginsManager extends EventEmitter {
                 // download plugin
                 return Promise.resolve().then((): Promise<void> => {
 
-                    this._logger?.("info", "Downloading plugin...", false, repo);
+                    this._logger?.("info", "Downloading plugin...", false, pluginName);
+                    this.emit("installing", pluginName, 1, MAX_INSTALL_STEPS, "Downloading plugin...");
 
-                    return gitInstall(directory, user, repo).then((): void => {
+                    return gitInstall(directory, user, pluginName).then((): void => {
 
-                        this._logger?.("success", "Download success", false, repo);
+                        this._logger?.("success", "Download success", false, pluginName);
 
                     });
 
@@ -493,7 +526,7 @@ export default class PluginsManager extends EventEmitter {
                     return isDirectory(directory).then((isPluginADirectory: boolean): void => {
 
                         if (!isPluginADirectory) {
-                            throw new Error("\"" + repo + "\" plugin directory is not created");
+                            throw new Error("\"" + pluginName + "\" plugin directory is not created");
                         }
 
                     });
@@ -507,11 +540,14 @@ export default class PluginsManager extends EventEmitter {
                     return isFile(packageFile).then((isPluginAPackageFile: boolean): void => {
 
                         if (!isPluginAPackageFile) {
-                            throw new Error("\"" + repo + "\" plugin has no valid package.json");
+                            throw new Error("\"" + pluginName + "\" plugin has no valid package.json");
                         }
 
                     // read package.json and parse it
                     }).then((): Promise<Record<string, unknown>> => {
+
+                        this._logger?.("debug", "Reading package.json...", false, pluginName);
+                        this.emit("installing", pluginName, 2, MAX_INSTALL_STEPS, "Reading package.json...");
 
                         return readFile(packageFile, "utf-8").then((content: string): Record<string, unknown> => {
                             return JSON.parse(content) as Record<string, unknown>;
@@ -521,14 +557,14 @@ export default class PluginsManager extends EventEmitter {
 
                         // check if the plugin has a valid name
                         if ("string" !== typeof packageData.name || "" === packageData.name.trim()) {
-                            throw new Error("\"" + repo + "\" plugin has no valid name");
+                            throw new Error("\"" + pluginName + "\" plugin has no valid name");
                         }
 
-                        const pluginName: string = packageData.name;
+                        pluginName = packageData.name;
 
                         // check if the plugin has a valid entry point
                         if ("string" !== typeof packageData.main || "" === packageData.main.trim()) {
-                            throw new Error("\"" + repo + "\" plugin has no valid entry point");
+                            throw new Error("\"" + pluginName + "\" plugin has no valid entry point");
                         }
 
                         const entryPoint: string = join(directory, packageData.main);
@@ -544,16 +580,17 @@ export default class PluginsManager extends EventEmitter {
                             // check if the plugin has a build script
 
                             if ("object" !== typeof packageData.scripts || null === packageData.scripts || 0 >= Object.keys(packageData.scripts).length) {
-                                throw new Error("\"" + repo + "\" plugin has no scripts registered");
+                                throw new Error("\"" + pluginName + "\" plugin has no scripts registered");
                             }
 
                             const scripts: Record<string, string> = packageData.scripts as Record<string, string>;
 
                             if ("string" !== typeof scripts.build || "" === scripts.build.trim()) {
-                                throw new Error("\"" + repo + "\" plugin has no build script registered");
+                                throw new Error("\"" + pluginName + "\" plugin has no build script registered");
                             }
 
                             this._logger?.("info", "Installing dev dependencies...", false, pluginName);
+                            this.emit("installing", pluginName, 3, MAX_INSTALL_STEPS, "Installing dev dependencies...");
 
                             // install plugin with dependencies
                             return npmInstall(directory, true).then((): Promise<void> => {
@@ -561,12 +598,15 @@ export default class PluginsManager extends EventEmitter {
                                 this._logger?.("success", "Plugin installed successfully", false, pluginName);
                                 this._logger?.("info", "Building plugin...", false, pluginName);
 
+                                this.emit("installing", pluginName, 4, MAX_INSTALL_STEPS, "Building plugin...");
+
                                 return npmBuild(directory);
 
                             // remove dev dependencies
                             }).then((): Promise<void> => {
 
                                 this._logger?.("debug", "Removing dev dependencies...", false, pluginName);
+                                this.emit("installing", pluginName, 5, MAX_INSTALL_STEPS, "Removing dev dependencies...");
 
                                 return rmdirp(join(directory, "node_modules")).then((): void => {
 
@@ -582,7 +622,8 @@ export default class PluginsManager extends EventEmitter {
                                 return Promise.resolve();
                             }
 
-                            this._logger?.("debug", "Installing dependencies...", false, pluginName);
+                            this._logger?.("debug", "Installing plugin dependencies...", false, pluginName);
+                            this.emit("installing", pluginName, 6, MAX_INSTALL_STEPS, "Installing plugin dependencies...");
 
                             return npmInstall(directory).then((): void => {
 
@@ -597,10 +638,16 @@ export default class PluginsManager extends EventEmitter {
                 // create plugin
                 }).then((): Promise<Orchestrator> => {
 
+                    this._logger?.("debug", "Creating plugin...", false, pluginName);
+                    this.emit("installing", pluginName, 7, MAX_INSTALL_STEPS, "Creating plugin...");
+
                     return createPluginByDirectory(directory, this.externalResourcesDirectory, this._logger, ...data);
 
                 // check plugin modules versions
                 }).then((plugin: Orchestrator): Promise<Orchestrator> => {
+
+                    this._logger?.("debug", "Checking plugin modules versions...", false, pluginName);
+                    this.emit("installing", pluginName, 8, MAX_INSTALL_STEPS, "Checking plugin modules versions...");
 
                     return this.checkModules(plugin).then((): Promise<Orchestrator> => {
                         return Promise.resolve(plugin);
@@ -611,12 +658,18 @@ export default class PluginsManager extends EventEmitter {
                     // execute plugin install script
                     return Promise.resolve().then((): Promise<void> => {
 
+                        this._logger?.("debug", "Executing plugin install script...", false, pluginName);
+                        this.emit("installing", pluginName, 9, MAX_INSTALL_STEPS, "Executing plugin install script...");
+
                         return plugin.install(...data).then((): void => {
                             this.emit("installed", plugin, ...data);
                         });
 
                     // execute init plugin script
                     }).then((): Promise<void> => {
+
+                        this._logger?.("debug", "Executing plugin init script...", false, pluginName);
+                        this.emit("installing", pluginName, 10, MAX_INSTALL_STEPS, "Executing plugin init script...");
 
                         return plugin.init(...data).then((): void => {
                             this.emit("initialized", plugin, ...data);
@@ -652,23 +705,45 @@ export default class PluginsManager extends EventEmitter {
 
         }
 
+        private _updateWithoutGit (directory: string, githubRepository: string): Promise<void> {
+
+            return rm(directory, {
+                "recursive": true,
+                "force": true
+            }).then((): Promise<void> => {
+
+                const githubUserRepo: GithubUserRepo | null = parseGithubUserRepo(githubRepository);
+
+                if (!githubUserRepo) {
+
+                    throw new Error(
+                        "Plugin has an invalid github project link"
+                    );
+
+                }
+
+                const { user, repo } = githubUserRepo;
+
+                return gitInstall(directory, user, repo);
+
+            });
+
+        }
+
         // update a plugin via its github repo, using "data" in arguments for "release", "update" and "init" plugin's methods
         public updateViaGithub (plugin: Orchestrator, ...data: unknown[]): Promise<Orchestrator> {
 
             let directory: string = "";
-            let key: number = -1;
             let pluginName: string = "";
+            let githubRepository: string = "";
 
             // check plugin
             return checkOrchestrator("updateViaGithub/plugin", plugin).then((): void => {
 
                 pluginName = plugin.name;
+                githubRepository = plugin.repository;
 
-                key = this.getPluginsNames().findIndex((pn: string): boolean => {
-                    return pluginName === pn;
-                });
-
-                if (-1 >= key) {
+                if (!this.getPluginsNames().includes(pluginName)) {
                     throw new Error("Plugin \"" + pluginName + "\" is not registered");
                 }
 
@@ -683,112 +758,146 @@ export default class PluginsManager extends EventEmitter {
 
                 });
 
-            // check remote version
-            }).then((): Promise<string> => {
+            }).then((): Promise<boolean> => {
 
-                const currentVersion = semver.coerce(plugin.version);
+                return isGitUsed(directory);
 
-                if (!currentVersion) {
+            }).then((gitUsed: boolean): Promise<Orchestrator> => {
 
-                    throw new Error(
-                        "Plugin \"" + pluginName + "\" has no valid version (\"" + plugin.version + "\")"
-                    );
+                const MAX_UPDATE_STEPS = 7;
 
-                }
+                // check remote version
+                return Promise.resolve().then((): Promise<string> => {
 
-                this._logger?.("debug", "Get github latest tag", false, pluginName);
+                    const currentVersion = semver.coerce(plugin.version);
 
-                return this.getLatestGithubTag(plugin).then((tag: string): string => {
-
-                    const latestVersion = semver.coerce(tag);
-
-                    if (!latestVersion) {
+                    if (!currentVersion) {
 
                         throw new Error(
-                            "No valid version found for plugin \"" + pluginName + "\" on github"
+                            "Plugin \"" + pluginName + "\" has no valid version (\"" + plugin.version + "\")"
                         );
 
                     }
 
-                    this._logger?.("debug", "Compare local version with github latest tag", false, pluginName);
+                    this._logger?.("debug", "Get github latest tag", false, pluginName);
+                    this.emit("updating", pluginName, 1, MAX_UPDATE_STEPS, "Getting github latest tag...");
 
-                    if (!semver.gt(latestVersion, currentVersion)) {
+                    return this.getLatestGithubTag(plugin).then((tag: string): string => {
 
-                        throw new Error(
-                            "Plugin \"" + pluginName + "\" is already up to date (v" + plugin.version + ")"
-                        );
+                        const latestVersion = semver.coerce(tag);
 
-                    }
+                        if (!latestVersion) {
 
-                    this._logger?.("success", "New version available", false, pluginName);
+                            throw new Error(
+                                "No valid version found for plugin \"" + pluginName + "\" on github"
+                            );
 
-                    return tag;
+                        }
 
-                });
+                        this._logger?.("debug", "Compare local version with github latest tag", false, pluginName);
 
-            // release plugin
-            }).then((latestTag: string): Promise<string> => {
+                        if (!semver.gt(latestVersion, currentVersion)) {
 
-                return plugin.release(...data).then((): Promise<void> => {
+                            throw new Error(
+                                "Plugin \"" + pluginName + "\" is already up to date (v" + plugin.version + ")"
+                            );
 
-                    this.emit("released", plugin, ...data);
+                        }
 
-                    return plugin.destroy(...data);
+                        this._logger?.("success", "New version available", false, pluginName);
 
-                }).then((): string => {
+                        return tag;
 
-                    this.emit("destroyed", pluginName, ...data);
+                    });
 
-                    this.plugins.splice(key, 1);
+                // release plugin
+                }).then((latestTag: string): Promise<string> => {
 
-                    return latestTag;
+                    this._logger?.("debug", "Releasing plugin...", false, pluginName);
+                    this.emit("updating", pluginName, 2, MAX_UPDATE_STEPS, "Releasing plugin...");
 
-                });
+                    const key: number = this.plugins.indexOf(plugin);
 
-            // update plugin
-            }).then((latestTag: string): Promise<Orchestrator> => {
+                    return plugin.release(...data).then((): Promise<void> => {
 
-                this._logger?.("debug", "Update with new plugin version", false, pluginName);
+                        this.emit("released", plugin, ...data);
 
-                return gitUpdate(directory, latestTag).then((): Promise<Orchestrator> => {
+                        return plugin.destroy(...data);
+
+                    }).then((): string => {
+
+                        this.emit("destroyed", pluginName, ...data);
+
+                        if (-1 < key) {
+                            this.plugins.splice(key, 1);
+                        }
+
+                        return latestTag;
+
+                    });
+
+                // update plugin
+                }).then((latestTag: string): Promise<void> => {
+
+                    this._logger?.("debug", "Update with new plugin version", false, pluginName);
+                    this.emit("updating", pluginName, 3, MAX_UPDATE_STEPS, "Updating plugin with new version...");
+
+                    return gitUsed
+                        ? gitUpdate(directory, latestTag)
+                        : this._updateWithoutGit(directory, githubRepository);
+
+                // after update, create plugin
+                }).then((): Promise<Orchestrator> => {
+
+                    this._logger?.("debug", "Creating plugin...", false, pluginName);
+                    this.emit("updating", pluginName, 4, MAX_UPDATE_STEPS, "Creating plugin...");
 
                     return createPluginByDirectory(directory, this.externalResourcesDirectory, this._logger, ...data);
 
-                });
+                // check plugin modules versions
+                }).then((_plugin: Orchestrator): Promise<Orchestrator> => {
 
-            // check plugin modules versions
-            }).then((_plugin: Orchestrator): Promise<Orchestrator> => {
+                    this._logger?.("debug", "Check modules", false, pluginName);
 
-                this._logger?.("debug", "Check modules", false, pluginName);
+                    return this.checkModules(_plugin).then((): Orchestrator => {
+                        return _plugin;
+                    });
 
-                return this.checkModules(_plugin).then((): Orchestrator => {
-                    return _plugin;
-                });
+                }).then((_plugin: Orchestrator): Promise<Orchestrator> => {
 
-            }).then((_plugin: Orchestrator): Promise<Orchestrator> => {
+                    // update dependencies & execute update script
+                    return Promise.resolve().then((): Promise<void> => {
 
-                // update dependencies & execute update script
-                return Promise.resolve().then((): Promise<void> => {
+                        this._logger?.("debug", "Updating dependencies...", false, pluginName);
+                        this.emit("updating", pluginName, 5, MAX_UPDATE_STEPS, "Updating dependencies...");
 
-                    return !_plugin.dependencies ? Promise.resolve() : npmUpdate(directory);
+                        return !_plugin.dependencies ? Promise.resolve() : npmUpdate(directory);
 
-                }).then((): Promise<void> => {
+                    }).then((): Promise<void> => {
 
-                    return _plugin.update(...data);
+                        this._logger?.("debug", "Executing plugin update script...", false, pluginName);
+                        this.emit("updating", pluginName, 6, MAX_UPDATE_STEPS, "Executing plugin update script...");
 
-                }).then((): Promise<void> => {
+                        return _plugin.update(...data);
 
-                    this.emit("updated", _plugin, ...data);
+                    }).then((): Promise<void> => {
 
-                    return _plugin.init(...data);
+                        this._logger?.("debug", "Executing plugin init script...", false, pluginName);
+                        this.emit("updating", pluginName, 7, MAX_UPDATE_STEPS, "Executing plugin init script...");
 
-                // execute init script
-                }).then((): Orchestrator => {
+                        this.emit("updated", _plugin, ...data);
 
-                    this.emit("initialized", _plugin, ...data);
-                    this.plugins[key] = _plugin;
+                        return _plugin.init(...data);
 
-                    return _plugin;
+                    // execute init script
+                    }).then((): Orchestrator => {
+
+                        this.emit("initialized", _plugin, ...data);
+                        this.plugins.push(_plugin);
+
+                        return _plugin;
+
+                    });
 
                 });
 
@@ -829,9 +938,7 @@ export default class PluginsManager extends EventEmitter {
             // release plugin
             }).then((): Promise<void> => {
 
-                const key: number = this.getPluginsNames().findIndex((name: string): boolean => {
-                    return name === pluginName;
-                });
+                const key: number = this.plugins.indexOf(plugin);
 
                 return plugin.release(...data).then((): Promise<void> => {
 
@@ -847,7 +954,9 @@ export default class PluginsManager extends EventEmitter {
 
                     this.emit("destroyed", pluginName, ...data);
 
-                    this.plugins.splice(key, 1);
+                    if (-1 < key) {
+                        this.plugins.splice(key, 1);
+                    }
 
                 });
 

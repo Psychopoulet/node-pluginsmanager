@@ -57,8 +57,8 @@ try {
 		})
 
 		// release
-		.on("released", (pluginName: string): void => {
-			console.log("--- [event/released] '" + pluginName + " released ---");
+		.on("released", (plugin: Orchestrator): void => {
+			console.log("--- [event/released] '" + plugin.name + "' (v" + plugin.version + ") released ---");
 		}).on("allreleased", (): void => {
 			console.log("--- [event/released] all plugins released ---");
 		})
