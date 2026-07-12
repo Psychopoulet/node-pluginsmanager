@@ -11,10 +11,10 @@
 
 export default function isGitUsed (directory: string): Promise<boolean> {
 
-    return isDirectory(join(directory, ".git")).then((check: boolean): Promise<boolean> => {
+    return isDirectory(join(directory, ".git")).then((check: boolean): Promise<boolean> | boolean => {
 
         if (!check) {
-            return Promise.resolve(false);
+            return false;
         }
 
         return new Promise((resolve: (value: boolean) => void): void => {
