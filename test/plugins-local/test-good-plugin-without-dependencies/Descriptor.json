@@ -1,0 +1,45 @@
+{
+	"openapi": "3.0.2",
+	"info": {
+		"title": "test-good-plugin-without-dependencies",
+		"version": "0.0.4",
+		"description": "An abstract parent plugin for node-pluginsmanager",
+		"contact": {
+			"name": "Sébastien VIDAL",
+			"url": "https://github.com/Psychopoulet/node-pluginsmanager/issues"
+		},
+		"license": {
+			"name": "ISC",
+			"url": "https://en.wikipedia.org/wiki/ISC_license"
+		}
+	},
+	"paths": {
+		"/test-good-plugin-without-dependencies/get": {
+			"get": {
+				"description": "",
+				"summary": "Simple API test for Server class",
+				"operationId": "get",
+				"responses": {
+					"200": {
+						"description": "Everything is fine",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "array",
+									"items": {
+										"type": "string"
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	},
+	"servers": [],
+	"externalDocs": {
+		"description": "Find out more about this API",
+		"url": "https://github.com/Psychopoulet/node-pluginsmanager#readme"
+	}
+}
