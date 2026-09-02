@@ -401,8 +401,8 @@ export default class PluginsManager extends EventEmitter<{
                 if (conflictingNames.length) {
 
                     return Promise.reject(new Error(
-                        "Cannot load plugins: name conflict between local and external plugins (\"" +
-                        conflictingNames.join("\", \"") + "\")"
+                        "Cannot load plugins: name conflict between local and external plugins (\""
+                        + conflictingNames.join("\", \"") + "\")"
                     ));
 
                 }
@@ -569,6 +569,14 @@ export default class PluginsManager extends EventEmitter<{
             }).then((): Promise<void> => {
                 return checkNonEmptyString("installViaGithub/repo", pluginName);
             }).then((): Promise<string> => {
+
+                if (this._externalPluginNames.has(pluginName)) {
+
+                    throw new Error(
+                        "Plugin \"" + pluginName + "\" is already registered as external and cannot be installed"
+                    );
+
+                }
 
                 const directory: string = join(this.directory, pluginName);
 
@@ -829,6 +837,10 @@ export default class PluginsManager extends EventEmitter<{
                     throw new Error("Plugin \"" + pluginName + "\" is not registered");
                 }
 
+                if (this._isExternalPlugin(plugin)) {
+                    throw new Error("Plugin \"" + pluginName + "\" is external and cannot be updated");
+                }
+
             // check plugin directory
             }).then((): Promise<void> => {
 
@@ -1002,6 +1014,10 @@ export default class PluginsManager extends EventEmitter<{
 
                     if (!this.getPluginsNames().includes(pluginName)) {
                         throw new Error("Plugin \"" + pluginName + "\" is not registered");
+                    }
+
+                    if (this._isExternalPlugin(plugin)) {
+                        throw new Error("Plugin \"" + pluginName + "\" is external and cannot be uninstalled");
                     }
 
                 });
