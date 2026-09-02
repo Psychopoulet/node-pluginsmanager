@@ -25,6 +25,7 @@ $ npm install node-pluginsmanager
 
   * simply manage plugins (extended from [node-pluginsmanager-plugin](https://github.com/Psychopoulet/node-pluginsmanager-plugin)) to interact with specifics hardwares / API / whatever
   * install plugins manually or via github & initialize them
+  * load external plugins from absolute directories (outside the plugins directory)
   * update plugins via github
   * uninstall plugins and release there resources
   * run plugins' middlewares for server, to create specifics rules
@@ -70,9 +71,36 @@ $ npm install node-pluginsmanager
 
   * ``` on("uninstalled", (pluginName: string, ...unknown[]) => void) : this ``` fires if a plugin is uninstalled
 
+## External plugins
+
+External plugins are loaded from absolute directories registered **before** `loadAll()`. They are added to `plugins` and initialized like local plugins, but cannot be updated or uninstalled by the manager.
+
+```typescript
+import { join } from "node:path";
+import PluginsManager from "node-pluginsmanager";
+
+const manager = new PluginsManager({
+  "directory": "/path/to/local/plugins",
+  "externalResourcesDirectory": "/path/to/resources"
+});
+
+await manager.addExternalPluginDirectory("/path/to/external/my-plugin");
+await manager.setOrder([ "my-plugin", "other-plugin" ]); // optional
+await manager.loadAll();
+await manager.initAll();
+```
+
+Rules:
+
+  * each path must be an **absolute** directory pointing to a plugin root
+  * registration must happen **before** `loadAll()`
+  * a plugin name cannot exist both locally and externally
+  * external plugins cannot be updated (`updateViaGithub`) or uninstalled (`uninstall`)
+  * `releaseAll()` and `destroyAll()` still apply to external plugins
+
 ## Examples
 
-[check the TypeScript compilation tests](https://github.com/Psychopoulet/node-pluginsmanager/blob/master/test/typescript/compilation.ts)
+[check the TypeScript compilation tests](https://github.com/Psychopoulet/node-pluginsmanager/blob/master/test/typescript/compilation.cts)
 
 ## Tests
 

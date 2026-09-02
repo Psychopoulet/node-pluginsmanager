@@ -2,7 +2,7 @@
 
     // natives
     import EventEmitter from "node:events";
-    import { join } from "node:path";
+    import { basename, join } from "node:path";
     import { homedir } from "node:os";
     import { mkdir, readdir, readFile, rm } from "node:fs/promises";
 
@@ -50,6 +50,7 @@
     import type { Server as SocketIOServer } from "socket.io";
 
     // locals
+    import type { PluginToLoad } from "./loadSortedPlugins";
     import type { GithubTag } from "./utils/getLatestGithubTag";
     import type { GithubUserRepo } from "./utils/parseGithubUserRepo";
 
@@ -104,6 +105,8 @@ export default class PluginsManager extends EventEmitter<{
         protected _logger: tLogger | null;
 
         protected _orderedPluginsNames: string[];
+        protected _externalPluginDirectories: string[];
+        protected _externalPluginNames: Set<string>;
 
     // public
 
@@ -129,6 +132,8 @@ export default class PluginsManager extends EventEmitter<{
             this._beforeInitAll = null;
 
             this._orderedPluginsNames = [];
+            this._externalPluginDirectories = [];
+            this._externalPluginNames = new Set();
 
             this._logger = "function" === typeof options.logger ? options.logger : null;
 
@@ -147,6 +152,49 @@ export default class PluginsManager extends EventEmitter<{
 
             return this.plugins.map((plugin: Orchestrator): string => {
                 return plugin.name;
+            });
+
+        }
+
+        public addExternalPluginDirectory (directory: string): Promise<void> {
+
+            return checkAbsoluteDirectory("addExternalPluginDirectory/directory", directory).then((): Promise<boolean> => {
+
+                if (this._externalPluginDirectories.includes(directory)) {
+
+                    throw new Error(
+                        "\"" + directory + "\" is already registered as external plugin directory"
+                    );
+
+                }
+
+                const pluginName: string = basename(directory);
+
+                if (this._externalPluginNames.has(pluginName)) {
+
+                    throw new Error(
+                        "External plugin \"" + pluginName + "\" is already registered"
+                    );
+
+                }
+
+                return isDirectory(join(this.directory, pluginName));
+
+            }).then((existsAsLocal: boolean): void => {
+
+                const pluginName: string = basename(directory);
+
+                if (existsAsLocal) {
+
+                    throw new Error(
+                        "Plugin \"" + pluginName + "\" already exists as a local plugin and cannot be added as external"
+                    );
+
+                }
+
+                this._externalPluginDirectories.push(directory);
+                this._externalPluginNames.add(pluginName);
+
             });
 
         }
@@ -346,8 +394,36 @@ export default class PluginsManager extends EventEmitter<{
             // load all
             }).then((files: string[]): Promise<void> => {
 
+                const conflictingNames: string[] = files.filter((fileName: string): boolean => {
+                    return this._externalPluginNames.has(fileName);
+                });
+
+                if (conflictingNames.length) {
+
+                    throw new Error(
+                        "Cannot load plugins: name conflict between local and external plugins (\""
+                        + conflictingNames.join("\", \"") + "\")"
+                    );
+
+                }
+
+                const pluginsToLoad: PluginToLoad[] = [
+                    ...files.map((pluginName: string): PluginToLoad => {
+                        return {
+                            "name": pluginName,
+                            "directory": join(this.directory, pluginName)
+                        };
+                    }),
+                    ...this._externalPluginDirectories.map((directory: string): PluginToLoad => {
+                        return {
+                            "name": basename(directory),
+                            "directory": directory
+                        };
+                    })
+                ];
+
                 return loadSortedPlugins(
-                    this.directory, this.externalResourcesDirectory, files, this.plugins,
+                    pluginsToLoad, this.externalResourcesDirectory, this.plugins,
                     this._orderedPluginsNames, this.emit.bind(this), this._logger, ...data
                 );
 
@@ -493,6 +569,14 @@ export default class PluginsManager extends EventEmitter<{
             }).then((): Promise<void> => {
                 return checkNonEmptyString("installViaGithub/repo", pluginName);
             }).then((): Promise<string> => {
+
+                if (this._externalPluginNames.has(pluginName)) {
+
+                    throw new Error(
+                        "Plugin \"" + pluginName + "\" is already registered as external and cannot be installed"
+                    );
+
+                }
 
                 const directory: string = join(this.directory, pluginName);
 
@@ -705,6 +789,12 @@ export default class PluginsManager extends EventEmitter<{
 
         }
 
+        private _isExternalPlugin (plugin: Orchestrator): boolean {
+
+            return this._externalPluginNames.has(plugin.name);
+
+        }
+
         private _updateWithoutGit (directory: string, githubRepository: string): Promise<void> {
 
             return rm(directory, {
@@ -745,6 +835,10 @@ export default class PluginsManager extends EventEmitter<{
 
                 if (!this.getPluginsNames().includes(pluginName)) {
                     throw new Error("Plugin \"" + pluginName + "\" is not registered");
+                }
+
+                if (this._isExternalPlugin(plugin)) {
+                    throw new Error("Plugin \"" + pluginName + "\" is external and cannot be updated");
                 }
 
             // check plugin directory
@@ -920,6 +1014,10 @@ export default class PluginsManager extends EventEmitter<{
 
                     if (!this.getPluginsNames().includes(pluginName)) {
                         throw new Error("Plugin \"" + pluginName + "\" is not registered");
+                    }
+
+                    if (this._isExternalPlugin(plugin)) {
+                        throw new Error("Plugin \"" + pluginName + "\" is external and cannot be uninstalled");
                     }
 
                 });
