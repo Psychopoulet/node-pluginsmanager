@@ -104,6 +104,7 @@ export default class PluginsManager extends EventEmitter<{
         protected _logger: tLogger | null;
 
         protected _orderedPluginsNames: string[];
+        protected _externalPluginDirectories: string[];
 
     // public
 
@@ -129,6 +130,7 @@ export default class PluginsManager extends EventEmitter<{
             this._beforeInitAll = null;
 
             this._orderedPluginsNames = [];
+            this._externalPluginDirectories = [];
 
             this._logger = "function" === typeof options.logger ? options.logger : null;
 
@@ -147,6 +149,22 @@ export default class PluginsManager extends EventEmitter<{
 
             return this.plugins.map((plugin: Orchestrator): string => {
                 return plugin.name;
+            });
+
+        }
+
+        public addExternalPluginDirectory (directory: string): Promise<void> {
+
+            return checkAbsoluteDirectory("addExternalPluginDirectory/directory", directory).then((): void => {
+
+                if (this._externalPluginDirectories.includes(directory)) {
+                    throw new Error(
+                        "\"" + directory + "\" is already registered as external plugin directory"
+                    );
+                }
+
+                this._externalPluginDirectories.push(directory);
+
             });
 
         }
