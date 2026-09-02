@@ -1,8 +1,5 @@
 // deps
 
-    // natives
-    import { join } from "node:path";
-
     // locals
     import createPluginByDirectory from "./createPluginByDirectory";
 
@@ -11,14 +8,18 @@
     // externals
     import type { Orchestrator, tLogger } from "node-pluginsmanager-plugin";
 
+    export interface iPluginToLoad {
+        "name": string;
+        "directory": string;
+    }
+
 // private
 
     // methods
 
         function _loadPlugin (
-            globalDirectory: string,
+            pluginToLoad: iPluginToLoad,
             externalResourcesDirectory: string,
-            pluginFileName: string,
             loadedPlugins: Orchestrator[],
             emit: (eventName: string, ...subdata: unknown[]) => void,
             logger: tLogger | null,
@@ -27,17 +28,15 @@
 
             // is already loaded ?
             const plugin: Orchestrator | undefined = loadedPlugins.find((p: Orchestrator): boolean => {
-                return pluginFileName === p.name;
+                return pluginToLoad.name === p.name;
             });
 
             // is already exists ?
             return plugin ? Promise.resolve() : Promise.resolve().then((): Promise<Orchestrator> => {
 
-                emit("loading", pluginFileName, ...data);
+                emit("loading", pluginToLoad.name, ...data);
 
-                const directory: string = join(globalDirectory, pluginFileName);
-
-                return createPluginByDirectory(directory, externalResourcesDirectory, logger, ...data);
+                return createPluginByDirectory(pluginToLoad.directory, externalResourcesDirectory, logger, ...data);
 
             // emit event
             }).then((createdPlugin: Orchestrator): Promise<void> => {
@@ -52,8 +51,9 @@
         }
 
         function _loadPlugins (
-            globalDirectory: string, externalResourcesDirectory: string,
-            pluginsToLoad: string[], loadedPlugins: Orchestrator[],
+            pluginsToLoad: iPluginToLoad[],
+            externalResourcesDirectory: string,
+            loadedPlugins: Orchestrator[],
             emit: (eventName: string, ...subdata: unknown[]) => void,
             logger: tLogger | null,
             i: number,
@@ -62,12 +62,12 @@
 
             return i < pluginsToLoad.length ? Promise.resolve().then((): Promise<void> => {
 
-                return _loadPlugin(globalDirectory, externalResourcesDirectory, pluginsToLoad[i], loadedPlugins, emit, logger, ...data);
+                return _loadPlugin(pluginsToLoad[i], externalResourcesDirectory, loadedPlugins, emit, logger, ...data);
 
             // loop
             }).then((): Promise<void> => {
 
-                return _loadPlugins(globalDirectory, externalResourcesDirectory, pluginsToLoad, loadedPlugins, emit, logger, i + 1, ...data);
+                return _loadPlugins(pluginsToLoad, externalResourcesDirectory, loadedPlugins, emit, logger, i + 1, ...data);
 
             }) : Promise.resolve();
 
@@ -76,43 +76,43 @@
 // module
 
 export default function loadSortedPlugins (
-    globalDirectory: string, externalResourcesDirectory: string,
-    files: string[], loadedPlugins: Orchestrator[], orderedPluginsNames: string[],
+    pluginsToLoad: iPluginToLoad[], externalResourcesDirectory: string,
+    loadedPlugins: Orchestrator[], orderedPluginsNames: string[],
     emit: (eventName: string, ...subdata: unknown[]) => void, logger: tLogger | null, ...data: unknown[]
 ): Promise<void> {
 
-    // if no files, does not run
-    return !files.length ? Promise.resolve() : Promise.resolve().then((): Promise<void> => {
+    // if no plugins, does not run
+    return !pluginsToLoad.length ? Promise.resolve() : Promise.resolve().then((): Promise<void> => {
 
-        const sortedPluginsNames: string[] = [];
+        const sortedPlugins: iPluginToLoad[] = [];
         orderedPluginsNames.forEach((pluginName: string): void => {
 
-            const plugin: string | undefined = files.find((p: string): boolean => {
-                return p === pluginName;
+            const plugin: iPluginToLoad | undefined = pluginsToLoad.find((p: iPluginToLoad): boolean => {
+                return p.name === pluginName;
             });
 
-            if ("string" === typeof plugin) {
-                sortedPluginsNames.push(pluginName);
+            if (plugin) {
+                sortedPlugins.push(plugin);
             }
 
         });
 
         // first, sorted plugins
-        return sortedPluginsNames.length
-            ? _loadPlugins(globalDirectory, externalResourcesDirectory, sortedPluginsNames, loadedPlugins, emit, logger, 0, ...data)
+        return sortedPlugins.length
+            ? _loadPlugins(sortedPlugins, externalResourcesDirectory, loadedPlugins, emit, logger, 0, ...data)
             : Promise.resolve();
 
     }).then((): Promise<void> => {
 
-        const unsortedPluginsNames: string[] = [
-            ...files.filter((pluginName: string): boolean => {
-                return !orderedPluginsNames.includes(pluginName);
-            }).sort((a: string, b: string): -1 | 0 | 1 => {
+        const unsortedPlugins: iPluginToLoad[] = [
+            ...pluginsToLoad.filter((plugin: iPluginToLoad): boolean => {
+                return !orderedPluginsNames.includes(plugin.name);
+            }).sort((a: iPluginToLoad, b: iPluginToLoad): -1 | 0 | 1 => {
 
-                if (a < b) {
+                if (a.name < b.name) {
                     return -1;
                 }
-                else if (a > b) {
+                else if (a.name > b.name) {
                     return 1;
                 }
                 else {
@@ -122,9 +122,9 @@ export default function loadSortedPlugins (
             })
         ];
 
-        // then, all other plugins, asynchronously
-        return unsortedPluginsNames.length
-            ? _loadPlugins(globalDirectory, externalResourcesDirectory, unsortedPluginsNames, loadedPlugins, emit, logger, 0, ...data)
+        // then, all other plugins
+        return unsortedPlugins.length
+            ? _loadPlugins(unsortedPlugins, externalResourcesDirectory, loadedPlugins, emit, logger, 0, ...data)
             : Promise.resolve();
 
     });
