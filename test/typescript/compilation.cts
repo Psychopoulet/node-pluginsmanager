@@ -18,6 +18,7 @@
 	const EXTERNAL_DIRECTORY: string = join(homedir(), "MySoftware");
 	const EXTERNAL_DIRECTORY_PLUGINS: string = join(EXTERNAL_DIRECTORY, "plugins");
 	const EXTERNAL_DIRECTORY_RESSOURCES: string = join(EXTERNAL_DIRECTORY, "ressources");
+	const EXTERNAL_PLUGIN_DIRECTORY: string = join(__dirname, "..", "plugins", "test-good-plugin-without-dependencies");
 
 	const manager: PluginManager = new PluginManager({
 		"directory": EXTERNAL_DIRECTORY_PLUGINS,
@@ -102,6 +103,14 @@ try {
 			});
 
 		});
+
+	}).then((): Promise<void> => {
+
+		return manager.addExternalPluginDirectory(EXTERNAL_PLUGIN_DIRECTORY);
+
+	}).then((): Promise<void> => {
+
+		return manager.loadAll();
 
 	}).then((): Promise<void> => {
 
