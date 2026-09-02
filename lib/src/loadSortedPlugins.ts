@@ -8,7 +8,7 @@
     // externals
     import type { Orchestrator, tLogger } from "node-pluginsmanager-plugin";
 
-    export interface iPluginToLoad {
+    export interface PluginToLoad {
         "name": string;
         "directory": string;
     }
@@ -18,7 +18,7 @@
     // methods
 
         function _loadPlugin (
-            pluginToLoad: iPluginToLoad,
+            pluginToLoad: PluginToLoad,
             externalResourcesDirectory: string,
             loadedPlugins: Orchestrator[],
             emit: (eventName: string, ...subdata: unknown[]) => void,
@@ -51,7 +51,7 @@
         }
 
         function _loadPlugins (
-            pluginsToLoad: iPluginToLoad[],
+            pluginsToLoad: PluginToLoad[],
             externalResourcesDirectory: string,
             loadedPlugins: Orchestrator[],
             emit: (eventName: string, ...subdata: unknown[]) => void,
@@ -76,7 +76,7 @@
 // module
 
 export default function loadSortedPlugins (
-    pluginsToLoad: iPluginToLoad[], externalResourcesDirectory: string,
+    pluginsToLoad: PluginToLoad[], externalResourcesDirectory: string,
     loadedPlugins: Orchestrator[], orderedPluginsNames: string[],
     emit: (eventName: string, ...subdata: unknown[]) => void, logger: tLogger | null, ...data: unknown[]
 ): Promise<void> {
@@ -84,10 +84,10 @@ export default function loadSortedPlugins (
     // if no plugins, does not run
     return !pluginsToLoad.length ? Promise.resolve() : Promise.resolve().then((): Promise<void> => {
 
-        const sortedPlugins: iPluginToLoad[] = [];
+        const sortedPlugins: PluginToLoad[] = [];
         orderedPluginsNames.forEach((pluginName: string): void => {
 
-            const plugin: iPluginToLoad | undefined = pluginsToLoad.find((p: iPluginToLoad): boolean => {
+            const plugin: PluginToLoad | undefined = pluginsToLoad.find((p: PluginToLoad): boolean => {
                 return p.name === pluginName;
             });
 
@@ -104,10 +104,10 @@ export default function loadSortedPlugins (
 
     }).then((): Promise<void> => {
 
-        const unsortedPlugins: iPluginToLoad[] = [
-            ...pluginsToLoad.filter((plugin: iPluginToLoad): boolean => {
+        const unsortedPlugins: PluginToLoad[] = [
+            ...pluginsToLoad.filter((plugin: PluginToLoad): boolean => {
                 return !orderedPluginsNames.includes(plugin.name);
-            }).sort((a: iPluginToLoad, b: iPluginToLoad): -1 | 0 | 1 => {
+            }).sort((a: PluginToLoad, b: PluginToLoad): -1 | 0 | 1 => {
 
                 if (a.name < b.name) {
                     return -1;

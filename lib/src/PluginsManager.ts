@@ -50,7 +50,7 @@
     import type { Server as SocketIOServer } from "socket.io";
 
     // locals
-    import type { iPluginToLoad } from "./loadSortedPlugins";
+    import type { PluginToLoad } from "./loadSortedPlugins";
     import type { GithubTag } from "./utils/getLatestGithubTag";
     import type { GithubUserRepo } from "./utils/parseGithubUserRepo";
 
@@ -400,21 +400,21 @@ export default class PluginsManager extends EventEmitter<{
 
                 if (conflictingNames.length) {
 
-                    return Promise.reject(new Error(
+                    throw new Error(
                         "Cannot load plugins: name conflict between local and external plugins (\""
                         + conflictingNames.join("\", \"") + "\")"
-                    ));
+                    );
 
                 }
 
-                const pluginsToLoad: iPluginToLoad[] = [
-                    ...files.map((pluginName: string): iPluginToLoad => {
+                const pluginsToLoad: PluginToLoad[] = [
+                    ...files.map((pluginName: string): PluginToLoad => {
                         return {
                             "name": pluginName,
                             "directory": join(this.directory, pluginName)
                         };
                     }),
-                    ...this._externalPluginDirectories.map((directory: string): iPluginToLoad => {
+                    ...this._externalPluginDirectories.map((directory: string): PluginToLoad => {
                         return {
                             "name": basename(directory),
                             "directory": directory
