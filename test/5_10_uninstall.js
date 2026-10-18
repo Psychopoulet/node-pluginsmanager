@@ -9,8 +9,8 @@
 
     // locals
     const copyPlugin = require(join(__dirname, "utils", "copyPlugin.js"));
-    const PluginsManager = require(join(__dirname, "..", "lib", "cjs", "main.cjs"));
-    const rmdirp = require(join(__dirname, "..", "lib", "cjs", "utils", "rmdirp.js")).default;
+    const PluginsManager = require(join(__dirname, "..", "lib", "src", "main.cts"));
+    const rmdirp = require(join(__dirname, "..", "lib", "src", "utils", "rmdirp.ts")).default;
 
 // const
 

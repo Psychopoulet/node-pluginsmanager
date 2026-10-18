@@ -9,9 +9,9 @@
     const { Orchestrator } = require("node-pluginsmanager-plugin");
 
     // locals
-    const checkDirectory = require(join(__dirname, "..", "lib", "cjs", "checkers", "checkDirectory.js"));
+    const checkDirectory = require(join(__dirname, "..", "lib", "src", "checkers", "checkDirectory.ts"));
     const copyPlugin = require(join(__dirname, "utils", "copyPlugin.js"));
-    const rmdirp = require(join(__dirname, "..", "lib", "cjs", "utils", "rmdirp.js")).default;
+    const rmdirp = require(join(__dirname, "..", "lib", "src", "utils", "rmdirp.ts")).default;
 
 // const
 
@@ -62,7 +62,7 @@
         }
     };
 
-    const PluginsManager = proxyquire(join(__dirname, "..", "lib", "cjs", "PluginsManager.js"), MOCKS).default;
+    const PluginsManager = proxyquire(join(__dirname, "..", "lib", "src", "PluginsManager.ts"), MOCKS).default;
 
 // tests
 
@@ -310,7 +310,7 @@ describe("pluginsmanager / update via github", () => {
 
         it("should test update with already up to date plugin", () => {
 
-            const PluginsManagerOutdated = proxyquire(join(__dirname, "..", "lib", "cjs", "PluginsManager.js"), {
+            const PluginsManagerOutdated = proxyquire(join(__dirname, "..", "lib", "src", "PluginsManager.ts"), {
                 ...MOCKS,
                 "./utils/getLatestGithubTag": {
                     "__esModule": true,

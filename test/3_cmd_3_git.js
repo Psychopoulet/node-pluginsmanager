@@ -8,10 +8,10 @@
 
     // locals
 
-    const GIT_DIRECTORY = join(__dirname, "..", "lib", "cjs", "cmd", "git");
+    const GIT_DIRECTORY = join(__dirname, "..", "lib", "src", "cmd", "git");
 
-        const install = require(join(GIT_DIRECTORY, "gitInstall.js"));
-        const update = require(join(GIT_DIRECTORY, "gitUpdate.js"));
+        const install = require(join(GIT_DIRECTORY, "gitInstall.ts"));
+        const update = require(join(GIT_DIRECTORY, "gitUpdate.ts"));
 
 // const
 

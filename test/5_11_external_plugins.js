@@ -6,8 +6,8 @@
     const { join } = require("node:path");
 
     // locals
-    const PluginsManager = require(join(__dirname, "..", "lib", "cjs", "main.cjs"));
-    const isDirectory = require(join(__dirname, "..", "lib", "cjs", "utils", "isDirectory.js")).default;
+    const PluginsManager = require(join(__dirname, "..", "lib", "src", "main.cts"));
+    const isDirectory = require(join(__dirname, "..", "lib", "src", "utils", "isDirectory.ts")).default;
 
 // const
 

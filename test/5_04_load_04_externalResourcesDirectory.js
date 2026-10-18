@@ -5,8 +5,8 @@
     const { join } = require("node:path");
 
     // locals
-    const checkAbsoluteDirectory = require(join(__dirname, "..", "lib", "cjs", "checkers", "checkAbsoluteDirectory.js"));
-    const PluginsManager = require(join(__dirname, "..", "lib", "cjs", "main.cjs"));
+    const checkAbsoluteDirectory = require(join(__dirname, "..", "lib", "src", "checkers", "checkAbsoluteDirectory.ts"));
+    const PluginsManager = require(join(__dirname, "..", "lib", "src", "main.cts"));
 
 // tests
 

@@ -11,7 +11,7 @@
 
     // locals
     const copyPlugin = require(join(__dirname, "utils", "copyPlugin.js"));
-    const createPluginByDirectory = require(join(__dirname, "..", "lib", "cjs", "createPluginByDirectory.js"));
+    const createPluginByDirectory = require(join(__dirname, "..", "lib", "src", "createPluginByDirectory.ts"));
 
 // consts
 

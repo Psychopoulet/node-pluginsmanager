@@ -10,7 +10,7 @@
 
     // locals
     const copyPlugin = require(join(__dirname, "utils", "copyPlugin.js"));
-    const rmdirp = require(join(__dirname, "..", "lib", "cjs", "utils", "rmdirp.js")).default;
+    const rmdirp = require(join(__dirname, "..", "lib", "src", "utils", "rmdirp.ts")).default;
 
 // const
 
@@ -50,7 +50,7 @@
 
     }
 
-    const PluginsManager = proxyquire(join(__dirname, "..", "lib", "cjs", "PluginsManager.js"), {
+    const PluginsManager = proxyquire(join(__dirname, "..", "lib", "src", "PluginsManager.ts"), {
         "./cmd/git/gitInstall": {
             "__esModule": true,
             "default": _mockGitInstall

@@ -5,7 +5,7 @@
     const { join } = require("node:path");
 
     // locals
-    const checkNonEmptyArray = require(join(__dirname, "..", "lib", "cjs", "checkers", "checkNonEmptyArray.js"));
+    const checkNonEmptyArray = require(join(__dirname, "..", "lib", "src", "checkers", "checkNonEmptyArray.ts"));
 
 // tests
 

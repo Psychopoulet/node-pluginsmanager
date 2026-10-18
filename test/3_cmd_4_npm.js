@@ -7,10 +7,10 @@
 
     // locals
 
-    const NPM_DIRECTORY = join(__dirname, "..", "lib", "cjs", "cmd", "npm");
+    const NPM_DIRECTORY = join(__dirname, "..", "lib", "src", "cmd", "npm");
 
-        const install = require(join(NPM_DIRECTORY, "npmInstall.js"));
-        const update = require(join(NPM_DIRECTORY, "npmUpdate.js"));
+        const install = require(join(NPM_DIRECTORY, "npmInstall.ts"));
+        const update = require(join(NPM_DIRECTORY, "npmUpdate.ts"));
 
 // const
 
