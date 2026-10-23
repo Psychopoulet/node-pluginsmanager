@@ -69,7 +69,10 @@
 describe("pluginsmanager / update via github", () => {
 
     const pluginsManager = new PluginsManager({
-        "directory": PLUGINS_DIRECTORY
+        "directory": PLUGINS_DIRECTORY,
+        "logger": () => {
+            // nothing to do here
+        }
     });
 
     describe("params", () => {
@@ -361,6 +364,166 @@ describe("pluginsmanager / update via github", () => {
                 return pluginsManagerOutdated.releaseAll().then(() => {
                     return pluginsManagerOutdated.destroyAll();
                 });
+
+            });
+
+        }).timeout(MAX_TIMOUT);
+
+        it("should reject a plugin with no valid version", () => {
+
+            const pluginName = "test-update-bad-version";
+
+            return copyPlugin(PLUGINS_DIRECTORY, "test-good-plugin", pluginName, {
+                "name": pluginName,
+                "repository": "git://github.com/Psychopoulet/node-pluginsmanager-plugin-test",
+                "version": "not-a-version"
+            }).then(() => {
+
+                return pluginsManager.loadAll();
+
+            }).then(() => {
+
+                const plugin = pluginsManager.plugins.find((item) => {
+                    return pluginName === item.name;
+                });
+
+                plugin.version = "not-a-version";
+
+                return pluginsManager.updateViaGithub(plugin, EVENTS_DATA);
+
+            }).then(() => {
+                throw new Error("tests does not generate error");
+            }).catch((err) => {
+
+                strictEqual(typeof err, "object", "Generated error is not an object");
+                ok(err instanceof Error, "Generated error is not an instance of Error");
+                ok(-1 < err.message.indexOf("no valid version"), "Generated error message is not as expected");
+
+            }).finally(() => {
+
+                return rmdirp(join(PLUGINS_DIRECTORY, pluginName));
+
+            });
+
+        }).timeout(MAX_TIMOUT);
+
+        it("should reject a github tag that is not a version", () => {
+
+            const PluginsManagerBadTag = proxyquire(join(__dirname, "..", "lib", "src", "PluginsManager.ts"), {
+                ...MOCKS,
+                "./utils/getLatestGithubTag": {
+                    "__esModule": true,
+                    "default": () => {
+                        return Promise.resolve({
+                            "name": "not-a-version",
+                            "commit": {
+                                "sha": "abc",
+                                "url": "test"
+                            },
+                            "tarball_url": "test",
+                            "zipball_url": "test",
+                            "node_id": "test"
+                        });
+                    }
+                }
+            }).default;
+            const pluginsManagerBadTag = new PluginsManagerBadTag({
+                "directory": PLUGINS_DIRECTORY
+            });
+            const pluginName = "test-update-bad-tag";
+
+            return copyPlugin(PLUGINS_DIRECTORY, "test-good-plugin", pluginName, {
+                "name": pluginName,
+                "repository": "git://github.com/Psychopoulet/node-pluginsmanager-plugin-test"
+            }).then(() => {
+
+                return pluginsManagerBadTag.loadAll();
+
+            }).then(() => {
+
+                return pluginsManagerBadTag.updateViaGithub(pluginsManagerBadTag.plugins.find((plugin) => {
+                    return pluginName === plugin.name;
+                }) || null, EVENTS_DATA);
+
+            }).then(() => {
+                throw new Error("tests does not generate error");
+            }).catch((err) => {
+
+                strictEqual(typeof err, "object", "Generated error is not an object");
+                ok(err instanceof Error, "Generated error is not an instance of Error");
+                ok(-1 < err.message.indexOf("No valid version found"), "Generated error message is not as expected");
+
+            }).finally(() => {
+
+                return rmdirp(join(PLUGINS_DIRECTORY, pluginName));
+
+            });
+
+        }).timeout(MAX_TIMOUT);
+
+        it("should reinstall from github when the plugin directory is not a git repository", () => {
+
+            let gitInstallCalled = false;
+            const PluginsManagerNoGit = proxyquire(join(__dirname, "..", "lib", "src", "PluginsManager.ts"), {
+                ...MOCKS,
+                "./cmd/isGitUsed": {
+                    "__esModule": true,
+                    "default": () => {
+                        return Promise.resolve(false);
+                    }
+                },
+                "./cmd/git/gitInstall": {
+                    "__esModule": true,
+                    "default": () => {
+                        gitInstallCalled = true;
+                        return Promise.resolve();
+                    }
+                },
+                "./utils/getLatestGithubTag": {
+                    "__esModule": true,
+                    "default": () => {
+                        return Promise.resolve({
+                            "name": "9.9.9",
+                            "commit": {
+                                "sha": "abc",
+                                "url": "test"
+                            },
+                            "tarball_url": "test",
+                            "zipball_url": "test",
+                            "node_id": "test"
+                        });
+                    }
+                }
+            }).default;
+            const pluginsManagerNoGit = new PluginsManagerNoGit({
+                "directory": PLUGINS_DIRECTORY
+            });
+            const pluginName = "test-update-without-git";
+
+            return copyPlugin(PLUGINS_DIRECTORY, "test-good-plugin", pluginName, {
+                "name": pluginName,
+                "repository": "git://github.com/Psychopoulet/node-pluginsmanager-plugin-test"
+            }).then(() => {
+
+                return pluginsManagerNoGit.loadAll();
+
+            }).then(() => {
+
+                return pluginsManagerNoGit.updateViaGithub(pluginsManagerNoGit.plugins.find((plugin) => {
+                    return pluginName === plugin.name;
+                }) || null, EVENTS_DATA);
+
+            }).then(() => {
+                throw new Error("tests does not generate error");
+            }).catch((err) => {
+
+                strictEqual(typeof err, "object", "Generated error is not an object");
+                ok(err instanceof Error, "Generated error is not an instance of Error");
+                strictEqual(gitInstallCalled, true, "git install was not used");
+
+            }).finally(() => {
+
+                return rmdirp(join(PLUGINS_DIRECTORY, pluginName));
 
             });
 

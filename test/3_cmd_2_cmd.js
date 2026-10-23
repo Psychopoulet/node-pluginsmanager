@@ -2,6 +2,8 @@
 
     // natives
     const { ok, strictEqual } = require("node:assert");
+    const { EventEmitter } = require("node:events");
+    const childProcess = require("node:child_process");
     const { join } = require("node:path");
 
     // locals
@@ -193,6 +195,117 @@ describe("cmd / cmd", () => {
         it("should test node version", () => {
 
             return cmd.default("./", "node", [ "-v" ]);
+
+        });
+
+        it("should reject when the process cannot be spawned", () => {
+
+            const originalSpawn = childProcess.spawn;
+
+            childProcess.spawn = () => {
+
+                const child = new EventEmitter();
+
+                child.stdout = new EventEmitter();
+                child.stderr = new EventEmitter();
+                child.stdout.setEncoding = () => {
+                    // nothing to do here
+                };
+                child.stderr.setEncoding = () => {
+                    // nothing to do here
+                };
+
+                process.nextTick(() => {
+                    child.emit("error", new Error("spawn failed"));
+                    child.emit("close", 1);
+                });
+
+                return child;
+
+            };
+
+            return cmd.default(join(__dirname, ".."), "node", [ "-v" ]).then(() => {
+                throw new Error("tests does not generate error");
+            }).catch((err) => {
+
+                strictEqual(typeof err, "object", "generated error is not as expected");
+                ok(err instanceof Error, "generated error is not as expected");
+
+            }).finally(() => {
+                childProcess.spawn = originalSpawn;
+            });
+
+        });
+
+        it("should reject a failing command that writes to stdout", () => {
+
+            const originalSpawn = childProcess.spawn;
+
+            childProcess.spawn = () => {
+
+                const child = new EventEmitter();
+
+                child.stdout = new EventEmitter();
+                child.stderr = new EventEmitter();
+                child.stdout.setEncoding = () => {
+                    // nothing to do here
+                };
+                child.stderr.setEncoding = () => {
+                    // nothing to do here
+                };
+
+                process.nextTick(() => {
+                    child.stdout.emit("data", "fail");
+                    child.emit("close", 1);
+                });
+
+                return child;
+
+            };
+
+            return cmd.default(join(__dirname, ".."), "node", [ "-v" ]).then(() => {
+                throw new Error("tests does not generate error");
+            }).catch((err) => {
+
+                strictEqual(typeof err, "object", "generated error is not as expected");
+                ok(err instanceof Error, "generated error is not as expected");
+                ok(-1 < err.message.indexOf("fail"), "generated error message is not as expected");
+
+            }).finally(() => {
+                childProcess.spawn = originalSpawn;
+            });
+
+        });
+
+        it("should resolve when a spawn error is followed by a zero exit code", () => {
+
+            const originalSpawn = childProcess.spawn;
+
+            childProcess.spawn = () => {
+
+                const child = new EventEmitter();
+
+                child.stdout = new EventEmitter();
+                child.stderr = new EventEmitter();
+                child.stdout.setEncoding = () => {
+                    // nothing to do here
+                };
+                child.stderr.setEncoding = () => {
+                    // nothing to do here
+                };
+
+                process.nextTick(() => {
+                    child.emit("error", new Error("spawn failed"));
+                    child.emit("close", 0);
+                });
+
+                return child;
+
+            };
+
+            return cmd.default(join(__dirname, ".."), "node", [ "-v" ]).finally(() => {
+                childProcess.spawn = originalSpawn;
+            });
 
         });
 

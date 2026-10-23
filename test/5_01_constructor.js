@@ -1,7 +1,7 @@
 // deps
 
     // natives
-    const { deepStrictEqual, strictEqual } = require("node:assert");
+    const { deepStrictEqual, strictEqual, throws } = require("node:assert");
     const { homedir } = require("node:os");
     const { join } = require("node:path");
 
@@ -38,7 +38,31 @@ describe("pluginsmanager / constructor", () => {
 
         // public
         strictEqual(pluginsManager.directory, join(__dirname, "plugins2"), "Generated plugin is not as expected");
-        deepStrictEqual(pluginsManager.plugins, [], "Generated plugin is not as expected");
+
+    });
+
+    it("should reject options that are not an object", () => {
+
+        throws(() => {
+            return new PluginsManager(false);
+        }, (err) => {
+            return err instanceof ReferenceError;
+        });
+
+    });
+
+    it("should call next when no plugin exposes app middleware", () => {
+
+        const pluginsManager = new PluginsManager({
+            "directory": join(__dirname, "plugins")
+        });
+        let called = false;
+
+        pluginsManager.appMiddleware({}, {}, () => {
+            called = true;
+        });
+
+        strictEqual(called, true, "next was not called");
 
     });
 

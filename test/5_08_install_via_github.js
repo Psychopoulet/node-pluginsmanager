@@ -62,7 +62,10 @@
 describe("pluginsmanager / install via github", () => {
 
     const pluginsManager = new PluginsManager({
-        "directory": PLUGINS_DIRECTORY
+        "directory": PLUGINS_DIRECTORY,
+        "logger": () => {
+            // nothing to do here
+        }
     });
 
     before(() => {

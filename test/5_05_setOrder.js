@@ -259,7 +259,14 @@ describe("pluginsmanager / setOrder", () => {
         it("should test normal load with all plugins ordered", () => {
 
             return pluginsManager.setOrder([ "test-good-plugin-without-dependencies", "test-good-plugin" ]).then(() => {
+
+                deepStrictEqual(
+                    pluginsManager.getOrder(),
+                    [ "test-good-plugin-without-dependencies", "test-good-plugin" ]
+                );
+
                 return pluginsManager.loadAll();
+
             }).then(() => {
                 return pluginsManager.initAll();
             });
