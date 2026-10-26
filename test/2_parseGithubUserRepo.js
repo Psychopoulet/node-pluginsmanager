@@ -5,7 +5,7 @@
     const { join } = require("node:path");
 
     // locals
-    const parseGithubUserRepo = require(join(__dirname, "..", "lib", "cjs", "utils", "parseGithubUserRepo.js"));
+    const parseGithubUserRepo = require(join(__dirname, "..", "lib", "src", "utils", "parseGithubUserRepo.ts"));
 
 // tests
 

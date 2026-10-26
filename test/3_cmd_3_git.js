@@ -2,16 +2,17 @@
 
     // natives
     const { ok, strictEqual } = require("node:assert");
-    const { mkdir, rm } = require("node:fs/promises");
-    const { homedir } = require("node:os");
+    const { execFile } = require("node:child_process");
+    const { mkdir, mkdtemp, rm, writeFile } = require("node:fs/promises");
+    const { homedir, tmpdir } = require("node:os");
     const { join } = require("node:path");
 
     // locals
 
-    const GIT_DIRECTORY = join(__dirname, "..", "lib", "cjs", "cmd", "git");
+    const GIT_DIRECTORY = join(__dirname, "..", "lib", "src", "cmd", "git");
 
-        const install = require(join(GIT_DIRECTORY, "gitInstall.js"));
-        const update = require(join(GIT_DIRECTORY, "gitUpdate.js"));
+        const install = require(join(GIT_DIRECTORY, "gitInstall.ts"));
+        const update = require(join(GIT_DIRECTORY, "gitUpdate.ts"));
 
 // const
 
@@ -22,6 +23,22 @@
 
     const PLUGINS_DIRECTORY = join(homedir(), "node-pluginsmanager");
         const DOWNLOADED_PLUGIN_DIRECTORY = join(PLUGINS_DIRECTORY, "node-containerpattern");
+
+// private
+
+    function _git (cwd, args) {
+
+        return new Promise((resolve, reject) => {
+
+            execFile("git", args, {
+                "cwd": cwd
+            }, (err) => {
+                return err ? reject(err) : resolve();
+            });
+
+        });
+
+    }
 
 // tests
 
@@ -281,6 +298,79 @@ describe("cmd / git", () => {
 
         it("should test with valid data", () => {
             return update.default(DOWNLOADED_PLUGIN_DIRECTORY);
+        }).timeout(MAX_TIMOUT);
+
+        it("should reject an empty tag", (done) => {
+
+            update.default(DOWNLOADED_PLUGIN_DIRECTORY, "").then(() => {
+                done(new Error("tests does not generate error"));
+            }).catch((err) => {
+
+                strictEqual(typeof err, "object", "generated error is not as expected");
+                ok(err instanceof Error, "generated error is not as expected");
+
+                done();
+
+            });
+
+        });
+
+        it("should checkout a specific tag", () => {
+
+            let root = "";
+
+            return mkdtemp(join(tmpdir(), "pluginsmanager-git-tag-")).then((dir) => {
+
+                root = dir;
+
+                return mkdir(join(dir, "origin"));
+
+            }).then(() => {
+
+                const origin = join(root, "origin");
+
+                return _git(origin, [ "init" ]).then(() => {
+                    return writeFile(join(origin, "file.txt"), "a", "utf-8");
+                }).then(() => {
+                    return _git(origin, [
+                        "-c",
+                        "user.email=test@example.com",
+                        "-c",
+                        "user.name=test",
+                        "add",
+                        "file.txt"
+                    ]);
+                }).then(() => {
+                    return _git(origin, [
+                        "-c",
+                        "user.email=test@example.com",
+                        "-c",
+                        "user.name=test",
+                        "commit",
+                        "-m",
+                        "init"
+                    ]);
+                }).then(() => {
+                    return _git(origin, [ "tag", "v1.0.0" ]);
+                }).then(() => {
+                    return _git(root, [
+                        "clone",
+                        origin,
+                        "clone"
+                    ]);
+                }).then(() => {
+                    return update.default(join(root, "clone"), "v1.0.0");
+                });
+
+            }).finally(() => {
+
+                return root ? rm(root, {
+                    "recursive": true,
+                    "force": true
+                }) : Promise.resolve();
+
+            });
+
         }).timeout(MAX_TIMOUT);
 
     });

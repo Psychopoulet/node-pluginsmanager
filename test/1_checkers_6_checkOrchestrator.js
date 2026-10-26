@@ -8,7 +8,7 @@
     const { Orchestrator } = require("node-pluginsmanager-plugin");
 
     // locals
-    const checkOrchestrator = require(join(__dirname, "..", "lib", "cjs", "checkers", "checkOrchestrator.js"));
+    const checkOrchestrator = require(join(__dirname, "..", "lib", "src", "checkers", "checkOrchestrator.ts"));
 
 // tests
 

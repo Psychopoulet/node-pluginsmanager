@@ -5,7 +5,7 @@
     const { join } = require("node:path");
 
     // locals
-    const checkAbsoluteDirectory = require(join(__dirname, "..", "lib", "cjs", "checkers", "checkAbsoluteDirectory.js"));
+    const checkAbsoluteDirectory = require(join(__dirname, "..", "lib", "src", "checkers", "checkAbsoluteDirectory.ts"));
 
 // tests
 

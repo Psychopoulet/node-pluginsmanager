@@ -28,7 +28,9 @@ describe("compilation typescript", () => {
                     join(__dirname, "typescript", "compilation.cts"),
                     "--target es6",
                     "--module commonjs",
-                    "--esModuleInterop"
+                    "--esModuleInterop",
+                    "--ignoreConfig",
+                    "--types node"
                 ];
 
                 exec(args.join(" "), {

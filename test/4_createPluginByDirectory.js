@@ -2,8 +2,8 @@
 
     // natives
     const { ok, strictEqual } = require("node:assert");
-    const { mkdir, rm, writeFile } = require("node:fs/promises");
-    const { homedir } = require("node:os");
+    const { mkdir, mkdtemp, rm, writeFile } = require("node:fs/promises");
+    const { homedir, tmpdir } = require("node:os");
     const { basename, join } = require("node:path");
 
     // externals
@@ -11,7 +11,7 @@
 
     // locals
     const copyPlugin = require(join(__dirname, "utils", "copyPlugin.js"));
-    const createPluginByDirectory = require(join(__dirname, "..", "lib", "cjs", "createPluginByDirectory.js"));
+    const createPluginByDirectory = require(join(__dirname, "..", "lib", "src", "createPluginByDirectory.ts"));
 
 // consts
 
@@ -290,6 +290,138 @@ describe("createPluginByDirectory", () => {
 
                 strictEqual(typeof plugin, "object", "Generated plugin is not an object");
                 ok(plugin instanceof Orchestrator, "Generated plugin is not an Orchestrator");
+
+            });
+
+        });
+
+        it("should reject a module that throws a non-error", () => {
+
+            let root = "";
+
+            return mkdtemp(join(tmpdir(), "pluginsmanager-throw-")).then((dir) => {
+
+                root = dir;
+
+                return writeFile(join(dir, "package.json"), JSON.stringify({
+                    "name": "boom",
+                    "main": "boom.js"
+                }), "utf-8");
+
+            }).then(() => {
+
+                return writeFile(join(root, "boom.js"), "throw \"boom\";\n", "utf-8");
+
+            }).then(() => {
+
+                return createPluginByDirectory.default(root, TESTS_EXTERNAL_RESOURCES_DIRECTORY);
+
+            }).then(() => {
+                throw new Error("There is no generated error");
+            }).catch((err) => {
+
+                strictEqual(typeof err, "object", "Generated error is not an object");
+                ok(err instanceof Error, "Generated error is not an Error");
+                ok(-1 < err.message.indexOf("boom"), "Generated error message is not as expected");
+
+            }).finally(() => {
+
+                return root ? rm(root, {
+                    "recursive": true,
+                    "force": true
+                }) : Promise.resolve();
+
+            });
+
+        });
+
+        it("should reject a module that throws an error", () => {
+
+            let root = "";
+
+            return mkdtemp(join(tmpdir(), "pluginsmanager-throw-error-")).then((dir) => {
+
+                root = dir;
+
+                return writeFile(join(dir, "package.json"), JSON.stringify({
+                    "name": "boom",
+                    "main": "boom.js"
+                }), "utf-8");
+
+            }).then(() => {
+
+                return writeFile(join(root, "boom.js"), "throw new Error(\"boom-error\");\n", "utf-8");
+
+            }).then(() => {
+
+                return createPluginByDirectory.default(root, TESTS_EXTERNAL_RESOURCES_DIRECTORY);
+
+            }).then(() => {
+                throw new Error("There is no generated error");
+            }).catch((err) => {
+
+                strictEqual(typeof err, "object", "Generated error is not an object");
+                ok(err instanceof Error, "Generated error is not an Error");
+                ok(-1 < err.message.indexOf("boom-error"), "Generated error message is not as expected");
+
+            }).finally(() => {
+
+                return root ? rm(root, {
+                    "recursive": true,
+                    "force": true
+                }) : Promise.resolve();
+
+            });
+
+        });
+
+        it("should reject a plugin whose loaded name does not match its directory", () => {
+
+            const pluginName = "renamed-plugin";
+            const pluginDirectory = join(TESTS_PLUGINS_DIRECTORY, pluginName);
+
+            return copyPlugin(TESTS_PLUGINS_DIRECTORY, "test-good-plugin", pluginName, {
+                "name": pluginName
+            }).then(() => {
+
+                return writeFile(join(pluginDirectory, "Orchestrator.js"), [
+                    "const { join } = require(\"node:path\");",
+                    "const { Orchestrator } = require(\"node-pluginsmanager-plugin\");",
+                    "module.exports = class OrchestratorGoodPlugin extends Orchestrator {",
+                    "    constructor (options) {",
+                    "        const opt = options || {};",
+                    "        opt.packageFile = join(__dirname, \"package.json\");",
+                    "        opt.descriptorFile = join(__dirname, \"Descriptor.json\");",
+                    "        opt.mediatorFile = join(__dirname, \"Mediator.js\");",
+                    "        opt.serverFile = join(__dirname, \"Server.js\");",
+                    "        super(opt);",
+                    "    }",
+                    "    load () {",
+                    "        this.name = \"not-the-directory\";",
+                    "        return Promise.resolve();",
+                    "    }",
+                    "};",
+                    ""
+                ].join("\n"), "utf-8");
+
+            }).then(() => {
+
+                return createPluginByDirectory.default(pluginDirectory, TESTS_EXTERNAL_RESOURCES_DIRECTORY);
+
+            }).then(() => {
+                throw new Error("There is no generated error");
+            }).catch((err) => {
+
+                strictEqual(typeof err, "object", "Generated error is not an object");
+                ok(err instanceof Error, "Generated error is not an Error");
+                ok(-1 < err.message.indexOf("does not fit"), "Generated error message is not as expected");
+
+            }).finally(() => {
+
+                return rm(pluginDirectory, {
+                    "recursive": true,
+                    "force": true
+                });
 
             });
 

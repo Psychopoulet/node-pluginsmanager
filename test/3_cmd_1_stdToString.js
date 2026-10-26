@@ -5,7 +5,7 @@
     const { join } = require("node:path");
 
     // locals
-    const stdToString = require(join(__dirname, "..", "lib", "cjs", "cmd", "stdToString.js"));
+    const stdToString = require(join(__dirname, "..", "lib", "src", "cmd", "stdToString.ts"));
 
 // tests
 

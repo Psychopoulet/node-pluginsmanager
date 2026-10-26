@@ -5,7 +5,7 @@
     const { join } = require("node:path");
 
     // locals
-    const PluginsManager = require(join(__dirname, "..", "lib", "cjs", "main.cjs"));
+    const PluginsManager = require(join(__dirname, "..", "lib", "src", "main.cts"));
     const copyPlugin = require(join(__dirname, "utils", "copyPlugin.js"));
 
 // const
