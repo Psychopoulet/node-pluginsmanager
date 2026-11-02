@@ -2,7 +2,7 @@
 
     // natives
     const { ok, strictEqual } = require("node:assert");
-    const { basename, join } = require("node:path");
+    const { basename, isAbsolute, join, relative } = require("node:path");
 
     // externals
     const proxyquire = require("proxyquire").noCallThru();
@@ -11,6 +11,7 @@
     // locals
     const checkDirectory = require(join(__dirname, "..", "lib", "src", "checkers", "checkDirectory.ts"));
     const copyPlugin = require(join(__dirname, "utils", "copyPlugin.js"));
+    const isDirectory = require(join(__dirname, "..", "lib", "src", "utils", "isDirectory.ts")).default;
     const rmdirp = require(join(__dirname, "..", "lib", "src", "utils", "rmdirp.ts")).default;
 
 // const
@@ -63,6 +64,34 @@
     };
 
     const PluginsManager = proxyquire(join(__dirname, "..", "lib", "src", "PluginsManager.ts"), MOCKS).default;
+
+// private
+
+    function _pluginCacheKeys (directory) {
+
+        return Object.keys(require.cache).filter((file) => {
+
+            const fromDirectory = relative(directory, file);
+
+            if ("" === fromDirectory) {
+                return true;
+            }
+
+            return !fromDirectory.startsWith("..") && !isAbsolute(fromDirectory);
+
+        });
+
+    }
+
+    function _releaseManager (manager, directory) {
+
+        return manager.releaseAll().then(() => {
+            return manager.destroyAll();
+        }).then(() => {
+            return rmdirp(directory);
+        });
+
+    }
 
 // tests
 
@@ -524,6 +553,168 @@ describe("pluginsmanager / update via github", () => {
             }).finally(() => {
 
                 return rmdirp(join(PLUGINS_DIRECTORY, pluginName));
+
+            });
+
+        }).timeout(MAX_TIMOUT);
+
+        it("should drop the plugin when the update fails after release", () => {
+
+            let gitInstallCalled = false;
+            const PluginsManagerFailed = proxyquire(join(__dirname, "..", "lib", "src", "PluginsManager.ts"), {
+                ...MOCKS,
+                "./cmd/git/gitUpdate": {
+                    "__esModule": true,
+                    "default": () => {
+                        return Promise.reject(new Error("git update failed"));
+                    }
+                },
+                "./cmd/git/gitInstall": {
+                    "__esModule": true,
+                    "default": (_directory, _user, repo) => {
+
+                        gitInstallCalled = true;
+
+                        return copyPlugin(PLUGINS_DIRECTORY, "test-good-plugin", repo, {
+                            "name": repo,
+                            "dependencies": {}
+                        });
+
+                    }
+                }
+            }).default;
+            const pluginsManagerFailed = new PluginsManagerFailed({
+                "directory": PLUGINS_DIRECTORY
+            });
+            const pluginName = "test-update-failed-after";
+            const directory = join(PLUGINS_DIRECTORY, pluginName);
+
+            return copyPlugin(PLUGINS_DIRECTORY, "test-good-plugin", pluginName, {
+                "name": pluginName,
+                "repository": "git://github.com/Psychopoulet/node-pluginsmanager-plugin-test"
+            }).then(() => {
+
+                return pluginsManagerFailed.loadAll();
+
+            }).then(() => {
+
+                ok(0 < _pluginCacheKeys(directory).length, "plugin was not loaded into require.cache");
+
+                return pluginsManagerFailed.updateViaGithub(pluginsManagerFailed.plugins.find((plugin) => {
+                    return pluginName === plugin.name;
+                }) || null, EVENTS_DATA);
+
+            }).then(() => {
+                throw new Error("tests does not generate error");
+            }).catch((err) => {
+
+                strictEqual(typeof err, "object", "Generated error is not an object");
+                ok(err instanceof Error, "Generated error is not an instance of Error");
+                ok(-1 < err.message.indexOf("git update failed"), "Generated error message is not as expected");
+                ok(!pluginsManagerFailed.getPluginsNames().includes(pluginName), "plugin stayed registered");
+                strictEqual(_pluginCacheKeys(directory).length, 0, "require.cache still holds the plugin");
+
+                return isDirectory(directory);
+
+            }).then((exists) => {
+
+                strictEqual(exists, false, "plugin directory was not removed");
+
+                return pluginsManagerFailed.installViaGithub("Psychopoulet", pluginName, EVENTS_DATA);
+
+            }).then((plugin) => {
+
+                strictEqual(gitInstallCalled, true, "install was rejected because the directory already exists");
+                strictEqual(plugin.name, pluginName, "Installed plugin name is not as expected");
+                strictEqual(plugin.constructor.name, "OrchestratorGoodPlugin", "Installed plugin was not loaded");
+                ok(0 < _pluginCacheKeys(directory).length, "installed plugin was not loaded into require.cache");
+                ok(pluginsManagerFailed.getPluginsNames().includes(pluginName), "Installed plugin is not registered");
+
+            }).finally(() => {
+
+                return _releaseManager(pluginsManagerFailed, directory);
+
+            });
+
+        }).timeout(MAX_TIMOUT);
+
+        it("should keep the plugin when the update fails before release", () => {
+
+            let gitInstallCalled = false;
+            const PluginsManagerUpToDate = proxyquire(join(__dirname, "..", "lib", "src", "PluginsManager.ts"), {
+                ...MOCKS,
+                "./utils/getLatestGithubTag": {
+                    "__esModule": true,
+                    "default": () => {
+                        return Promise.resolve({
+                            "name": "0.0.4",
+                            "commit": {
+                                "sha": "abc",
+                                "url": "test"
+                            },
+                            "tarball_url": "test",
+                            "zipball_url": "test",
+                            "node_id": "test"
+                        });
+                    }
+                },
+                "./cmd/git/gitInstall": {
+                    "__esModule": true,
+                    "default": () => {
+                        gitInstallCalled = true;
+                        return Promise.reject(new Error("git install reached"));
+                    }
+                }
+            }).default;
+            const pluginsManagerUpToDate = new PluginsManagerUpToDate({
+                "directory": PLUGINS_DIRECTORY
+            });
+            const pluginName = "test-update-failed-before";
+            const directory = join(PLUGINS_DIRECTORY, pluginName);
+
+            return copyPlugin(PLUGINS_DIRECTORY, "test-good-plugin", pluginName, {
+                "name": pluginName,
+                "repository": "git://github.com/Psychopoulet/node-pluginsmanager-plugin-test"
+            }).then(() => {
+
+                return pluginsManagerUpToDate.loadAll();
+
+            }).then(() => {
+
+                ok(0 < _pluginCacheKeys(directory).length, "plugin was not loaded into require.cache");
+
+                return pluginsManagerUpToDate.updateViaGithub(pluginsManagerUpToDate.plugins.find((plugin) => {
+                    return pluginName === plugin.name;
+                }) || null, EVENTS_DATA);
+
+            }).then(() => {
+                throw new Error("tests does not generate error");
+            }).catch((err) => {
+
+                strictEqual(typeof err, "object", "Generated error is not an object");
+                ok(err instanceof Error, "Generated error is not an instance of Error");
+                ok(-1 < err.message.indexOf("already up to date"), "Generated error message is not as expected");
+                ok(pluginsManagerUpToDate.getPluginsNames().includes(pluginName), "plugin was removed from the list");
+                ok(0 < _pluginCacheKeys(directory).length, "require.cache lost the plugin");
+
+                return isDirectory(directory);
+
+            }).then((exists) => {
+
+                strictEqual(exists, true, "plugin directory was removed");
+
+                return pluginsManagerUpToDate.installViaGithub("Psychopoulet", pluginName).then(() => {
+                    throw new Error("install was not rejected");
+                }, (installErr) => {
+
+                    strictEqual(gitInstallCalled, false, "install passed the existing directory");
+                    ok(-1 < installErr.message.indexOf("plugin already exists"), "install was not rejected because the directory already exists");
+
+                });
+
+            }).finally(() => {
+
+                return _releaseManager(pluginsManagerUpToDate, directory);
 
             });
 

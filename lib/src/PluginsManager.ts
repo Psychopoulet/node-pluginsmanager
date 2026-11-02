@@ -13,6 +13,7 @@
 
     // locals
     import rmdirp from "./utils/rmdirp";
+    import clearRequireCache from "./utils/clearRequireCache";
     import checkAbsoluteDirectory from "./checkers/checkAbsoluteDirectory";
     import checkFunction from "./checkers/checkFunction";
     import checkNonEmptyArray from "./checkers/checkNonEmptyArray";
@@ -820,6 +821,26 @@ export default class PluginsManager extends EventEmitter<{
 
         }
 
+        private _rejectReleasedUpdate (pluginName: string, directory: string, err: Error): Promise<Orchestrator> {
+
+            if (this.getPluginsNames().includes(pluginName)) {
+                return Promise.reject(err);
+            }
+
+            clearRequireCache(directory);
+
+            return rmdirp(directory).then((): Promise<Orchestrator> => {
+
+                return Promise.reject(err);
+
+            }).catch((): Promise<Orchestrator> => {
+
+                return Promise.reject(err);
+
+            });
+
+        }
+
         // update a plugin via its github repo, using "data" in arguments for "release", "update" and "init" plugin's methods
         public updateViaGithub (plugin: Orchestrator, ...data: unknown[]): Promise<Orchestrator> {
 
@@ -992,6 +1013,10 @@ export default class PluginsManager extends EventEmitter<{
                         return _plugin;
 
                     });
+
+                }).catch((err: Error): Promise<Orchestrator> => {
+
+                    return this._rejectReleasedUpdate(pluginName, directory, err);
 
                 });
 
