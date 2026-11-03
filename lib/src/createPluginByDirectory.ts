@@ -12,6 +12,7 @@
     import checkAbsoluteDirectory from "./checkers/checkAbsoluteDirectory";
     import checkOrchestrator from "./checkers/checkOrchestrator";
     import checkFunction from "./checkers/checkFunction";
+    import clearRequireCache from "./utils/clearRequireCache";
 
 // types & interfaces
 
@@ -39,6 +40,7 @@ export default function createPluginByDirectory (directory: string, externalReso
         return new Promise((resolve: (value: tMultiExportPlugin | tDefaultExportPlugin | typeof Orchestrator) => void, reject: (err: Error) => void): void => {
 
             try {
+                clearRequireCache(directory);
                 resolve(require(directory) as tMultiExportPlugin | tDefaultExportPlugin | typeof Orchestrator);
             }
             catch (e) {

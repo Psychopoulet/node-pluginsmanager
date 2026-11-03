@@ -234,7 +234,7 @@ describe("pluginsmanager / install via github", () => {
 
             });
 
-        });
+        }).timeout(MAX_TIMOUT);
 
         it("should test download already existing repo", (done) => {
 

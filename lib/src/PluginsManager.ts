@@ -13,6 +13,7 @@
 
     // locals
     import rmdirp from "./utils/rmdirp";
+    import clearRequireCache from "./utils/clearRequireCache";
     import checkAbsoluteDirectory from "./checkers/checkAbsoluteDirectory";
     import checkFunction from "./checkers/checkFunction";
     import checkNonEmptyArray from "./checkers/checkNonEmptyArray";
@@ -66,6 +67,26 @@
 
     const DEFAULT_PLUGINS_DIRECTORY: string = join(homedir(), "node-pluginsmanager-plugins");
     const DEFAULT_RESOURCES_DIRECTORY: string = join(homedir(), "node-pluginsmanager-resources");
+
+// private
+
+    // methods
+    function _removeReleasedDirectory (directory: string): Promise<void> {
+
+        return rmdirp(directory).catch((): Promise<void> => {
+
+            return rm(directory, {
+                "recursive": true,
+                "force": true
+            });
+
+        }).catch((): Promise<void> => {
+
+            return Promise.resolve();
+
+        });
+
+    }
 
 // module
 
@@ -820,6 +841,50 @@ export default class PluginsManager extends EventEmitter<{
 
         }
 
+        private _rejectReleasedUpdate (pluginName: string, directory: string, err: Error): Promise<Orchestrator> {
+
+            if (this.getPluginsNames().includes(pluginName)) {
+                return Promise.reject(err);
+            }
+
+            clearRequireCache(directory);
+
+            return rmdirp(join(this.externalResourcesDirectory, pluginName)).catch((): Promise<void> => {
+
+                return Promise.resolve();
+
+            }).then((): Promise<void> => {
+
+                return _removeReleasedDirectory(directory);
+
+            }).then((): Promise<Orchestrator> => {
+
+                return Promise.reject(err);
+
+            });
+
+        }
+
+        private _splicePlugin (key: number): void {
+
+            if (-1 < key) {
+                this.plugins.splice(key, 1);
+            }
+
+        }
+
+        private _destroyReleasedPlugin (plugin: Orchestrator, key: number, ...data: unknown[]): Promise<void> {
+
+            return plugin.destroy(...data).catch((err: Error): Promise<void> => {
+
+                this._splicePlugin(key);
+
+                return Promise.reject(err);
+
+            });
+
+        }
+
         // update a plugin via its github repo, using "data" in arguments for "release", "update" and "init" plugin's methods
         public updateViaGithub (plugin: Orchestrator, ...data: unknown[]): Promise<Orchestrator> {
 
@@ -916,15 +981,13 @@ export default class PluginsManager extends EventEmitter<{
 
                         this.emit("released", plugin, ...data);
 
-                        return plugin.destroy(...data);
+                        return this._destroyReleasedPlugin(plugin, key, ...data);
 
                     }).then((): string => {
 
                         this.emit("destroyed", pluginName, ...data);
 
-                        if (-1 < key) {
-                            this.plugins.splice(key, 1);
-                        }
+                        this._splicePlugin(key);
 
                         return latestTag;
 
@@ -992,6 +1055,10 @@ export default class PluginsManager extends EventEmitter<{
                         return _plugin;
 
                     });
+
+                }).catch((err: Error): Promise<Orchestrator> => {
+
+                    return this._rejectReleasedUpdate(pluginName, directory, err);
 
                 });
 
