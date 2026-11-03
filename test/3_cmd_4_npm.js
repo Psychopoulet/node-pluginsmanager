@@ -14,7 +14,6 @@
     const NPM_DIRECTORY = join(__dirname, "..", "lib", "src", "cmd", "npm");
 
         const install = require(join(NPM_DIRECTORY, "npmInstall.ts"));
-        const update = require(join(NPM_DIRECTORY, "npmUpdate.ts"));
 
 // const
 
@@ -141,10 +140,6 @@ describe("cmd / npm", () => {
             console.log(err);
             return Promise.reject(err);
         });
-    }).timeout(MAX_TIMOUT);
-
-    it("should test right update", () => {
-        return update.default(PLUGINS_DIRECTORY);
     }).timeout(MAX_TIMOUT);
 
 });

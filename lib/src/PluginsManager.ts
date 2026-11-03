@@ -38,7 +38,6 @@
         // npm
         import npmInstall from "./cmd/npm/npmInstall";
         import npmBuild from "./cmd/npm/npmBuild";
-        import npmUpdate from "./cmd/npm/npmUpdate";
 
 // types & interfaces
 
@@ -1028,7 +1027,7 @@ export default class PluginsManager extends EventEmitter<{
                         this._logger?.("debug", "Updating dependencies...", false, pluginName);
                         this.emit("updating", pluginName, 5, MAX_UPDATE_STEPS, "Updating dependencies...");
 
-                        return !_plugin.dependencies ? Promise.resolve() : npmUpdate(directory);
+                        return !_plugin.dependencies ? Promise.resolve() : npmInstall(directory);
 
                     }).then((): Promise<void> => {
 
