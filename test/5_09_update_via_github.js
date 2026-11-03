@@ -2,6 +2,7 @@
 
     // natives
     const { ok, strictEqual } = require("node:assert");
+    const { mkdir, writeFile } = require("node:fs/promises");
     const { basename, isAbsolute, join, relative } = require("node:path");
 
     // externals
@@ -561,8 +562,29 @@ describe("pluginsmanager / update via github", () => {
         it("should drop the plugin when the update fails after release", () => {
 
             let gitInstallCalled = false;
+            let pluginDirectoryRemovalFailed = false;
+            const pluginName = "test-update-failed-after";
+            const directory = join(PLUGINS_DIRECTORY, pluginName);
+            const resourcesDirectory = join(__dirname, "resources-update-failed");
+            const pluginResources = join(resourcesDirectory, pluginName);
             const PluginsManagerFailed = proxyquire(join(__dirname, "..", "lib", "src", "PluginsManager.ts"), {
                 ...MOCKS,
+                "./utils/rmdirp": {
+                    "__esModule": true,
+                    "default": (target) => {
+
+                        if (target === directory && !pluginDirectoryRemovalFailed) {
+
+                            pluginDirectoryRemovalFailed = true;
+
+                            return Promise.reject(new Error("rmdirp failed"));
+
+                        }
+
+                        return rmdirp(target);
+
+                    }
+                },
                 "./cmd/git/gitUpdate": {
                     "__esModule": true,
                     "default": () => {
@@ -584,10 +606,9 @@ describe("pluginsmanager / update via github", () => {
                 }
             }).default;
             const pluginsManagerFailed = new PluginsManagerFailed({
-                "directory": PLUGINS_DIRECTORY
+                "directory": PLUGINS_DIRECTORY,
+                "externalResourcesDirectory": resourcesDirectory
             });
-            const pluginName = "test-update-failed-after";
-            const directory = join(PLUGINS_DIRECTORY, pluginName);
 
             return copyPlugin(PLUGINS_DIRECTORY, "test-good-plugin", pluginName, {
                 "name": pluginName,
@@ -599,6 +620,16 @@ describe("pluginsmanager / update via github", () => {
             }).then(() => {
 
                 ok(0 < _pluginCacheKeys(directory).length, "plugin was not loaded into require.cache");
+
+                return mkdir(pluginResources, {
+                    "recursive": true
+                });
+
+            }).then(() => {
+
+                return writeFile(join(pluginResources, "stale.txt"), "stale", "utf-8");
+
+            }).then(() => {
 
                 return pluginsManagerFailed.updateViaGithub(pluginsManagerFailed.plugins.find((plugin) => {
                     return pluginName === plugin.name;
@@ -613,6 +644,13 @@ describe("pluginsmanager / update via github", () => {
                 ok(-1 < err.message.indexOf("git update failed"), "Generated error message is not as expected");
                 ok(!pluginsManagerFailed.getPluginsNames().includes(pluginName), "plugin stayed registered");
                 strictEqual(_pluginCacheKeys(directory).length, 0, "require.cache still holds the plugin");
+                strictEqual(pluginDirectoryRemovalFailed, true, "rmdirp was not retried with a forced removal");
+
+                return isDirectory(pluginResources);
+
+            }).then((resourcesExist) => {
+
+                strictEqual(resourcesExist, false, "external resources were not removed");
 
                 return isDirectory(directory);
 
@@ -632,7 +670,9 @@ describe("pluginsmanager / update via github", () => {
 
             }).finally(() => {
 
-                return _releaseManager(pluginsManagerFailed, directory);
+                return _releaseManager(pluginsManagerFailed, directory).then(() => {
+                    return rmdirp(resourcesDirectory);
+                });
 
             });
 
@@ -723,11 +763,13 @@ describe("pluginsmanager / update via github", () => {
         it("should drop the plugin when destroy fails after release", () => {
 
             let destroyedCount = 0;
-            const pluginsManagerDestroy = new PluginsManager({
-                "directory": PLUGINS_DIRECTORY
-            });
             const pluginName = "test-update-destroy-failed";
             const directory = join(PLUGINS_DIRECTORY, pluginName);
+            const resourcesDirectory = join(__dirname, "resources-update-destroy");
+            const pluginsManagerDestroy = new PluginsManager({
+                "directory": PLUGINS_DIRECTORY,
+                "externalResourcesDirectory": resourcesDirectory
+            });
 
             pluginsManagerDestroy.on("destroyed", (name) => {
 
@@ -774,7 +816,9 @@ describe("pluginsmanager / update via github", () => {
 
             }).finally(() => {
 
-                return _releaseManager(pluginsManagerDestroy, directory);
+                return _releaseManager(pluginsManagerDestroy, directory).then(() => {
+                    return rmdirp(resourcesDirectory);
+                });
 
             });
 

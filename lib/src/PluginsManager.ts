@@ -68,6 +68,26 @@
     const DEFAULT_PLUGINS_DIRECTORY: string = join(homedir(), "node-pluginsmanager-plugins");
     const DEFAULT_RESOURCES_DIRECTORY: string = join(homedir(), "node-pluginsmanager-resources");
 
+// private
+
+    // methods
+    function _removeReleasedDirectory (directory: string): Promise<void> {
+
+        return rmdirp(directory).catch((): Promise<void> => {
+
+            return rm(directory, {
+                "recursive": true,
+                "force": true
+            });
+
+        }).catch((): Promise<void> => {
+
+            return Promise.resolve();
+
+        });
+
+    }
+
 // module
 
 export default class PluginsManager extends EventEmitter<{
@@ -829,11 +849,15 @@ export default class PluginsManager extends EventEmitter<{
 
             clearRequireCache(directory);
 
-            return rmdirp(directory).then((): Promise<Orchestrator> => {
+            return rmdirp(join(this.externalResourcesDirectory, pluginName)).catch((): Promise<void> => {
 
-                return Promise.reject(err);
+                return Promise.resolve();
 
-            }).catch((): Promise<Orchestrator> => {
+            }).then((): Promise<void> => {
+
+                return _removeReleasedDirectory(directory);
+
+            }).then((): Promise<Orchestrator> => {
 
                 return Promise.reject(err);
 
