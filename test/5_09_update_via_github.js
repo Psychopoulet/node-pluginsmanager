@@ -720,6 +720,66 @@ describe("pluginsmanager / update via github", () => {
 
         }).timeout(MAX_TIMOUT);
 
+        it("should drop the plugin when destroy fails after release", () => {
+
+            let destroyedCount = 0;
+            const pluginsManagerDestroy = new PluginsManager({
+                "directory": PLUGINS_DIRECTORY
+            });
+            const pluginName = "test-update-destroy-failed";
+            const directory = join(PLUGINS_DIRECTORY, pluginName);
+
+            pluginsManagerDestroy.on("destroyed", (name) => {
+
+                if (pluginName === name) {
+                    destroyedCount += 1;
+                }
+
+            });
+
+            return copyPlugin(PLUGINS_DIRECTORY, "test-good-plugin-without-dependencies", pluginName, {
+                "name": pluginName,
+                "repository": "git://github.com/Psychopoulet/node-pluginsmanager-plugin-test"
+            }).then(() => {
+
+                return pluginsManagerDestroy.loadAll();
+
+            }).then(() => {
+
+                const plugin = pluginsManagerDestroy.plugins.find((item) => {
+                    return pluginName === item.name;
+                }) || null;
+
+                plugin.destroy = () => {
+                    return Promise.reject(new Error("destroy failed"));
+                };
+
+                return pluginsManagerDestroy.updateViaGithub(plugin, EVENTS_DATA);
+
+            }).then(() => {
+                throw new Error("tests does not generate error");
+            }).catch((err) => {
+
+                strictEqual(typeof err, "object", "Generated error is not an object");
+                ok(err instanceof Error, "Generated error is not an instance of Error");
+                ok(-1 < err.message.indexOf("destroy failed"), "Generated error message is not as expected");
+                strictEqual(destroyedCount, 0, "destroyed was emitted");
+                ok(!pluginsManagerDestroy.getPluginsNames().includes(pluginName), "plugin stayed registered");
+
+                return isDirectory(directory);
+
+            }).then((exists) => {
+
+                strictEqual(exists, false, "plugin directory was not removed");
+
+            }).finally(() => {
+
+                return _releaseManager(pluginsManagerDestroy, directory);
+
+            });
+
+        }).timeout(MAX_TIMOUT);
+
     });
 
 });

@@ -841,6 +841,26 @@ export default class PluginsManager extends EventEmitter<{
 
         }
 
+        private _splicePlugin (key: number): void {
+
+            if (-1 < key) {
+                this.plugins.splice(key, 1);
+            }
+
+        }
+
+        private _destroyReleasedPlugin (plugin: Orchestrator, key: number, ...data: unknown[]): Promise<void> {
+
+            return plugin.destroy(...data).catch((err: Error): Promise<void> => {
+
+                this._splicePlugin(key);
+
+                return Promise.reject(err);
+
+            });
+
+        }
+
         // update a plugin via its github repo, using "data" in arguments for "release", "update" and "init" plugin's methods
         public updateViaGithub (plugin: Orchestrator, ...data: unknown[]): Promise<Orchestrator> {
 
@@ -937,15 +957,13 @@ export default class PluginsManager extends EventEmitter<{
 
                         this.emit("released", plugin, ...data);
 
-                        return plugin.destroy(...data);
+                        return this._destroyReleasedPlugin(plugin, key, ...data);
 
                     }).then((): string => {
 
                         this.emit("destroyed", pluginName, ...data);
 
-                        if (-1 < key) {
-                            this.plugins.splice(key, 1);
-                        }
+                        this._splicePlugin(key);
 
                         return latestTag;
 
